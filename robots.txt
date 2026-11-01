@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://money-spread.onrender.com/sitemap.xml
