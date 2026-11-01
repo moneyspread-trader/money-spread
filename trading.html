@@ -798,16 +798,30 @@
       document.getElementById('positionsDrawer').style.display = 'none';
     }
 
-    // Sync header market name when asset changes
-    if (window.MoneySpread && window.MoneySpread.subscribe) {
-      window.MoneySpread.subscribe(() => {
-        const asset = window.MoneySpread.getActiveAsset();
-        if (asset) {
-          const el = document.getElementById('headerMarketName');
-          if (el) el.textContent = asset.name || asset.symbol;
-        }
-      });
+    // Sync header market name when asset changes (wait for main.js to init)
+    function subscribeMarketName() {
+      if (window.MoneySpread && window.MoneySpread.subscribe) {
+        window.MoneySpread.subscribe(() => {
+          const asset = window.MoneySpread.getActiveAsset();
+          if (asset) {
+            const el = document.getElementById('headerMarketName');
+            if (el) el.textContent = asset.name || asset.symbol;
+            // also update price
+            const priceEl = document.getElementById('headerMarketPrice');
+            if (priceEl && asset.price !== undefined) {
+              priceEl.textContent = asset.price.toFixed(asset.decimals || 2);
+            }
+          }
+        });
+      } else {
+        // main.js not ready yet, retry after short delay
+        setTimeout(subscribeMarketName, 300);
+      }
     }
+    document.addEventListener('DOMContentLoaded', function() {
+      // slight delay so main.js initTradingPage() runs first
+      setTimeout(subscribeMarketName, 500);
+    });
 
     // Direct synchronous top avatar render
     (function renderAvatarImmediate() {
