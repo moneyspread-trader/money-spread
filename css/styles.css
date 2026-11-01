@@ -3805,6 +3805,18 @@ button {
   .account-balance-number {
     font-size: 1.6rem !important;
   }
+  .account-user-meta {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .account-user-meta .user-large-avatar {
+    width: 56px !important;
+    height: 56px !important;
+  }
+  .account-user-name, #accountUserDisplayName {
+    font-size: 1.1rem !important;
+  }
   .account-nav-tabs {
     overflow-x: auto !important;
     white-space: nowrap !important;
