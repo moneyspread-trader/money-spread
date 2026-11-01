@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trading Platform | Money Spread - Binary Options & Synthetics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trading Platform | Money Spread</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,263 +11,536 @@
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+  <style>
+    /* Deriv-Style Ultra Compact Mobile Viewport - Single Screen Fit */
+    body.trading-app {
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #090915;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Minimalist Trading Header */
+    .trading-header {
+      height: 48px;
+      min-height: 48px;
+      padding: 0 10px;
+      background: #0c0c1c;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .top-left-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Deriv-Style Market Selector Pill */
+    .market-selector-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 5px 10px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.84rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .market-selector-pill:hover, .market-selector-pill:active {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #00c49f;
+    }
+
+    /* Account Pill */
+    .account-selector-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    /* Clean Workspace: Chart (Top) & Deriv-style Horizontal Dock (Bottom) */
+    .trading-workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      height: calc(100vh - 48px);
+    }
+
+    /* Chart Area */
+    .chart-container-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      min-height: 220px;
+      overflow: hidden;
+      background: #090915;
+    }
+
+    /* Mini Bar: Timeframe & Chart Type */
+    .chart-mini-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 10px;
+      background: rgba(12, 12, 28, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.72rem;
+    }
+
+    .chart-viewport {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Digit Ticks Line at bottom of chart */
+    .digit-ticks-stream {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: rgba(10, 10, 20, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    /* Deriv-Style Bottom Controls Bar (Horizontal Left-to-Right) */
+    .deriv-controls-dock {
+      background: #111124;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.6);
+      z-index: 50;
+    }
+
+    /* Horizontal inputs row: Trade Type | Duration | Stake */
+    .deriv-params-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .deriv-param-box {
+      flex: 1;
+      background: #181830;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 4px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      cursor: pointer;
+    }
+    .deriv-param-box:focus-within {
+      border-color: #00c49f;
+    }
+
+    .deriv-param-label {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #8888aa;
+      line-height: 1;
+      margin-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .deriv-param-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .deriv-param-input-wrap input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0;
+      outline: none;
+    }
+
+    .deriv-param-input-wrap select {
+      background: transparent;
+      border: none;
+      color: #00c49f;
+      font-weight: 700;
+      font-size: 0.72rem;
+      outline: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* Execution Dual Buttons (RISE / FALL) */
+    .deriv-action-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .btn-deriv-trade {
+      flex: 1;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .btn-deriv-rise {
+      background: linear-gradient(135deg, #00c49f 0%, #009e80 100%);
+      box-shadow: 0 4px 14px rgba(0, 196, 159, 0.35);
+    }
+    .btn-deriv-fall {
+      background: linear-gradient(135deg, #ff444f 0%, #d82b35 100%);
+      box-shadow: 0 4px 14px rgba(255, 68, 79, 0.35);
+    }
+    .btn-deriv-trade:active {
+      transform: scale(0.97);
+    }
+
+    .trade-action-title {
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .trade-action-payout {
+      font-size: 0.72rem;
+      text-align: right;
+      opacity: 0.95;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Markets Fullscreen Modal Selector */
+    .markets-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      flex-direction: column;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .markets-modal-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #141428;
+    }
+
+    .markets-modal-categories {
+      display: flex;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #0f0f20;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .markets-modal-categories::-webkit-scrollbar { display: none; }
+
+    .market-cat-pill {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.06);
+      color: #8888aa;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+    }
+    .market-cat-pill.active {
+      background: #ff444f;
+      color: #fff;
+      border-color: #ff444f;
+    }
+
+    .markets-modal-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-market-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: #181830;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .modal-market-row:active, .modal-market-row.active {
+      border-color: #00c49f;
+      background: rgba(0, 196, 159, 0.1);
+    }
+
+    /* Trade Types Fullscreen Modal Selector */
+    .tradetypes-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      align-items: flex-end;
+    }
+    .tradetypes-sheet {
+      width: 100%;
+      background: #16162e;
+      border-radius: 16px 16px 0 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 16px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .tradetypes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .tradetype-card {
+      background: #1c1c38;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .tradetype-card.active {
+      border-color: #00c49f;
+      background: rgba(0, 196, 159, 0.15);
+    }
+    .tradetype-card-title {
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #fff;
+    }
+    .tradetype-card-desc {
+      font-size: 0.7rem;
+      color: #8888aa;
+      line-height: 1.25;
+    }
+
+    /* Positions & History Mini Drawer */
+    .positions-drawer-sheet {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 9999;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .positions-drawer-box {
+      background: #16162e;
+      border-radius: 16px 16px 0 0;
+      max-height: 75vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+  </style>
 </head>
 <body class="trading-app">
 
-  <!-- Top Marquee Ticker -->
-  <div class="ticker-tape">
-    <div class="ticker-inner">
-      <!-- Injected via main.js -->
-    </div>
-  </div>
-
-  <!-- Trading Header -->
+  <!-- Minimal Trading Header -->
   <header class="trading-header">
-    <div class="trading-header-left">
-      <a href="trading.html" class="navbar-brand" style="font-size: 1.15rem;">
-        <div class="brand-icon" style="width: 32px; height: 32px;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2V22" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M16 6.5C16 4.5 14.2 3 12 3C9.5 3 8 4.5 8 6.5C8 9.5 16 9 16 12.5C16 15 14 17 12 17C9.5 17 8 15 8 13.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M4 12L2 9M2 9L5 7M2 9H6" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M20 12L22 15M22 15L19 17M22 15H18" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <span class="brand-text">Money Spread</span>
-      </a>
+    <div class="top-left-group">
+      <!-- One Simple Tap to Pick Market -->
+      <button class="market-selector-pill" id="btnOpenMarketsModal" onclick="openMarketsModal()" title="Tap to change market">
+        <span style="color:#00c49f;">📈</span>
+        <span id="headerMarketName">Volatility 75</span>
+        <span style="font-size: 0.65rem; color: #888;">▼</span>
+      </button>
 
-      <div class="header-tagline-badge">
-        <span>Quote:</span>
-        <strong>"Trade Smart. Win Big. The Money is Always Spreading."</strong>
+      <!-- Spot Price -->
+      <div style="display: flex; flex-direction: column;">
+        <span id="activeAssetPrice" style="font-family:'JetBrains Mono',monospace; font-size:0.95rem; font-weight:800; color:#00c49f; line-height:1;">74,210.00</span>
+        <span id="activeAssetChange" style="font-size:0.62rem; color:#00c49f; line-height:1; font-weight:700;">+1.45%</span>
       </div>
     </div>
 
-    <div class="trading-header-right">
-      <div class="badge-live">
-        <span class="pulse-dot"></span>
-        <span>LIVE MARKET</span>
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <!-- Account Mode Pill -->
+      <div class="account-selector-pill" title="Tap to switch Demo / Real">
+        <span id="accountTypeTag" style="font-weight: 800; font-size: 0.72rem; color: #00c49f;">DEMO</span>
+        <span id="accountBalanceAmount" style="font-family:'JetBrains Mono',monospace; font-weight: 700; font-size: 0.75rem; color: #fff;">$10,000.00</span>
       </div>
 
-      <!-- Account Switcher Pill -->
-      <div class="account-selector-pill" title="Click to switch Demo / Real">
-        <span id="accountTypeTag" class="account-type-tag">DEMO</span>
-        <span id="accountBalanceAmount" class="account-balance-amount">$10,000.00 USD</span>
-        <span style="font-size: 0.7rem; color: var(--text-muted);">▼</span>
-      </div>
+      <!-- Trade History / Positions Trigger -->
+      <button onclick="openPositionsDrawer()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #fff;" title="Open Positions & History">
+        📋
+      </button>
 
-      <a href="deposit.html" class="btn btn-secondary btn-sm" style="padding: 5px 12px; background: #00c49f; color: #000; font-weight: 700; text-decoration: none; border-radius: 6px;">Deposit</a>
-      <a href="withdraw.html" class="btn btn-secondary btn-sm" style="padding: 5px 12px; background: #ff444f; color: #fff; font-weight: 700; text-decoration: none; border-radius: 6px;">Withdraw</a>
+      <!-- Profile Avatar -->
       <a href="account.html" id="topNavUserAvatar" style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #ff444f, #1f1f3a); overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.82rem; border: 1.5px solid rgba(255,255,255,0.25); text-decoration: none; color: #fff;" title="My Account">
         C
       </a>
     </div>
   </header>
 
-  <!-- Main 3-Column Trading Workspace -->
+  <!-- Workspace Container: Chart + Bottom Trade Dock -->
   <main class="trading-workspace">
 
-    <!-- LEFT PANEL: Asset Selector & Categories -->
-    <aside class="panel-assets">
-      <div class="asset-search-container">
-        <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="assetSearchInput" placeholder="Search markets (e.g. Vol 75, EUR)...">
-        </div>
-      </div>
-
-      <div class="category-nav">
-        <button class="active" data-cat="all">All</button>
-        <button data-cat="synthetic">Synthetic</button>
-        <button data-cat="forex">Forex</button>
-        <button data-cat="crypto">Crypto</button>
-        <button data-cat="commodities">Commodities</button>
-        <button data-cat="indices">Indices</button>
-      </div>
-
-      <!-- Scrollable Asset List -->
-      <div id="assetListScroll" class="asset-list-scroll">
-        <!-- Rendered dynamically by main.js with all 22+ assets -->
-      </div>
-    </aside>
-
-    <!-- CENTER PANEL: Chart & Market Analytics -->
-    <section class="panel-center">
-      <!-- Market Details Bar -->
-      <div class="chart-top-bar">
-        <div class="chart-symbol-info">
-          <span id="activeAssetName" class="active-asset-name">Volatility 75 Index</span>
-          <span id="activeAssetPrice" class="active-asset-price price-up">74,210.00</span>
-          <span id="activeAssetChange" class="active-asset-change price-up">+1.45%</span>
-        </div>
-
-        <div class="chart-stats-row">
-          <span>24h High: <strong id="activeAssetHigh">74,650.00</strong></span>
-          <span>24h Low: <strong id="activeAssetLow">73,810.00</strong></span>
-          <span>Type: <strong>Continuous 24/7</strong></span>
-        </div>
-      </div>
-
-      <!-- Chart Toolbar (Timeframes & Modes) -->
-      <div class="chart-toolbar">
-        <div class="tf-group">
-          <span style="font-size: 0.72rem; color: var(--text-muted); margin-right: 4px;">Timeframe:</span>
+    <!-- CHART AREA (Always clean and unobstructed) -->
+    <div class="chart-container-area">
+      <!-- Chart Mini Controls -->
+      <div class="chart-mini-bar">
+        <div class="tf-group" style="display: flex; gap: 4px; overflow-x: auto;">
           <button class="tool-btn">1s</button>
           <button class="tool-btn active">5s</button>
           <button class="tool-btn">15s</button>
-          <button class="tool-btn">30s</button>
           <button class="tool-btn">1m</button>
           <button class="tool-btn">5m</button>
-          <button class="tool-btn">15m</button>
-          <button class="tool-btn">1h</button>
         </div>
 
-        <div class="type-group">
-          <button class="tool-btn active" data-chart-type="candle">Candles</button>
-          <button class="tool-btn" data-chart-type="line">Line / Area</button>
-          <button class="tool-btn" data-chart-type="digits">Digits Only</button>
-          <span style="font-size: 0.72rem; color: var(--color-yellow); margin-left: 8px;">SMA (14) Active</span>
+        <div class="type-group" style="display: flex; gap: 4px;">
+          <button class="tool-btn active" data-chart-type="candle" style="padding: 2px 6px; font-size: 0.7rem;">Candles</button>
+          <button class="tool-btn" data-chart-type="line" style="padding: 2px 6px; font-size: 0.7rem;">Line</button>
+          <button class="tool-btn" data-chart-type="digits" style="padding: 2px 6px; font-size: 0.7rem;">Digits</button>
         </div>
       </div>
 
-      <!-- Live Digit Stream Bar (Deriv-Style Last Digits) -->
-      <div class="digit-stream-bar" id="digitStreamBar">
-        <span class="digit-stream-label">LAST DIGITS (TICK FEED):</span>
-        <div class="digit-stream-pills" id="digitStreamPills">
-          <!-- Populated live via main.js -->
-        </div>
-      </div>
-
-      <!-- The Realtime Interactive Chart Canvas -->
+      <!-- Chart Viewport -->
       <div class="chart-viewport" id="chartViewport">
-        <div class="chart-overlay-watermark">MONEY SPREAD</div>
         <canvas id="tradingChartCanvas"></canvas>
       </div>
 
-      <!-- Digits Only Frequency Board (Deriv-Style 2 Rows of 5 Digits) -->
-      <div class="digits-board" id="digitsOnlyBoard" style="display: none;">
-        <div class="digits-board-header">
-          <div>
-            <div style="font-size: 1.15rem; font-weight: 800; color: #fff;">Digit Frequency Statistics</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Percentage appearance over last 100 ticks</div>
-          </div>
-          <div class="digits-even-odd-bar">
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <span style="color: #70a1ff; font-weight: 700; font-size: 0.85rem;">EVEN:</span>
-              <strong id="statEvenPct" style="color:#fff; font-family:var(--font-mono);">50.0%</strong>
-            </div>
-            <div class="even-odd-progress">
-              <div id="evenProgressBar" style="width: 50%; background: #3772ff; height: 100%; transition: width 0.3s ease;"></div>
-              <div id="oddProgressBar" style="width: 50%; background: #ff444f; height: 100%; transition: width 0.3s ease;"></div>
-            </div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <span style="color: #ff6b6b; font-weight: 700; font-size: 0.85rem;">ODD:</span>
-              <strong id="statOddPct" style="color:#fff; font-family:var(--font-mono);">50.0%</strong>
-            </div>
-          </div>
+      <!-- Digit Statistics Board (When Digits Mode is selected) -->
+      <div class="digits-board" id="digitsOnlyBoard" style="display: none; padding: 8px 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="color: #fff; font-size: 0.85rem;">Digit Stats (100 Ticks)</strong>
+          <span style="font-size: 0.75rem; color:#70a1ff;">EVEN: <strong id="statEvenPct">50%</strong> | ODD: <strong id="statOddPct" style="color:#ff6b6b;">50%</strong></span>
         </div>
-
-        <!-- 2 Rows of 5 Digits Each -->
-        <div class="digits-grid-container">
-          <!-- Row 1: 0, 1, 2, 3, 4 -->
-          <div class="digits-row" id="digitsRow1">
-            <!-- 0 to 4 rendered live via main.js -->
-          </div>
-          <!-- Row 2: 5, 6, 7, 8, 9 -->
-          <div class="digits-row" id="digitsRow2">
-            <!-- 5 to 9 rendered live via main.js -->
-          </div>
-        </div>
-
-        <div class="digits-board-footer" style="display:flex; align-items:center; flex-wrap:wrap; gap:16px; font-size:0.78rem;">
-          <span style="color:#00c49f; font-weight:800;">● Green: 1st Most Frequent</span>
-          <span style="color:#ffd600; font-weight:800;">● Yellow: 2nd Most Frequent</span>
-          <span style="color:#70a1ff; font-weight:800;">● Blue: Other Digits</span>
-          <span style="color:#ff69b4; font-weight:800;">● Pink: 2nd Least Frequent</span>
-          <span style="color:#ff444f; font-weight:800;">● Red: Least Frequent</span>
-          <span style="color:#00c49f; font-weight:800;">▲ Cursor: Active Changing Digit</span>
-          <span style="margin-left: auto; color: var(--text-muted);">Real-time tick engine active</span>
+        <div class="digits-grid-container" style="gap: 4px;">
+          <div class="digits-row" id="digitsRow1"></div>
+          <div class="digits-row" id="digitsRow2"></div>
         </div>
       </div>
 
-      <!-- BOTTOM DRAWER: Positions & History -->
-      <div class="trading-bottom-drawer">
-        <div class="drawer-tabs">
-          <button class="drawer-tab active" data-target="drawerOpenPositions">Open Positions</button>
-          <button class="drawer-tab" data-target="drawerHistory">Trade History</button>
+      <!-- Deriv Last Digits Horizontal Strip -->
+      <div class="digit-ticks-stream" id="digitStreamBar">
+        <span style="font-size: 0.65rem; color: #888; font-weight: 700; margin-right: 4px;">DIGITS:</span>
+        <div class="digit-stream-pills" id="digitStreamPills" style="display: flex; gap: 4px;"></div>
+      </div>
+    </div>
+
+    <!-- DERIV-STYLE HORIZONTAL TRADE DOCK (Everything in One Screen, Left to Right) -->
+    <div class="deriv-controls-dock">
+      
+      <!-- Row 1: Selected Trade Type | Duration | Stake Amount -->
+      <div class="deriv-params-row">
+        <!-- Tap to Change Trade Type -->
+        <div class="deriv-param-box" onclick="openTradeTypesModal()" title="Tap to switch trade contract">
+          <div class="deriv-param-label">
+            <span>CONTRACT</span>
+            <span id="tradeTypePayoutBadge" style="color: #00c49f;">95%</span>
+          </div>
+          <div style="font-size: 0.85rem; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: space-between;">
+            <span id="currentTradeTypeLabel">Rise / Fall</span>
+            <span style="font-size: 0.65rem; color: #888;">▼</span>
+          </div>
         </div>
 
-        <div class="drawer-content">
-          <!-- Open Positions Tab -->
-          <div id="drawerOpenPositions" class="drawer-tab-content" style="display: block;">
-            <table class="positions-table">
-              <thead>
-                <tr>
-                  <th>Market</th>
-                  <th>Contract</th>
-                  <th>Stake</th>
-                  <th>Entry Spot</th>
-                  <th>Current Spot</th>
-                  <th>Remaining</th>
-                  <th>Potential P/L</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="openPositionsBody">
-                <!-- Rendered dynamically via main.js -->
-              </tbody>
-            </table>
+        <!-- Duration Input -->
+        <div class="deriv-param-box">
+          <div class="deriv-param-label">
+            <span>DURATION</span>
+            <span>TICKS / SEC</span>
           </div>
+          <div class="deriv-param-input-wrap">
+            <input type="number" id="tradeDurationInput" value="5" min="1" max="365">
+            <select id="tradeDurationUnit">
+              <option value="ticks" selected>Ticks</option>
+              <option value="s">Sec</option>
+              <option value="m">Min</option>
+            </select>
+          </div>
+        </div>
 
-          <!-- Trade History Tab -->
-          <div id="drawerHistory" class="drawer-tab-content" style="display: none;">
-            <table class="positions-table">
-              <thead>
-                <tr>
-                  <th>Market</th>
-                  <th>Contract</th>
-                  <th>Stake</th>
-                  <th>Entry Spot</th>
-                  <th>Exit Spot</th>
-                  <th>Result</th>
-                  <th>Profit / Loss</th>
-                </tr>
-              </thead>
-              <tbody id="tradeHistoryBody">
-                <!-- Rendered dynamically via main.js -->
-              </tbody>
-            </table>
+        <!-- Stake Amount Input -->
+        <div class="deriv-param-box">
+          <div class="deriv-param-label">
+            <span>STAKE</span>
+            <span id="payoutProfit" style="color: #00c49f;">+$9.50</span>
+          </div>
+          <div class="deriv-param-input-wrap">
+            <span style="color:#888; font-weight:800; font-size:0.85rem;">$</span>
+            <input type="number" id="tradeStakeInput" value="10" min="1" step="1">
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- RIGHT PANEL: Trade Setup & Execution Controls -->
-    <aside class="panel-trade-controls">
-      <!-- Trade Types -->
-      <div class="control-group">
-        <div class="control-label">
-          <span>TRADE TYPE</span>
-          <span id="tradeTypePayoutBadge" style="color: var(--color-green); font-size: 0.7rem;">95% Payout</span>
+      <!-- Digit Prediction Box (Shown ONLY when Matches/Differs or Over/Under is picked) -->
+      <div id="digitPredictionGroup" style="display: none; background: #16162e; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.68rem; margin-bottom: 2px;">
+          <span id="digitPredictionLabel" style="color:#aaa; font-weight:700;">PREDICTION DIGIT</span>
+          <span id="digitPredictionInfo" style="color:#00c49f; font-weight:800;">Digit: 4</span>
         </div>
-        <div class="trade-type-tabs" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
-          <button class="trade-type-btn active" data-type="rise">Rise/Fall</button>
-          <button class="trade-type-btn" data-type="even_odd">Even/Odd</button>
-          <button class="trade-type-btn" data-type="match_diff">Match/Diff</button>
-          <button class="trade-type-btn" data-type="over_under">Over/Under</button>
-          <button class="trade-type-btn" data-type="higher">Higher/Lower</button>
-          <button class="trade-type-btn" data-type="touch">Touch/No Touch</button>
-          <button class="trade-type-btn" data-type="in">In/Out</button>
-          <button class="trade-type-btn" data-type="multiplier">Multiplier</button>
-        </div>
-      </div>
-
-      <!-- Digit Prediction Box (Shown for Matches/Differs and Over/Under) -->
-      <div class="control-group" id="digitPredictionGroup" style="display: none;">
-        <div class="control-label">
-          <span id="digitPredictionLabel">PREDICTION DIGIT</span>
-          <span id="digitPredictionInfo" style="color: var(--color-coral); font-size: 0.72rem; font-weight:700;">Selected: 4</span>
-        </div>
-        <div class="digit-selector-row">
+        <div class="digit-selector-row" style="display: flex; gap: 4px; justify-content: space-between;">
           <button type="button" class="digit-btn" data-digit="0">0</button>
           <button type="button" class="digit-btn" data-digit="1">1</button>
           <button type="button" class="digit-btn" data-digit="2">2</button>
@@ -281,111 +554,276 @@
         </div>
       </div>
 
-      <!-- Duration -->
-      <div class="control-group">
-        <div class="control-label">
-          <span>DURATION</span>
-          <span>1s - 365d</span>
-        </div>
-        <div class="input-with-select">
-          <input type="number" id="tradeDurationInput" value="15" min="1" max="365">
-          <select id="tradeDurationUnit">
-            <option value="ticks">Ticks</option>
-            <option value="s" selected>Seconds</option>
-            <option value="m">Minutes</option>
-            <option value="h">Hours</option>
-            <option value="d">Days</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Stake -->
-      <div class="control-group">
-        <div class="control-label">
-          <span>STAKE AMOUNT</span>
-          <span>Currency: USD</span>
-        </div>
-        <div class="input-with-select">
-          <input type="number" id="tradeStakeInput" value="10" min="1" step="1">
-          <select id="tradeStakeCurrency">
-            <option value="USD" selected>USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-            <option value="BTC">BTC</option>
-            <option value="ETH">ETH</option>
-          </select>
-        </div>
-        <div class="quick-stakes">
-          <button class="quick-stake-btn" data-val="10">+$10</button>
-          <button class="quick-stake-btn" data-val="25">+$25</button>
-          <button class="quick-stake-btn" data-val="50">+$50</button>
-          <button class="quick-stake-btn" data-val="100">+$100</button>
-          <button class="quick-stake-btn" data-val="500">+$500</button>
-        </div>
-      </div>
-
-      <!-- Payout Details Calculation Box -->
-      <div class="payout-calculation-box">
-        <div class="payout-row">
-          <span>Contract Stake</span>
-          <strong id="payoutStakeDisplay">$10.00</strong>
-        </div>
-        <div class="payout-row">
-          <span>Net Profit</span>
-          <strong id="payoutProfit" style="color: var(--color-green);">+$9.50 (95%)</strong>
-        </div>
-        <div class="payout-row highlight">
-          <span>Total Payout</span>
-          <strong id="payoutPotential" style="font-size: 1.1rem; color: #fff;">$19.50</strong>
-        </div>
-      </div>
-
-      <!-- Big Execution Buttons -->
-      <div class="execution-buttons">
+      <!-- Row 2: Two Big Execution Buttons (Left: RISE, Right: FALL) -->
+      <div class="deriv-action-row">
         <!-- Button 1 (Rise / Even / Matches / Over) -->
-        <button id="btnRise" class="btn-trade btn-rise">
-          <div class="trade-btn-left">
-            <svg id="btnRiseIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="19" x2="12" y2="5"></line>
-              <polyline points="5 12 12 5 19 12"></polyline>
-            </svg>
+        <button id="btnRise" class="btn-deriv-trade btn-deriv-rise">
+          <div class="trade-action-title">
+            <span>▲</span>
             <span id="btnRiseTitle">RISE</span>
           </div>
-          <div class="trade-btn-right">
-            <span>Payout</span>
-            <span id="risePayoutSub" class="trade-btn-payout">$19.50</span>
+          <div class="trade-action-payout">
+            <span>Payout</span><br>
+            <strong id="risePayoutSub">$19.50</strong>
           </div>
         </button>
 
         <!-- Button 2 (Fall / Odd / Differs / Under) -->
-        <button id="btnFall" class="btn-trade btn-fall">
-          <div class="trade-btn-left">
-            <svg id="btnFallIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <polyline points="19 12 12 19 5 12"></polyline>
-            </svg>
+        <button id="btnFall" class="btn-deriv-trade btn-deriv-fall">
+          <div class="trade-action-title">
+            <span>▼</span>
             <span id="btnFallTitle">FALL</span>
           </div>
-          <div class="trade-btn-right">
-            <span>Payout</span>
-            <span id="fallPayoutSub" class="trade-btn-payout">$19.50</span>
+          <div class="trade-action-payout">
+            <span>Payout</span><br>
+            <strong id="fallPayoutSub">$19.50</strong>
           </div>
         </button>
       </div>
 
-      <!-- Contract Details Summary -->
-      <div class="contract-summary-card">
-        <div style="font-weight: 600; color: #fff; margin-bottom: 4px;">Contract Terms</div>
-        <div id="contractTermsDesc">&bull; If price closes strictly higher at expiry: Full 95% net profit.<br>&bull; If price closes lower: Stake is lost.<br>&bull; Early cashout available at fair value before expiration.</div>
-      </div>
-
-    </aside>
+    </div>
 
   </main>
 
-  <!-- Universal Toast Container -->
+  <!-- MARKETS MODAL (Opens ONLY when you tap the market name) -->
+  <div class="markets-modal-overlay" id="marketsModal">
+    <div class="markets-modal-header">
+      <div style="font-weight: 800; font-size: 1.05rem; color: #fff;">Select Trading Market</div>
+      <button onclick="closeMarketsModal()" style="color: #aaa; font-size: 1.3rem; background: none; border: none; cursor: pointer; padding: 4px 8px;">✕</button>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <div class="markets-modal-categories">
+      <button class="market-cat-pill active" onclick="filterModalMarkets('all', this)">All</button>
+      <button class="market-cat-pill" onclick="filterModalMarkets('synthetic', this)">Synthetics</button>
+      <button class="market-cat-pill" onclick="filterModalMarkets('forex', this)">Forex</button>
+      <button class="market-cat-pill" onclick="filterModalMarkets('crypto', this)">Crypto</button>
+      <button class="market-cat-pill" onclick="filterModalMarkets('commodities', this)">Commodities</button>
+    </div>
+
+    <!-- Search Input -->
+    <div style="padding: 8px 12px; background: #121226; border-bottom: 1px solid rgba(255,255,255,0.06);">
+      <input type="text" id="modalMarketSearchInput" placeholder="🔍 Search (e.g. Vol 75, Boom, EUR)..." style="width: 100%; background: #181830; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.85rem;" oninput="onModalSearchInput()">
+    </div>
+
+    <!-- Markets List (Rendered dynamically) -->
+    <div class="markets-modal-list" id="modalMarketsList"></div>
+  </div>
+
+  <!-- TRADE TYPES MODAL (Opens when tapping Contract box) -->
+  <div class="tradetypes-modal-overlay" id="tradeTypesModal" onclick="if(event.target === this) closeTradeTypesModal()">
+    <div class="tradetypes-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+        <strong style="font-size: 1rem; color: #fff;">Select Contract Type</strong>
+        <button onclick="closeTradeTypesModal()" style="color: #888; font-size: 1.2rem; background: none; border: none;">✕</button>
+      </div>
+
+      <div class="tradetypes-grid">
+        <div class="tradetype-card active" data-type="rise" onclick="selectTradeTypeModal('rise', 'Rise / Fall')">
+          <div class="tradetype-card-title">📈 Rise / Fall</div>
+          <div class="tradetype-card-desc">Price closes higher or lower at expiry. (95% Payout)</div>
+        </div>
+
+        <div class="tradetype-card" data-type="match_diff" onclick="selectTradeTypeModal('match_diff', 'Matches / Differs')">
+          <div class="tradetype-card-title">🎯 Matches / Differs</div>
+          <div class="tradetype-card-desc">Predict the exact last digit (900% Payout) or Differs.</div>
+        </div>
+
+        <div class="tradetype-card" data-type="even_odd" onclick="selectTradeTypeModal('even_odd', 'Even / Odd')">
+          <div class="tradetype-card-title">🔢 Even / Odd</div>
+          <div class="tradetype-card-desc">Last digit is Even (0,2,4,6,8) or Odd (1,3,5,7,9).</div>
+        </div>
+
+        <div class="tradetype-card" data-type="over_under" onclick="selectTradeTypeModal('over_under', 'Over / Under')">
+          <div class="tradetype-card-title">⚖️ Over / Under</div>
+          <div class="tradetype-card-desc">Last digit ends higher or lower than your barrier.</div>
+        </div>
+
+        <div class="tradetype-card" data-type="higher" onclick="selectTradeTypeModal('higher', 'Higher / Lower')">
+          <div class="tradetype-card-title">📊 Higher / Lower</div>
+          <div class="tradetype-card-desc">Price breaches higher or lower barrier level.</div>
+        </div>
+
+        <div class="tradetype-card" data-type="touch" onclick="selectTradeTypeModal('touch', 'Touch / No Touch')">
+          <div class="tradetype-card-title">⚡ Touch / No Touch</div>
+          <div class="tradetype-card-desc">Price touches the trigger spot at least once.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POSITIONS & HISTORY DRAWER -->
+  <div class="positions-drawer-sheet" id="positionsDrawer" onclick="if(event.target === this) closePositionsDrawer()">
+    <div class="positions-drawer-box">
+      <div style="padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: #181832;">
+        <div style="display: flex; gap: 8px;">
+          <button class="drawer-tab active" data-target="drawerOpenPositions" style="background: none; border: none; color: #fff; font-weight: 800; font-size: 0.9rem; cursor: pointer;">Open Trades (<span id="openCountBadge">0</span>)</button>
+          <span style="color:#555;">|</span>
+          <button class="drawer-tab" data-target="drawerHistory" style="background: none; border: none; color: #888; font-weight: 700; font-size: 0.9rem; cursor: pointer;">History</button>
+        </div>
+        <button onclick="closePositionsDrawer()" style="color: #aaa; font-size: 1.2rem; background: none; border: none;">✕</button>
+      </div>
+
+      <div style="overflow-y: auto; padding: 10px; max-height: 60vh;">
+        <div id="drawerOpenPositions">
+          <table class="positions-table" style="width: 100%;">
+            <thead>
+              <tr><th>Market</th><th>Type</th><th>Stake</th><th>Spot</th><th>P/L</th></tr>
+            </thead>
+            <tbody id="openPositionsBody"></tbody>
+          </table>
+        </div>
+
+        <div id="drawerHistory" style="display: none;">
+          <table class="positions-table" style="width: 100%;">
+            <thead>
+              <tr><th>Market</th><th>Contract</th><th>Stake</th><th>Result</th><th>Profit</th></tr>
+            </thead>
+            <tbody id="tradeHistoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
   <div id="toast-container"></div>
 
+  <!-- Hidden elements needed by main.js engine -->
+  <div style="display: none;">
+    <div id="assetListScroll"></div>
+    <span id="activeAssetName">Volatility 75 Index</span>
+    <span id="activeAssetHigh">0</span>
+    <span id="activeAssetLow">0</span>
+    <span id="payoutStakeDisplay">$10.00</span>
+    <span id="payoutPotential">$19.50</span>
+    <div id="contractTermsDesc"></div>
+  </div>
+
   <script src="js/main.js"></script>
+  <script>
+    // Market Modal Logic
+    function openMarketsModal() {
+      document.getElementById('marketsModal').style.display = 'flex';
+      renderModalMarketsList();
+      setTimeout(() => {
+        const input = document.getElementById('modalMarketSearchInput');
+        if (input) input.focus();
+      }, 50);
+    }
+    function closeMarketsModal() {
+      document.getElementById('marketsModal').style.display = 'none';
+    }
+
+    let modalCategory = 'all';
+    function filterModalMarkets(cat, btn) {
+      modalCategory = cat;
+      document.querySelectorAll('.market-cat-pill').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderModalMarketsList();
+    }
+
+    function onModalSearchInput() {
+      renderModalMarketsList();
+    }
+
+    function renderModalMarketsList() {
+      const listEl = document.getElementById('modalMarketsList');
+      if (!listEl) return;
+      const search = (document.getElementById('modalMarketSearchInput')?.value || '').toLowerCase().trim();
+      const assets = window.ASSET_CATALOG || [];
+      const currentId = window.MoneySpread ? window.MoneySpread.activeAssetId : 'vol_75';
+
+      const filtered = assets.filter(a => {
+        const matchCat = modalCategory === 'all' || a.category === modalCategory;
+        const matchSearch = !search || a.name.toLowerCase().includes(search) || a.symbol.toLowerCase().includes(search);
+        return matchCat && matchSearch;
+      });
+
+      let html = '';
+      filtered.forEach(a => {
+        const isSelected = a.id === currentId;
+        const isUp = a.changePct >= 0;
+        const cls = isUp ? 'price-up' : 'price-down';
+        const arrow = isUp ? '+' : '';
+        html += `
+          <div class="modal-market-row ${isSelected ? 'active' : ''}" onclick="pickMarket('${a.id}')">
+            <div>
+              <div style="font-weight: 800; color: #fff; font-size: 0.95rem;">${a.name}</div>
+              <div style="font-size: 0.75rem; color: #888;">${a.symbol} &bull; <span style="text-transform:uppercase;">${a.category}</span></div>
+            </div>
+            <div style="text-align: right;">
+              <div class="${cls}" style="font-weight: 800; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;">${a.price.toFixed(a.decimals)}</div>
+              <div class="${cls}" style="font-size: 0.72rem; font-weight: 700;">${arrow}${a.changePct.toFixed(2)}%</div>
+            </div>
+          </div>
+        `;
+      });
+      listEl.innerHTML = html;
+    }
+
+    function pickMarket(assetId) {
+      if (window.MoneySpread && window.MoneySpread.setActiveAsset) {
+        window.MoneySpread.setActiveAsset(assetId);
+      }
+      closeMarketsModal();
+    }
+
+    // Trade Types Modal Logic
+    function openTradeTypesModal() {
+      document.getElementById('tradeTypesModal').style.display = 'flex';
+    }
+    function closeTradeTypesModal() {
+      document.getElementById('tradeTypesModal').style.display = 'none';
+    }
+
+    function selectTradeTypeModal(type, label) {
+      document.getElementById('currentTradeTypeLabel').textContent = label;
+      document.querySelectorAll('.tradetype-card').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-type') === type);
+      });
+      closeTradeTypesModal();
+
+      // Trigger the engine's updateTradeTypeUI
+      if (window.updateTradeTypeUI) {
+        window.updateTradeTypeUI(type);
+      }
+    }
+
+    // Positions Drawer Logic
+    function openPositionsDrawer() {
+      document.getElementById('positionsDrawer').style.display = 'flex';
+    }
+    function closePositionsDrawer() {
+      document.getElementById('positionsDrawer').style.display = 'none';
+    }
+
+    // Sync header market name when asset changes
+    if (window.MoneySpread && window.MoneySpread.subscribe) {
+      window.MoneySpread.subscribe(() => {
+        const asset = window.MoneySpread.getActiveAsset();
+        if (asset) {
+          const el = document.getElementById('headerMarketName');
+          if (el) el.textContent = asset.name || asset.symbol;
+        }
+      });
+    }
+
+    // Direct synchronous top avatar render
+    (function renderAvatarImmediate() {
+      try {
+        const u = JSON.parse(localStorage.getItem('ms_user') || 'null');
+        const av = document.getElementById('topNavUserAvatar');
+        if (av && u) {
+          const nick = u.nickname || u.name || 'C';
+          if (u.profilePic && u.profilePic.startsWith('data:image')) {
+            av.innerHTML = `<img src="${u.profilePic}" alt="${nick}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+          } else {
+            av.innerHTML = `<span>${nick.charAt(0).toUpperCase()}</span>`;
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>

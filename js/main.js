@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MONEY SPREAD - Professional Binary Options Trading Platform
  * Main Application Engine: Live Tickers, Real-time Candlestick Chart, 
  * Binary Options Trade Execution, Audio FX, Portfolio & LocalStorage State.
@@ -344,7 +344,7 @@ const MoneySpread = {
 
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    const icon = type === 'win' ? '🎉' : type === 'loss' ? '📉' : '💡';
+    const icon = type === 'win' ? 'ðŸŽ‰' : type === 'loss' ? 'ðŸ“‰' : 'ðŸ’¡';
 
     toast.innerHTML = `
       <div class="toast-icon">${icon}</div>
@@ -552,7 +552,7 @@ const MoneySpread = {
       const isUp = asset.changePct >= 0;
       const sign = isUp ? '+' : '';
       const cls = isUp ? 'price-up' : 'price-down';
-      const arrow = isUp ? '▲' : '▼';
+      const arrow = isUp ? 'â–²' : 'â–¼';
       html += `
         <div class="ticker-item" data-id="${asset.id}" onclick="MoneySpread.onTickerClick('${asset.id}')">
           <span class="ticker-symbol">${asset.symbol}</span>
@@ -570,7 +570,7 @@ const MoneySpread = {
       const isUp = asset.changePct >= 0;
       const sign = isUp ? '+' : '';
       const cls = isUp ? 'price-up' : 'price-down';
-      const arrow = isUp ? '▲' : '▼';
+      const arrow = isUp ? 'â–²' : 'â–¼';
 
       const priceEls = document.querySelectorAll(`.ticker-val-${asset.id}`);
       priceEls.forEach(el => el.textContent = asset.price.toFixed(asset.decimals));
@@ -764,7 +764,7 @@ const MoneySpread = {
         contract.closedAt = now;
 
         if (isWin) {
-          // Pay user — handle cross-mode correctly
+          // Pay user â€” handle cross-mode correctly
           if (contract.mode === 'demo') {
             this.demoBalance = Math.max(0, parseFloat((this.demoBalance + contract.payout).toFixed(2)));
           } else {
@@ -896,7 +896,7 @@ const MoneySpread = {
           </div>
           <!-- Cursor Below Each Number (Indicates Changing Status) -->
           <div class="digit-cursor-box ${isLatest ? 'is-active' : ''}" style="--cursor-color: ${rankColor};">
-            <div class="digit-cursor-pointer">▲</div>
+            <div class="digit-cursor-pointer">â–²</div>
             <div class="digit-cursor-track">
               <div class="digit-cursor-bar" style="width: ${Math.min(100, Math.max(8, parseFloat(pct) * 5))}%; background: ${rankColor};"></div>
             </div>
@@ -1514,7 +1514,7 @@ function initTradingPage() {
     });
   });
 
-  function updateTradeTypeUI(tradeType) {
+  window.updateTradeTypeUI = function updateTradeTypeUI(tradeType) {
     const btnRiseTitle = document.getElementById('btnRiseTitle');
     const btnFallTitle = document.getElementById('btnFallTitle');
     const digitGroup = document.getElementById('digitPredictionGroup');
@@ -1596,8 +1596,8 @@ function initTradingPage() {
         break;
 
       case 'multiplier':
-        if (btnRiseTitle) btnRiseTitle.textContent = 'UP ×10';
-        if (btnFallTitle) btnFallTitle.textContent = 'DOWN ×10';
+        if (btnRiseTitle) btnRiseTitle.textContent = 'UP Ã—10';
+        if (btnFallTitle) btnFallTitle.textContent = 'DOWN Ã—10';
         if (payoutBadge) payoutBadge.textContent = 'Multiplied Payout';
         if (termsDesc) termsDesc.innerHTML = '&bull; UP wins if exit price is above entry; profit is multiplied.<br>&bull; DOWN wins if exit price is below entry; profit is multiplied.<br>&bull; No cap on potential profit.';
         break;
@@ -2100,7 +2100,7 @@ function initAccountPage() {
           <td><strong>${h.symbol || h.name}</strong> ${h.type}</td>
           <td style="font-family: var(--font-mono); font-size: 0.82rem; color: #aaa;">${entryFormatted} &rarr; <span style="color: #fff;">${exitFormatted}</span></td>
           <td>$${Number(h.stake || 0).toFixed(2)}</td>
-          <td><span style="color: ${color}; font-weight: 800;">${isWin ? 'WON ✓' : 'LOST ✗'}</span></td>
+          <td><span style="color: ${color}; font-weight: 800;">${isWin ? 'WON âœ“' : 'LOST âœ—'}</span></td>
           <td style="color: ${color}; font-weight: 800;">${h.profit >= 0 ? '+' : ''}$${Number(h.profit || 0).toFixed(2)}</td>
           <td style="color: var(--text-muted); font-size: 0.8rem;">${new Date(h.closedAt || h.startTime || Date.now()).toLocaleTimeString()}</td>
         </tr>
