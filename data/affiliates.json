@@ -1,0 +1,32 @@
+[
+  {
+    "crNumber": "CR8239580",
+    "affiliateCode": "SPREAD-TMQ2H",
+    "name": "Wayne Partner",
+    "phone": "0712345678",
+    "email": "wayne.partner@moneyspread.com",
+    "pass": "PartnerSecure2026",
+    "demoBalance": 10000,
+    "realBalance": 10,
+    "commissionEarned": 10,
+    "totalReferred": 1,
+    "referredTraders": [
+      {
+        "name": "Alice Trader",
+        "nickname": "alicetrades",
+        "email": "alice@example.com",
+        "crNumber": "CR2052475",
+        "registeredAt": "2026-10-28T13:12:51.421Z"
+      }
+    ],
+    "commissionLedger": [
+      {
+        "trader": "alicetrades",
+        "depositAmount": 100,
+        "commission": 10,
+        "date": "2026-10-28T13:13:08.658Z"
+      }
+    ],
+    "createdAt": "2026-10-28T13:12:36.805Z"
+  }
+]

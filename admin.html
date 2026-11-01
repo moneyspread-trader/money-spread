@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Spread | Admin Command Center</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Admin Authentication Guard
+    if (localStorage.getItem('ms_admin_auth') !== 'admin_authenticated') {
+      window.location.href = 'register.html';
+    }
+  </script>
+  <style>
+    .admin-container {
+      max-width: 1240px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .admin-top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Dual Side Switcher Tabs */
+    .admin-main-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 2rem;
+      background: #141428;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: fit-content;
+    }
+    .admin-main-tab {
+      background: transparent;
+      border: none;
+      color: #8888aa;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .admin-main-tab:hover {
+      color: #fff;
+    }
+    .admin-main-tab.active.tab-traders {
+      background: #ff444f;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(255, 68, 79, 0.35);
+    }
+    .admin-main-tab.active.tab-affiliates {
+      background: #00c49f;
+      color: #0b0b16;
+      box-shadow: 0 4px 15px rgba(0, 196, 159, 0.35);
+    }
+    .tab-counter {
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.75rem;
+    }
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      background: #16162a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: #a0a0ba;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .table-container {
+      background: #16162a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+    .table-toolbar {
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .search-box {
+      background: #111122;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 14px;
+      color: #fff;
+      font-size: 0.9rem;
+      width: 280px;
+      outline: none;
+    }
+    .search-box:focus {
+      border-color: #ff444f;
+    }
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .users-table th {
+      background: #121224;
+      padding: 14px 18px;
+      color: #8888aa;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .users-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #ddd;
+    }
+    .users-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .badge-nick {
+      background: rgba(255, 68, 79, 0.15);
+      color: #ff6b6b;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-code {
+      background: rgba(0, 196, 159, 0.15);
+      color: #00c49f;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .balance-real {
+      color: #00c49f;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .balance-demo {
+      color: #3772ff;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .btn-action {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ccc;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-right: 4px;
+      transition: all 0.15s ease;
+    }
+    .btn-action:hover {
+      border-color: #00c49f;
+      color: #fff;
+    }
+    .btn-action.btn-del:hover {
+      border-color: #ff444f;
+      color: #ff444f;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-box {
+      background: #1a1a32;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 440px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+    .pass-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #bbb;
+      background: #111122;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body style="background: #0e0e1e; min-height: 100vh;">
+
+  <!-- Admin Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#ff444f"/>
+        <text x="18" y="24" text-anchor="middle" font-size="18" font-weight="bold" fill="white" font-family="Inter">$</text>
+      </svg>
+      <span class="brand-name">Money<span class="brand-accent">Spread</span> <span style="font-size: 0.75rem; background: #ff444f; color:#fff; padding: 2px 8px; border-radius: 4px; margin-left: 8px;">ADMIN COMMAND CENTER</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">View Site</a>
+      <a href="trading.html">Trading Terminal</a>
+      <a href="affiliate.html">Partner View</a>
+      <button class="btn-logout" onclick="adminLogout()">Log Out Admin</button>
+    </div>
+  </nav>
+
+  <div class="admin-container">
+    
+    <!-- Top Side Switcher: Traders Side & Affiliates Side -->
+    <div class="admin-main-tabs">
+      <button class="admin-main-tab active tab-traders" id="tabBtnTraders" onclick="switchAdminSection('traders')">
+        <span>📈 Traders Side</span>
+        <span class="tab-counter" id="badgeTraderCount">0</span>
+      </button>
+      <button class="admin-main-tab tab-affiliates" id="tabBtnAffiliates" onclick="switchAdminSection('affiliates')">
+        <span>🤝 Affiliates Side</span>
+        <span class="tab-counter" id="badgeAffiliateCount">0</span>
+      </button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 1: TRADERS SIDE                         -->
+    <!-- ============================================== -->
+    <div id="sectionTraders" class="admin-section">
+      <div class="admin-header">
+        <div>
+          <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;">Traders Directory & Accounts</h1>
+          <p style="color: #8888aa; font-size: 0.9rem;">Inspect registered trader profiles, balances, CR account identifiers, and trading credentials.</p>
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="openCreateModal()">+ Add New Trader</button>
+        </div>
+      </div>
+
+      <!-- Traders Stats -->
+      <div class="admin-stats-grid">
+        <div class="stat-card" style="border-top: 3px solid #ff444f;">
+          <div class="stat-label">Total Registered Traders</div>
+          <div class="stat-value" id="statUserCount">0</div>
+        </div>
+        <div class="stat-card" style="border-top: 3px solid #00c49f;">
+          <div class="stat-label">Total Real Money Balance</div>
+          <div class="stat-value" id="statRealTotal" style="color: #00c49f;">$0.00</div>
+        </div>
+        <div class="stat-card" style="border-top: 3px solid #3772ff;">
+          <div class="stat-label">Total Virtual Demo Funds</div>
+          <div class="stat-value" id="statDemoTotal" style="color: #3772ff;">$0.00</div>
+        </div>
+        <div class="stat-card" style="border-top: 3px solid #ffb74d;">
+          <div class="stat-label">Security & Encryption</div>
+          <div class="stat-value" style="font-size: 1.3rem; margin-top: 14px; color: #ffb74d;">🔒 256-Bit Active</div>
+        </div>
+      </div>
+
+      <!-- Traders Table -->
+      <div class="table-container">
+        <div class="table-toolbar">
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Registered Traders Database</h3>
+          <input type="text" class="search-box" id="searchBoxTraders" placeholder="Search traders by name, CR, email..." oninput="filterTradersTable()">
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Trader</th>
+                <th>CR Account ID</th>
+                <th>Nickname</th>
+                <th>Email Address</th>
+                <th>Password</th>
+                <th>Referred By</th>
+                <th>Demo Balance</th>
+                <th>Real Balance</th>
+                <th>Registered</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 2: AFFILIATES SIDE                      -->
+    <!-- ============================================== -->
+    <div id="sectionAffiliates" class="admin-section" style="display: none;">
+      <div class="admin-header">
+        <div>
+          <h1 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; color: #00c49f;">Affiliates & Partner Program</h1>
+          <p style="color: #8888aa; font-size: 0.9rem;">Manage partners, tracking codes, M-Pesa payout phone numbers, and 10% deposit commissions.</p>
+        </div>
+        <div>
+          <button class="btn btn-green" onclick="openAffiliateCreateModal()" style="font-weight: 700;">+ Register Affiliate Partner</button>
+        </div>
+      </div>
+
+      <!-- Affiliates Stats -->
+      <div class="admin-stats-grid">
+        <div class="stat-card" style="border-top: 3px solid #00c49f;">
+          <div class="stat-label">Total Registered Partners</div>
+          <div class="stat-value" id="statAffiliateCount" style="color: #00c49f;">0</div>
+        </div>
+        <div class="stat-card" style="border-top: 3px solid #3772ff;">
+          <div class="stat-label">Total Traders Referred</div>
+          <div class="stat-value" id="statAffTotalReferred" style="color: #3772ff;">0</div>
+        </div>
+        <div class="stat-card" style="border-top: 3px solid #ff444f;">
+          <div class="stat-label">Total Commissions Earned</div>
+          <div class="stat-value" id="statAffTotalCommissions" style="color: #ff444f;">$0.00</div>
+        </div>
+        <div class="stat-card" style="border-top: 3px solid #ffb74d;">
+          <div class="stat-label">Commission Model</div>
+          <div class="stat-value" style="font-size: 1.3rem; margin-top: 14px; color: #00c49f;">10% Lifetime Deposit</div>
+        </div>
+      </div>
+
+      <!-- Affiliates Table -->
+      <div class="table-container">
+        <div class="table-toolbar">
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Affiliates Partner Registry</h3>
+          <input type="text" class="search-box" id="searchBoxAffiliates" placeholder="Search by name, code, phone, email..." oninput="filterAffiliatesTable()" style="border-color: rgba(0,196,159,0.3);">
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Partner Name</th>
+                <th>Affiliate Code</th>
+                <th>CR ID</th>
+                <th>Payout Mobile (M-Pesa)</th>
+                <th>Email Address</th>
+                <th>Password</th>
+                <th>Traders Referred</th>
+                <th>Commission Balance</th>
+                <th>Registered</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="affiliatesTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Edit Trader Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 1rem;" id="modalTitle">Edit Trader Account</h3>
+      <form id="editUserForm" onsubmit="saveUserChanges(event)">
+        <input type="hidden" id="editUserEmail">
+        
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editName" required>
+        </div>
+        <div class="form-group">
+          <label>Nickname</label>
+          <input type="text" id="editNickname" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="text" id="editPass" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Real Balance ($)</label>
+            <input type="number" step="0.01" id="editReal" required>
+          </div>
+          <div class="form-group">
+            <label>Demo Balance ($)</label>
+            <input type="number" step="0.01" id="editDemo" required>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+          <button type="button" class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Affiliate Modal -->
+  <div class="modal-overlay" id="editAffiliateModal">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 1rem; color: #00c49f;" id="affModalTitle">Edit Partner Profile</h3>
+      <form id="editAffiliateForm" onsubmit="saveAffiliateChanges(event)">
+        <input type="hidden" id="editAffEmail">
+        
+        <div class="form-group">
+          <label>Official Name</label>
+          <input type="text" id="editAffName" required>
+        </div>
+        <div class="form-group">
+          <label>Mobile Number to be Paid On (M-Pesa)</label>
+          <input type="text" id="editAffPhone" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="text" id="editAffPass" required>
+        </div>
+        <div class="form-group">
+          <label>Commission Balance ($)</label>
+          <input type="number" step="0.01" id="editAffCommission" required>
+        </div>
+        
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-green" style="flex: 1; font-weight:700;">Save Partner Changes</button>
+          <button type="button" class="btn btn-outline" onclick="closeAffiliateModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let allUsers = [];
+    let allAffiliates = [];
+
+    function adminLogout() {
+      localStorage.removeItem('ms_admin_auth');
+      window.location.href = 'register.html';
+    }
+
+    function switchAdminSection(section) {
+      const isTraders = section === 'traders';
+      document.getElementById('sectionTraders').style.display = isTraders ? 'block' : 'none';
+      document.getElementById('sectionAffiliates').style.display = isTraders ? 'none' : 'block';
+      document.getElementById('tabBtnTraders').classList.toggle('active', isTraders);
+      document.getElementById('tabBtnAffiliates').classList.toggle('active', !isTraders);
+    }
+
+    // ---------------- TRADERS LOGIC ----------------
+    async function loadUsers() {
+      try {
+        const resp = await fetch('/api/admin/users', {
+          headers: { 'Authorization': 'Bearer admin_authenticated' }
+        });
+        const data = await resp.json();
+        if (data.success && Array.isArray(data.users)) {
+          allUsers = data.users;
+        } else {
+          allUsers = JSON.parse(localStorage.getItem('ms_users') || '[]');
+        }
+      } catch (err) {
+        allUsers = JSON.parse(localStorage.getItem('ms_users') || '[]');
+      }
+      renderUsers(allUsers);
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '';
+
+      let totalReal = 0;
+      let totalDemo = 0;
+
+      users.forEach((u, idx) => {
+        const real = parseFloat(u.realBalance || 0);
+        const demo = parseFloat(u.demoBalance || 10000);
+        totalReal += real;
+        totalDemo += demo;
+
+        const regDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Recent';
+        const refBadge = u.referredBy ? `<span class="badge-code">${u.referredBy}</span>` : '<span style="color:#666;">Direct</span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${u.name || 'Trader'}</strong></td>
+          <td><code style="color: #00c49f; font-weight: 700;">${u.crNumber || 'CR0000000'}</code></td>
+          <td><span class="badge-nick">@${u.nickname || 'none'}</span></td>
+          <td style="color: #a0a0ba;">${u.email}</td>
+          <td>
+            <span class="pass-pill" id="trader_pass_${idx}">${'•'.repeat(Math.min(u.pass ? u.pass.length : 8, 10))}</span>
+            <button onclick="togglePass('trader_pass_${idx}', '${(u.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">👁</button>
+          </td>
+          <td>${refBadge}</td>
+          <td><span class="balance-demo">$${demo.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
+          <td><span class="balance-real">$${real.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
+          <td style="font-size: 0.8rem; color: #888;">${regDate}</td>
+          <td style="text-align: right;">
+            <button class="btn-action" onclick="quickCredit('${u.email}', 100)" title="Quick Credit +$100 Real">+$100</button>
+            <button class="btn-action" onclick="openEditModal('${u.email}')">Edit</button>
+            <button class="btn-action btn-del" onclick="deleteUser('${u.email}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('statUserCount').textContent = users.length;
+      document.getElementById('badgeTraderCount').textContent = users.length;
+      document.getElementById('statRealTotal').textContent = '$' + totalReal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('statDemoTotal').textContent = '$' + totalDemo.toLocaleString('en-US', {minimumFractionDigits: 2});
+    }
+
+    function filterTradersTable() {
+      const query = document.getElementById('searchBoxTraders').value.toLowerCase().trim();
+      const filtered = allUsers.filter(u => 
+        (u.name || '').toLowerCase().includes(query) ||
+        (u.nickname || '').toLowerCase().includes(query) ||
+        (u.email || '').toLowerCase().includes(query) ||
+        (u.crNumber || '').toLowerCase().includes(query) ||
+        (u.referredBy || '').toLowerCase().includes(query)
+      );
+      renderUsers(filtered);
+    }
+
+    function openEditModal(email) {
+      const user = allUsers.find(u => u.email === email);
+      if (!user) return;
+      document.getElementById('modalTitle').textContent = `Edit Trader: @${user.nickname || user.name}`;
+      document.getElementById('editUserEmail').value = user.email;
+      document.getElementById('editName').value = user.name || '';
+      document.getElementById('editNickname').value = user.nickname || '';
+      document.getElementById('editPass').value = user.pass || '';
+      document.getElementById('editReal').value = user.realBalance !== undefined ? user.realBalance : 0;
+      document.getElementById('editDemo').value = user.demoBalance !== undefined ? user.demoBalance : 10000;
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = 'Add New Trader';
+      document.getElementById('editUserEmail').value = '__NEW__';
+      document.getElementById('editName').value = '';
+      document.getElementById('editNickname').value = '';
+      document.getElementById('editPass').value = 'TraderPass123';
+      document.getElementById('editReal').value = 0;
+      document.getElementById('editDemo').value = 10000;
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function saveUserChanges(e) {
+      e.preventDefault();
+      const email = document.getElementById('editUserEmail').value;
+      const name = document.getElementById('editName').value;
+      const nickname = document.getElementById('editNickname').value;
+      const pass = document.getElementById('editPass').value;
+      const realBalance = parseFloat(document.getElementById('editReal').value) || 0;
+      const demoBalance = parseFloat(document.getElementById('editDemo').value) || 0;
+
+      if (email === '__NEW__') {
+        const newEmail = prompt('Enter trader email address:');
+        if (!newEmail) return;
+        try {
+          await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, nickname, email: newEmail, pass })
+          });
+        } catch (err) {}
+      } else {
+        try {
+          await fetch('/api/admin/update-user', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer admin_authenticated'
+            },
+            body: JSON.stringify({ email, name, nickname, pass, realBalance, demoBalance })
+          });
+        } catch (err) {}
+
+        const idx = allUsers.findIndex(u => u.email === email);
+        if (idx !== -1) {
+          allUsers[idx].name = name;
+          allUsers[idx].nickname = nickname;
+          allUsers[idx].pass = pass;
+          allUsers[idx].realBalance = realBalance;
+          allUsers[idx].demoBalance = demoBalance;
+          localStorage.setItem('ms_users', JSON.stringify(allUsers));
+        }
+      }
+
+      closeEditModal();
+      loadUsers();
+    }
+
+    async function quickCredit(email, amount) {
+      const user = allUsers.find(u => u.email === email);
+      if (!user) return;
+      const newReal = (parseFloat(user.realBalance || 0) + amount);
+      try {
+        await fetch('/api/admin/update-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer admin_authenticated'
+          },
+          body: JSON.stringify({ email, realBalance: newReal })
+        });
+      } catch (err) {}
+
+      user.realBalance = newReal;
+      localStorage.setItem('ms_users', JSON.stringify(allUsers));
+      renderUsers(allUsers);
+    }
+
+    async function deleteUser(email) {
+      if (!confirm(`Are you sure you want to permanently delete account for ${email}?`)) return;
+      try {
+        await fetch('/api/admin/delete-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer admin_authenticated'
+          },
+          body: JSON.stringify({ email })
+        });
+      } catch (err) {}
+
+      allUsers = allUsers.filter(u => u.email !== email);
+      localStorage.setItem('ms_users', JSON.stringify(allUsers));
+      renderUsers(allUsers);
+    }
+
+    // ---------------- AFFILIATES LOGIC ----------------
+    async function loadAffiliates() {
+      try {
+        const resp = await fetch('/api/admin/affiliates', {
+          headers: { 'Authorization': 'Bearer admin_authenticated' }
+        });
+        const data = await resp.json();
+        if (data.success && Array.isArray(data.affiliates)) {
+          allAffiliates = data.affiliates;
+        } else {
+          allAffiliates = [];
+        }
+      } catch (err) {
+        allAffiliates = [];
+      }
+      renderAffiliates(allAffiliates);
+    }
+
+    function renderAffiliates(affiliates) {
+      const tbody = document.getElementById('affiliatesTableBody');
+      tbody.innerHTML = '';
+
+      let totalCommissions = 0;
+      let totalReferrals = 0;
+
+      affiliates.forEach((a, idx) => {
+        const com = parseFloat(a.commissionEarned || 0);
+        const refCount = (a.referredTraders ? a.referredTraders.length : 0) || (a.totalReferred || 0);
+        totalCommissions += com;
+        totalReferrals += refCount;
+
+        const regDate = a.createdAt ? new Date(a.createdAt).toLocaleDateString() : 'Recent';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${a.name || 'Partner'}</strong></td>
+          <td><span class="badge-code">${a.affiliateCode || 'SPREAD-00000'}</span></td>
+          <td><code style="color: #00c49f; font-weight: 700;">${a.crNumber || 'CR0000000'}</code></td>
+          <td style="color: #00c49f; font-family:'JetBrains Mono',monospace; font-weight:700;">${a.phone || '-'}</td>
+          <td style="color: #a0a0ba;">${a.email}</td>
+          <td>
+            <span class="pass-pill" id="aff_pass_${idx}">${'•'.repeat(Math.min(a.pass ? a.pass.length : 8, 10))}</span>
+            <button onclick="togglePass('aff_pass_${idx}', '${(a.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">👁</button>
+          </td>
+          <td><span style="font-weight:700; color:#3772ff; font-family:'JetBrains Mono',monospace;">${refCount}</span></td>
+          <td><span class="balance-real">$${com.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
+          <td style="font-size: 0.8rem; color: #888;">${regDate}</td>
+          <td style="text-align: right;">
+            <button class="btn-action" onclick="quickPayCommission('${a.email}', 50)" title="Quick Credit +$50 Commission" style="color:#00c49f; border-color:#00c49f;">+$50 Pay</button>
+            <button class="btn-action" onclick="openAffiliateEditModal('${a.email}')">Edit</button>
+            <button class="btn-action btn-del" onclick="deleteAffiliate('${a.email}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('statAffiliateCount').textContent = affiliates.length;
+      document.getElementById('badgeAffiliateCount').textContent = affiliates.length;
+      document.getElementById('statAffTotalReferred').textContent = totalReferrals;
+      document.getElementById('statAffTotalCommissions').textContent = '$' + totalCommissions.toLocaleString('en-US', {minimumFractionDigits: 2});
+    }
+
+    function filterAffiliatesTable() {
+      const query = document.getElementById('searchBoxAffiliates').value.toLowerCase().trim();
+      const filtered = allAffiliates.filter(a => 
+        (a.name || '').toLowerCase().includes(query) ||
+        (a.affiliateCode || '').toLowerCase().includes(query) ||
+        (a.phone || '').toLowerCase().includes(query) ||
+        (a.email || '').toLowerCase().includes(query) ||
+        (a.crNumber || '').toLowerCase().includes(query)
+      );
+      renderAffiliates(filtered);
+    }
+
+    function openAffiliateEditModal(email) {
+      const aff = allAffiliates.find(a => a.email === email);
+      if (!aff) return;
+      document.getElementById('affModalTitle').textContent = `Edit Partner: ${aff.name}`;
+      document.getElementById('editAffEmail').value = aff.email;
+      document.getElementById('editAffName').value = aff.name || '';
+      document.getElementById('editAffPhone').value = aff.phone || '';
+      document.getElementById('editAffPass').value = aff.pass || '';
+      document.getElementById('editAffCommission').value = aff.commissionEarned !== undefined ? aff.commissionEarned : 0;
+      document.getElementById('editAffiliateModal').style.display = 'flex';
+    }
+
+    function openAffiliateCreateModal() {
+      document.getElementById('affModalTitle').textContent = 'Register New Affiliate Partner';
+      document.getElementById('editAffEmail').value = '__NEW__';
+      document.getElementById('editAffName').value = '';
+      document.getElementById('editAffPhone').value = '0712345678';
+      document.getElementById('editAffPass').value = 'PartnerPass123';
+      document.getElementById('editAffCommission').value = 0;
+      document.getElementById('editAffiliateModal').style.display = 'flex';
+    }
+
+    function closeAffiliateModal() {
+      document.getElementById('editAffiliateModal').style.display = 'none';
+    }
+
+    async function saveAffiliateChanges(e) {
+      e.preventDefault();
+      const email = document.getElementById('editAffEmail').value;
+      const name = document.getElementById('editAffName').value;
+      const phone = document.getElementById('editAffPhone').value;
+      const pass = document.getElementById('editAffPass').value;
+      const commissionEarned = parseFloat(document.getElementById('editAffCommission').value) || 0;
+
+      if (email === '__NEW__') {
+        const newEmail = prompt('Enter Partner email address:');
+        if (!newEmail) return;
+        try {
+          await fetch('/api/affiliate/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, email: newEmail, pass })
+          });
+        } catch (err) {}
+      } else {
+        try {
+          await fetch('/api/admin/update-affiliate', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer admin_authenticated'
+            },
+            body: JSON.stringify({ email, name, phone, pass, commissionEarned, realBalance: commissionEarned })
+          });
+        } catch (err) {}
+
+        const idx = allAffiliates.findIndex(a => a.email === email);
+        if (idx !== -1) {
+          allAffiliates[idx].name = name;
+          allAffiliates[idx].phone = phone;
+          allAffiliates[idx].pass = pass;
+          allAffiliates[idx].commissionEarned = commissionEarned;
+          allAffiliates[idx].realBalance = commissionEarned;
+        }
+      }
+
+      closeAffiliateModal();
+      loadAffiliates();
+    }
+
+    async function quickPayCommission(email, amount) {
+      const aff = allAffiliates.find(a => a.email === email);
+      if (!aff) return;
+      const newCom = (parseFloat(aff.commissionEarned || 0) + amount);
+      try {
+        await fetch('/api/admin/update-affiliate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer admin_authenticated'
+          },
+          body: JSON.stringify({ email, commissionEarned: newCom, realBalance: newCom })
+        });
+      } catch (err) {}
+
+      aff.commissionEarned = newCom;
+      renderAffiliates(allAffiliates);
+      alert(`Paid +$${amount} commission to ${aff.name} (${aff.phone})!`);
+    }
+
+    async function deleteAffiliate(email) {
+      if (!confirm(`Are you sure you want to permanently delete affiliate partner ${email}?`)) return;
+      try {
+        await fetch('/api/admin/delete-affiliate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer admin_authenticated'
+          },
+          body: JSON.stringify({ email })
+        });
+      } catch (err) {}
+
+      allAffiliates = allAffiliates.filter(a => a.email !== email);
+      renderAffiliates(allAffiliates);
+    }
+
+    // Common password toggle
+    function togglePass(elementId, actualPass) {
+      const el = document.getElementById(elementId);
+      if (el.textContent.includes('•')) {
+        el.textContent = actualPass;
+        el.style.color = '#ff6b6b';
+      } else {
+        el.textContent = '•'.repeat(Math.min(actualPass.length, 10));
+        el.style.color = '#bbb';
+      }
+    }
+
+    // Initialize both views on page load
+    loadUsers();
+    loadAffiliates();
+  </script>
+</body>
+</html>

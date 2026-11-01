@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Markets & Synthetics | Money Spread</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Marquee -->
+  <div class="ticker-tape">
+    <div class="ticker-inner"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="trading.html" class="navbar-brand">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2V22" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M16 6.5C16 4.5 14.2 3 12 3C9.5 3 8 4.5 8 6.5C8 9.5 16 9 16 12.5C16 15 14 17 12 17C9.5 17 8 15 8 13.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M4 12L2 9M2 9L5 7M2 9H6" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20 12L22 15M22 15L19 17M22 15H18" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-text">Money Spread</span>
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="trading.html" class="nav-link" style="color: #00c49f; font-weight: 700;">⚡ Signals & Trade</a></li>
+      <li><a href="markets.html" class="nav-link active">Markets</a></li>
+      <li><a href="deposit.html" class="nav-link">Deposit</a></li>
+      <li><a href="withdraw.html" class="nav-link" style="color: #ff6b6b; font-weight: 700;">Withdraw</a></li>
+      <li><a href="account.html" class="nav-link">Account</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      <a href="trading.html" class="btn btn-primary btn-sm">Start Trading &rarr;</a>
+    </div>
+  </nav>
+
+  <!-- Main Markets Container -->
+  <div class="markets-container">
+
+    <!-- Header Stats Banner -->
+    <div class="markets-header-card">
+      <div>
+        <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.4rem;">Live Market Directory</h1>
+        <p style="color: var(--text-secondary);">
+          Real-time tick data for 24/7 Synthetic Indices, Forex Majors, Cryptocurrencies, and Global Indices.
+        </p>
+      </div>
+
+      <div class="markets-stat-cards">
+        <div class="mini-stat">
+          <div class="mini-stat-label">Top Volatility</div>
+          <div class="mini-stat-val price-up">Volatility 100</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-label">Active Spreads From</div>
+          <div class="mini-stat-val" style="color: var(--color-coral);">0.08 Pips</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-label">Market Status</div>
+          <div class="mini-stat-val price-up">100% Operational</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter and Search Bar -->
+    <div class="market-filter-bar">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="market-category-btn tab-btn active" data-cat="all">All Markets</button>
+        <button class="market-category-btn tab-btn" data-cat="synthetic">Synthetic Indices</button>
+        <button class="market-category-btn tab-btn" data-cat="forex">Forex Majors</button>
+        <button class="market-category-btn tab-btn" data-cat="crypto">Cryptocurrencies</button>
+        <button class="market-category-btn tab-btn" data-cat="commodities">Commodities</button>
+        <button class="market-category-btn tab-btn" data-cat="indices">Stock Indices</button>
+      </div>
+
+      <div class="search-input-wrap" style="width: 280px;">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="marketSearchInput" placeholder="Filter by name or symbol...">
+      </div>
+    </div>
+
+    <!-- Live Real-Time Table -->
+    <div class="markets-table-wrap">
+      <table class="markets-table">
+        <thead>
+          <tr>
+            <th>Instrument</th>
+            <th>Category</th>
+            <th>Last Price</th>
+            <th>24h Change</th>
+            <th>24h High</th>
+            <th>24h Low</th>
+            <th>Spread</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="marketsTableBody">
+          <!-- Populated and updated live every 2s via main.js -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-disclaimer">
+      "Trade Smart. Win Big. The Money is Always Spreading." &bull; Money Spread Binary Trading Platform
+    </div>
+    <div class="footer-bottom">
+      <div>&copy; 2026 Money Spread International Ltd. All rights reserved.</div>
+      <div>Real-time low-latency financial feed simulation.</div>
+    </div>
+  </footer>
+
+  <div id="toast-container"></div>
+  <script src="js/main.js"></script>
+</body>
+</html>

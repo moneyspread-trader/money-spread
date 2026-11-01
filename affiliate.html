@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partner Dashboard | Money Spread</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .ref-code-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 196, 159, 0.12);
+      border: 1px dashed rgba(0, 196, 159, 0.45);
+      border-radius: 8px;
+      padding: 6px 14px;
+      margin-top: 8px;
+    }
+    .ref-code-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #00c49f;
+      letter-spacing: 0.05em;
+    }
+    .btn-copy {
+      background: #00c49f;
+      color: #0b0b16;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-copy:hover {
+      background: #00e0b6;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Live Market Ticker Marquee -->
+  <div class="ticker-tape">
+    <div class="ticker-inner"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="trading.html" class="navbar-brand">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2V22" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M16 6.5C16 4.5 14.2 3 12 3C9.5 3 8 4.5 8 6.5C8 9.5 16 9 16 12.5C16 15 14 17 12 17C9.5 17 8 15 8 13.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M4 12L2 9M2 9L5 7M2 9H6" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20 12L22 15M22 15L19 17M22 15H18" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-text">Money Spread</span>
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="trading.html" class="nav-link" style="color: #00c49f; font-weight: 700;">⚡ Signals & Trade</a></li>
+      <li><a href="markets.html" class="nav-link">Markets</a></li>
+      <li><a href="deposit.html" class="nav-link">Deposit</a></li>
+      <li><a href="withdraw.html" class="nav-link" style="color: #ff6b6b; font-weight: 700;">Withdraw</a></li>
+      <li><a href="account.html" class="nav-link">Trader Account</a></li>
+      <li><a href="affiliate.html" class="nav-link active">Partner Hub</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      <a href="trading.html" class="btn btn-primary btn-sm">Launch Trader &rarr;</a>
+    </div>
+  </nav>
+
+  <!-- Account Dashboard Container (Matches account.html structure exactly) -->
+  <div class="account-container">
+
+    <!-- Big User Overview Card -->
+    <div class="account-overview-card">
+      <div class="account-user-meta">
+        <div class="user-large-avatar" id="affiliateAvatar" style="background: linear-gradient(135deg, #00c49f, #007f66);">MS</div>
+        <div>
+          <div class="account-user-name" id="affiliateDisplayName">Affiliate Partner</div>
+          <div class="account-user-id">Account ID: <strong id="affiliateCrNumber" style="color:#00c49f; font-family:'JetBrains Mono',monospace;">CR0000000</strong> &bull; <span class="badge-live" style="background: rgba(0, 196, 159, 0.2); color: #00c49f; border-color: #00c49f;">PARTNER ACTIVE</span></div>
+          
+          <div class="ref-code-box">
+            <span>Affiliate Code:</span>
+            <span class="ref-code-text" id="affiliateCodeDisplay">SPREAD-00000</span>
+            <button class="btn-copy" onclick="copyAffiliateCode()">Copy Code</button>
+            <button class="btn-copy" onclick="copyReferralLink()" style="background:#ff444f; color:#fff;">Copy Link</button>
+          </div>
+
+          <div style="margin-top: 8px; font-size: 0.8rem; color: var(--color-green);">
+            ✓ Verified Partner &bull; Direct M-Pesa Payout Enabled &bull; 10% Deposit Commission
+          </div>
+        </div>
+      </div>
+
+      <div class="account-balance-display">
+        <div class="account-balance-title">Unwithdrawn Partner Earnings</div>
+        <div id="affiliateLargeBalance" class="account-balance-number" style="color: #00c49f;">$0.00 USD</div>
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px;">
+          <button onclick="requestAffiliatePayout()" class="btn btn-green btn-sm">M-Pesa Instant Cashout</button>
+          <a href="account.html" class="btn btn-outline btn-sm">Trader View</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="account-nav-tabs">
+      <div class="account-tab-link active" data-pane="paneAffOverview">Overview & Performance</div>
+      <div class="account-tab-link" data-pane="paneAffTraders">Referred Traders (<span id="tabCountTraders">0</span>)</div>
+      <div class="account-tab-link" data-pane="paneAffEarnings">Commission History</div>
+      <div class="account-tab-link" data-pane="paneAffPayout">Payout & Bank Settings</div>
+    </div>
+
+    <!-- TAB 1: OVERVIEW -->
+    <div id="paneAffOverview" class="account-tab-pane active">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div class="card" style="padding: 1.5rem;">
+          <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Referred Traders</div>
+          <div id="statTotalReferred" style="font-size: 2.2rem; font-weight: 800; margin-top: 6px; font-family:'JetBrains Mono',monospace;">0</div>
+        </div>
+        <div class="card" style="padding: 1.5rem;">
+          <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Total Lifetime Commission</div>
+          <div id="statTotalCommission" style="font-size: 2.2rem; font-weight: 800; margin-top: 6px; color: var(--color-green); font-family:'JetBrains Mono',monospace;">$0.00</div>
+        </div>
+        <div class="card" style="padding: 1.5rem;">
+          <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Commission Rate</div>
+          <div style="font-size: 2.2rem; font-weight: 800; margin-top: 6px; color: var(--color-coral); font-family:'JetBrains Mono',monospace;">10.0%</div>
+        </div>
+        <div class="card" style="padding: 1.5rem;">
+          <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase;">Payout Mobile Number</div>
+          <div id="statPayoutPhone" style="font-size: 1.3rem; font-weight: 800; margin-top: 10px; color: #fff; font-family:'JetBrains Mono',monospace;">-</div>
+        </div>
+      </div>
+
+      <!-- Referral Link Sharing Card -->
+      <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(0, 196, 159, 0.08), rgba(22, 22, 42, 0.9)); border: 1px solid rgba(0, 196, 159, 0.3);">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; color: #fff;">Your Exclusive Partner Invitation Link</h3>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem;">
+          Share this link with prospective traders. When they register through your link, your unique affiliate code is automatically attached to their profile. You earn a <strong>10% instant cash commission</strong> on every deposit they make.
+        </p>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <input type="text" id="referralLinkInput" readonly class="form-control" style="flex: 1; min-width: 280px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; background: #111122; color: #00c49f; border-color: rgba(0, 196, 159, 0.4);">
+          <button onclick="copyReferralLink()" class="btn btn-green">Copy Invitation Link</button>
+        </div>
+      </div>
+
+      <!-- Quick Actions Card (identical to account.html) -->
+      <div class="card" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, #181832 0%, #202042 100%); flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 700;">Account Actions & Workstation</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">Ready to trade binary options or manage your client book?</p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <a href="trading.html" class="btn btn-primary">Open Trading Platform &rarr;</a>
+          <button onclick="switchAffiliateAccount()" class="btn btn-secondary">Switch Account</button>
+          <button onclick="logoutAffiliate()" class="btn btn-outline" style="border-color: #ff444f; color: #ff444f;">Log Out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: REFERRED TRADERS -->
+    <div id="paneAffTraders" class="account-tab-pane">
+      <div class="card">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;">Your Network of Registered Traders</h3>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.5rem;">
+          Every trader who entered your affiliate code during registration appears below.
+        </p>
+        <div class="markets-table-wrap">
+          <table class="markets-table">
+            <thead>
+              <tr>
+                <th>Trader Name / Nickname</th>
+                <th>CR Account ID</th>
+                <th>Email Address</th>
+                <th>Registered Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="referredTradersTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No traders registered with your code yet. Share your referral link to begin earning!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: COMMISSION HISTORY -->
+    <div id="paneAffEarnings" class="account-tab-pane">
+      <div class="card">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 6px;">Commission Earnings Ledger</h3>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.5rem;">
+          Instant 10% credit records credited whenever a referred trader makes an account deposit.
+        </p>
+        <div class="markets-table-wrap">
+          <table class="markets-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Trader</th>
+                <th>Trader Deposit</th>
+                <th>Commission Rate</th>
+                <th>Net Commission Earned</th>
+              </tr>
+            </thead>
+            <tbody id="commissionHistoryTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No commissions earned yet. Commissions credit automatically upon trader deposit.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: PAYOUT SETTINGS -->
+    <div id="paneAffPayout" class="account-tab-pane">
+      <div class="card" style="max-width: 640px; margin: 0 auto;">
+        <h3 style="margin-bottom: 1rem;">Payment & Payout Configuration</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+          <div class="form-group">
+            <label class="form-label">Official Registered Partner Name</label>
+            <input type="text" id="payoutOfficialName" class="form-control" readonly>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Registered Mobile Number for Payout (M-Pesa / Mobile Money)</label>
+            <input type="text" id="payoutPhoneNumber" class="form-control" readonly style="color:var(--color-green); font-family:var(--font-mono); font-weight:700;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contact Email</label>
+            <input type="email" id="payoutEmail" class="form-control" readonly>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Unique Affiliate Partner ID (CR)</label>
+            <input type="text" id="payoutCrNumber" class="form-control" readonly style="color:var(--color-green); font-family:var(--font-mono);">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Commission Distribution Method</label>
+            <select class="form-control" disabled>
+              <option selected>📱 Instant M-Pesa STK Disbursement (Default)</option>
+            </select>
+          </div>
+
+          <div style="padding-top: 1rem; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600;">Instant Payout Notifications</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Receive SMS alerts each time a client deposits and commissions credit.</div>
+            </div>
+            <input type="checkbox" checked style="accent-color: var(--color-green); width: 18px; height: 18px;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="js/main.js"></script>
+  <script>
+    let currentAffiliate = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Setup tabs
+      document.querySelectorAll('.account-tab-link').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.account-tab-link').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.account-tab-pane').forEach(p => p.classList.remove('active'));
+          tab.classList.add('active');
+          const target = tab.getAttribute('data-pane');
+          if (target && document.getElementById(target)) {
+            document.getElementById(target).classList.add('active');
+          }
+        });
+      });
+
+      loadAffiliateData();
+    });
+
+    async function loadAffiliateData() {
+      // First check local storage
+      const stored = JSON.parse(localStorage.getItem('ms_affiliate') || 'null');
+      if (!stored) {
+        // If not logged in as affiliate, redirect to login
+        window.location.href = 'register.html';
+        return;
+      }
+      currentAffiliate = stored;
+
+      // Try fetching freshest affiliate state from server
+      try {
+        const resp = await fetch('/api/admin/affiliates', {
+          headers: { 'Authorization': 'Bearer admin_authenticated' }
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.affiliates) {
+            const match = data.affiliates.find(a => 
+              (a.email || '').toLowerCase() === (currentAffiliate.email || '').toLowerCase() ||
+              a.affiliateCode === currentAffiliate.affiliateCode
+            );
+            if (match) {
+              currentAffiliate = match;
+              localStorage.setItem('ms_affiliate', JSON.stringify(match));
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Could not sync with server, using cached affiliate profile:', err);
+      }
+
+      renderAffiliateUI();
+    }
+
+    function renderAffiliateUI() {
+      if (!currentAffiliate) return;
+
+      const code = currentAffiliate.affiliateCode || 'SPREAD-00000';
+      const name = currentAffiliate.name || 'Affiliate Partner';
+      const crNumber = currentAffiliate.crNumber || 'CR' + Math.floor(1000000 + Math.random() * 9000000);
+      const phone = currentAffiliate.phone || '-';
+      const email = currentAffiliate.email || '-';
+      const earned = parseFloat(currentAffiliate.commissionEarned || 0);
+
+      // Header info
+      document.getElementById('affiliateDisplayName').textContent = name;
+      document.getElementById('affiliateCrNumber').textContent = crNumber;
+      document.getElementById('affiliateCodeDisplay').textContent = code;
+      document.getElementById('affiliateLargeBalance').textContent = '$' + earned.toLocaleString('en-US', {minimumFractionDigits: 2}) + ' USD';
+
+      // Avatar initials
+      const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'MS';
+      document.getElementById('affiliateAvatar').textContent = initials;
+
+      // Overview stats
+      const referredList = currentAffiliate.referredTraders || [];
+      const ledgerList = currentAffiliate.commissionLedger || [];
+
+      document.getElementById('statTotalReferred').textContent = referredList.length || (currentAffiliate.totalReferred || 0);
+      document.getElementById('statTotalCommission').textContent = '$' + earned.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('statPayoutPhone').textContent = phone;
+      document.getElementById('tabCountTraders').textContent = referredList.length || (currentAffiliate.totalReferred || 0);
+
+      // Referral link
+      const origin = window.location.origin.includes('http') ? window.location.origin : window.location.origin;
+      const link = `${origin}/register.html?ref=${code}`;
+      document.getElementById('referralLinkInput').value = link;
+
+      // Settings pane
+      document.getElementById('payoutOfficialName').value = name;
+      document.getElementById('payoutPhoneNumber').value = phone;
+      document.getElementById('payoutEmail').value = email;
+      document.getElementById('payoutCrNumber').value = crNumber;
+
+      // Render referred traders table
+      const trBody = document.getElementById('referredTradersTableBody');
+      if (referredList.length > 0) {
+        trBody.innerHTML = '';
+        referredList.forEach(t => {
+          const row = document.createElement('tr');
+          const dateStr = t.registeredAt ? new Date(t.registeredAt).toLocaleDateString() : 'Recent';
+          row.innerHTML = `
+            <td><strong>${t.name || 'Trader'}</strong> <span style="color:#ff6b6b; font-family:'JetBrains Mono',monospace; font-size:0.8rem; margin-left:6px;">@${t.nickname || 'trader'}</span></td>
+            <td><code style="color:#00c49f; font-weight:700;">${t.crNumber || 'CR0000000'}</code></td>
+            <td style="color:var(--text-secondary);">${t.email || '-'}</td>
+            <td style="color:var(--text-muted); font-size:0.85rem;">${dateStr}</td>
+            <td><span class="badge-live" style="background:rgba(0,196,159,0.15); color:#00c49f; border-color:#00c49f;">ACTIVE TRADER</span></td>
+          `;
+          trBody.appendChild(row);
+        });
+      }
+
+      // Render commission history table
+      const comBody = document.getElementById('commissionHistoryTableBody');
+      if (ledgerList.length > 0) {
+        comBody.innerHTML = '';
+        ledgerList.forEach(item => {
+          const row = document.createElement('tr');
+          const dateStr = item.date ? new Date(item.date).toLocaleString() : 'Recent';
+          row.innerHTML = `
+            <td style="font-size:0.85rem; color:var(--text-muted);">${dateStr}</td>
+            <td><strong>@${item.trader || 'Trader'}</strong></td>
+            <td style="font-family:'JetBrains Mono',monospace;">$${parseFloat(item.depositAmount || 0).toFixed(2)}</td>
+            <td style="color:var(--color-coral); font-weight:700;">10%</td>
+            <td style="color:#00c49f; font-weight:800; font-family:'JetBrains Mono',monospace;">+$${parseFloat(item.commission || 0).toFixed(2)}</td>
+          `;
+          comBody.appendChild(row);
+        });
+      }
+    }
+
+    function copyAffiliateCode() {
+      const code = document.getElementById('affiliateCodeDisplay').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        MoneySpread.toast('Copied!', `Affiliate code "${code}" copied to clipboard.`, 'success');
+      }).catch(() => {
+        prompt('Copy your Affiliate Code:', code);
+      });
+    }
+
+    function copyReferralLink() {
+      const link = document.getElementById('referralLinkInput').value;
+      navigator.clipboard.writeText(link).then(() => {
+        MoneySpread.toast('Link Copied!', 'Invitation link copied to clipboard. Share with your traders!', 'success');
+      }).catch(() => {
+        prompt('Copy your Referral Link:', link);
+      });
+    }
+
+    function requestAffiliatePayout() {
+      const bal = currentAffiliate ? parseFloat(currentAffiliate.commissionEarned || 0) : 0;
+      if (bal <= 0) {
+        MoneySpread.toast('No Available Payout', 'You currently do not have unwithdrawn commission earnings. Share your code to earn 10% on trader deposits.', 'info');
+        return;
+      }
+      MoneySpread.toast('Payout Dispatched!', `KES ${(bal * 129.90).toFixed(0)} ($${bal.toFixed(2)}) has been queued for instant M-Pesa transfer to ${currentAffiliate.phone}.`, 'success');
+    }
+
+    function switchAffiliateAccount() {
+      localStorage.removeItem('ms_affiliate_logged_in');
+      localStorage.removeItem('ms_affiliate');
+      window.location.href = 'register.html?tab=login';
+    }
+
+    function logoutAffiliate() {
+      localStorage.removeItem('ms_affiliate_logged_in');
+      localStorage.removeItem('ms_affiliate');
+      localStorage.removeItem('ms_logged_in');
+      window.location.href = 'register.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account | Money Spread</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Live Market Ticker Marquee -->
+  <div class="ticker-tape">
+    <div class="ticker-inner"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="trading.html" class="navbar-brand">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2V22" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M16 6.5C16 4.5 14.2 3 12 3C9.5 3 8 4.5 8 6.5C8 9.5 16 9 16 12.5C16 15 14 17 12 17C9.5 17 8 15 8 13.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M4 12L2 9M2 9L5 7M2 9H6" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20 12L22 15M22 15L19 17M22 15H18" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-text">Money Spread</span>
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="trading.html" class="nav-link" style="color: #00c49f; font-weight: 700;">⚡ Signals & Trade</a></li>
+      <li><a href="markets.html" class="nav-link">Markets</a></li>
+      <li><a href="deposit.html" class="nav-link">Deposit</a></li>
+      <li><a href="withdraw.html" class="nav-link" style="color: #ff6b6b; font-weight: 700;">Withdraw</a></li>
+      <li><a href="account.html" class="nav-link active">Account</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      <a href="trading.html" class="btn btn-primary btn-sm">Launch Trader &rarr;</a>
+    </div>
+  </nav>
+
+  <!-- Account Dashboard Container -->
+  <div class="account-container">
+
+    <!-- Big User Overview Card -->
+    <div class="account-overview-card">
+      <div class="account-user-meta" style="display: flex; gap: 16px; align-items: center;">
+        <div style="position: relative; cursor: pointer;" title="Click to Change / Upload Profile Picture" onclick="document.getElementById('avatarFileInput').click()">
+          <div class="user-large-avatar" id="accountUserAvatar" style="width: 68px; height: 68px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff444f, #1f1f3a); border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(255,68,79,0.35);">
+            C
+          </div>
+          <span style="position: absolute; bottom: -2px; right: -2px; background: #00c49f; color: #000; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; border: 2px solid #16162a;" title="Import Photo">📷</span>
+        </div>
+
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="account-user-name" id="accountUserDisplayName" style="font-size: 1.35rem; font-weight: 800; color: #fff;">collo</div>
+            <span style="font-size: 0.72rem; background: rgba(0, 196, 159, 0.15); color: #00c49f; border: 1px solid rgba(0, 196, 159, 0.35); padding: 2px 8px; border-radius: 4px; font-weight: 700;">Verified Trader</span>
+          </div>
+
+          <div class="account-user-id" style="margin-top: 4px;">Account ID: <strong id="accountUserCrNumber" style="color:#00c49f; font-family:'JetBrains Mono',monospace;">CR8779020</strong> &bull; <span id="accountModeBadge" class="badge-live">DEMO</span></div>
+
+          <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap;">
+            <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+            <button class="btn btn-sm btn-secondary" onclick="document.getElementById('avatarFileInput').click()" style="padding: 3px 10px; font-size: 0.75rem; font-weight: 700;">📁 Import Picture</button>
+            <button class="btn btn-sm btn-outline" id="btnExportAvatar" onclick="exportProfilePhoto()" style="padding: 3px 10px; font-size: 0.75rem;">💾 Export Picture</button>
+            <button class="btn btn-sm btn-outline" id="btnRemoveAvatar" onclick="removeProfilePhoto()" style="padding: 3px 8px; font-size: 0.75rem; color: #ff6b6b; border-color: rgba(255, 68, 79, 0.3); display: none;">✕ Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-balance-display">
+        <div class="account-balance-title">Available Portfolio Balance</div>
+        <div id="accountLargeBalance" class="account-balance-number">$10,000.00 USD</div>
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px;">
+          <button id="accountModeToggleBtn" class="btn btn-secondary btn-sm">Switch Demo / Real</button>
+          <button id="btnResetDemo" class="btn btn-outline btn-sm">Reset Demo ($10K)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="account-nav-tabs">
+      <div class="account-tab-link active" data-pane="paneOverview">Overview & Stats</div>
+      <div class="account-tab-link" data-pane="paneDeposit">Deposit Funds</div>
+      <div class="account-tab-link" data-pane="paneWithdrawal">Withdrawal</div>
+      <div class="account-tab-link" data-pane="paneHistory">Transaction History</div>
+      <div class="account-tab-link" data-pane="paneSettings">Account Settings</div>
+    </div>
+
+    <!-- TAB 1: OVERVIEW -->
+    <div id="paneOverview" class="account-tab-pane active">
+
+      <!-- REAL ACCOUNT SECTION -->
+      <div style="background: linear-gradient(135deg, rgba(255, 68, 79, 0.1), rgba(255, 68, 79, 0.02)); border: 1px solid rgba(255, 68, 79, 0.35); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: #ff444f; color: #fff; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">Real Account</span>
+            <span style="color: #ff6b6b; font-weight: 700; font-size: 1.05rem;">Live Capital & Trading Record</span>
+          </div>
+          <div style="font-size: 0.9rem; color: #bbb;">
+            Real Balance: <strong id="statRealBalHeader" style="color: #fff; font-size: 1.25rem; font-family: 'JetBrains Mono', monospace;">$0.00 USD</strong>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+          <div class="card" style="padding: 1rem; background: rgba(0,0,0,0.45); margin: 0; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Real Trades</div>
+            <div id="statRealTotalTrades" style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: #fff;">0</div>
+          </div>
+          <div class="card" style="padding: 1rem; background: rgba(0,0,0,0.45); margin: 0; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Wins vs Losses</div>
+            <div id="statRealWinLoss" style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: #fff;">0W / 0L</div>
+          </div>
+          <div class="card" style="padding: 1rem; background: rgba(0,0,0,0.45); margin: 0; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Real Win Rate</div>
+            <div id="statRealWinRate" style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: #00c49f;">0.0%</div>
+          </div>
+          <div class="card" style="padding: 1rem; background: rgba(0,0,0,0.45); margin: 0; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Net Settled P/L</div>
+            <div id="statRealNetProfit" style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: #00c49f;">$0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEMO ACCOUNT SECTION -->
+      <div style="background: linear-gradient(135deg, rgba(0, 196, 159, 0.1), rgba(0, 196, 159, 0.02)); border: 1px solid rgba(0, 196, 159, 0.35); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.8rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="background: #00c49f; color: #000; font-size: 0.72rem; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">Demo Account</span>
+            <span style="color: #00c49f; font-weight: 700; font-size: 1.05rem;">Practice Capital & Training Record</span>
+          </div>
+          <div style="font-size: 0.9rem; color: #bbb;">
+            Demo Balance: <strong id="statDemoBalHeader" style="color: #fff; font-size: 1.25rem; font-family: 'JetBrains Mono', monospace;">$10,000.00 USD</strong>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+          <div class="card" style="padding: 1rem; background: rgba(0,0,0,0.45); margin: 0; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Total Demo Trades</div>
+            <div id="statDemoTotalTrades" style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: #fff;">0</div>
+          </div>
+          <div class="card" style="padding: 1rem; background: rgba(0,0,0,0.45); margin: 0; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Wins vs Losses</div>
+            <div id="statDemoWinLoss" style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: #fff;">0W / 0L</div>
+          </div>
+          <div class="card" style="padding: 1rem; background: rgba(0,0,0,0.45); margin: 0; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Demo Win Rate</div>
+            <div id="statDemoWinRate" style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: #00c49f;">0.0%</div>
+          </div>
+          <div class="card" style="padding: 1rem; background: rgba(0,0,0,0.45); margin: 0; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Net Settled P/L</div>
+            <div id="statDemoNetProfit" style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: #00c49f;">$0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Trade Access Card & Account Controls -->
+      <div class="card" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, #181832 0%, #202042 100%); flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 700;">Account Actions & Workstation</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px;">Markets are moving right now with up to 95% payouts.</p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <a href="trading.html" class="btn btn-primary">Open Trading Platform &rarr;</a>
+          <button onclick="switchAccount()" class="btn btn-secondary">Switch Account</button>
+          <button onclick="logoutAccount()" class="btn btn-outline" style="border-color: #ff444f; color: #ff444f;">Log Out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DEPOSIT -->
+    <div id="paneDeposit" class="account-tab-pane">
+      <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h3 style="margin-bottom: 0.5rem;">Instant Fund Deposit</h3>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.8rem;">
+          Select your payment provider. Virtual simulator credits your balance immediately.
+        </p>
+
+        <div style="background: rgba(0, 196, 159, 0.1); border: 1px solid rgba(0, 196, 159, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="color: #00c49f; display: block; font-size: 1rem;">📱 M-Pesa STK Push (1 USD = 129.90 KES)</strong>
+            <span style="color: var(--text-secondary); font-size: 0.85rem;">Instant deposit to your Real Account via phone prompt</span>
+          </div>
+          <a href="deposit.html" class="btn btn-green" style="text-decoration: none; font-weight: 700;">Open STK Push &rarr;</a>
+        </div>
+
+        <form id="depositSimulationForm" style="display: flex; flex-direction: column; gap: 1.2rem;">
+          <div class="form-group">
+            <label class="form-label">Other Payment Methods</label>
+            <select class="form-control" style="cursor: pointer;">
+              <option>💳 Visa / Mastercard (Instant &bull; 0% Fee)</option>
+              <option>₿ Bitcoin (BTC Network)</option>
+              <option>Ξ Ethereum / USDT (ERC-20)</option>
+              <option>📱 Apple Pay / Google Pay</option>
+              <option>⚡ Deriv P2P / AstroPay</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Deposit Amount (USD)</label>
+            <input type="number" id="depositAmountInput" class="form-control" value="500" min="10" step="10">
+          </div>
+
+          <button type="submit" class="btn btn-green btn-lg" style="margin-top: 10px;">
+            Simulate Instant Deposit &rarr;
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB 3: WITHDRAWAL -->
+    <div id="paneWithdrawal" class="account-tab-pane">
+      <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h3 style="margin-bottom: 0.5rem;">Request Withdrawal</h3>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1.5rem;">
+          Instant payouts to your mobile wallet or original payment method.
+        </p>
+
+        <div style="background: rgba(255, 68, 79, 0.08); border: 1px solid rgba(255, 68, 79, 0.25); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <strong style="color: #ff6b6b; display: block; font-size: 1rem;">📱 M-Pesa Instant Cashout (1 USD = 129.90 KES)</strong>
+            <span style="color: var(--text-secondary); font-size: 0.85rem;">Fast automated disbursement directly to your mobile phone number.</span>
+          </div>
+          <a href="withdraw.html" class="btn btn-primary" style="background:#ff444f; border-color:#ff444f; text-decoration: none; font-weight: 700;">Open Cashout Portal &rarr;</a>
+        </div>
+
+        <form onsubmit="event.preventDefault(); MoneySpread.toast('Withdrawal Submitted', 'Your request has been queued for automatic processing.', 'info');" style="display: flex; flex-direction: column; gap: 1.2rem;">
+          <div class="form-group">
+            <label class="form-label">Destination Method</label>
+            <select class="form-control">
+              <option>Bank Wire (SWIFT / SEPA)</option>
+              <option>Crypto Wallet (USDT / BTC)</option>
+              <option>Card Refund</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Withdrawal Amount ($)</label>
+            <input type="number" class="form-control" value="250" min="10">
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg">Submit Withdrawal Request</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB 4: TRANSACTION & TRADE HISTORY -->
+    <div id="paneHistory" class="account-tab-pane">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="historyFilterButtons">
+          <button class="btn btn-sm btn-primary" onclick="setHistoryFilter('all')" id="btnFilterAll" style="font-weight: 700;">All Trades</button>
+          <button class="btn btn-sm btn-outline" onclick="setHistoryFilter('real')" id="btnFilterReal" style="border-color: #ff444f; color: #ff6b6b; font-weight: 700;">Real Account Trades</button>
+          <button class="btn btn-sm btn-outline" onclick="setHistoryFilter('demo')" id="btnFilterDemo" style="border-color: #00c49f; color: #00c49f; font-weight: 700;">Demo Practice Trades</button>
+          <button class="btn btn-sm btn-outline" onclick="setHistoryFilter('won')" id="btnFilterWon" style="border-color: #00c49f; color: #00c49f;">Wins Only</button>
+          <button class="btn btn-sm btn-outline" onclick="setHistoryFilter('lost')" id="btnFilterLost" style="border-color: #ff444f; color: #ff6b6b;">Losses Only</button>
+        </div>
+        <div style="font-size: 0.8rem; color: #888;">
+          Total Recorded: <strong id="historyCountBadge" style="color: #fff;">0</strong>
+        </div>
+      </div>
+
+      <div class="markets-table-wrap">
+        <table class="markets-table">
+          <thead>
+            <tr>
+              <th>Contract ID</th>
+              <th>Account</th>
+              <th>Market & Type</th>
+              <th>Entry &rarr; Exit</th>
+              <th>Stake</th>
+              <th>Status</th>
+              <th>Net Profit/Loss</th>
+              <th>Settled Time</th>
+            </tr>
+          </thead>
+          <tbody id="accountHistoryTableBody">
+            <!-- Rendered dynamically via main.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 5: SETTINGS -->
+    <div id="paneSettings" class="account-tab-pane">
+      <div class="card" style="max-width: 640px; margin: 0 auto;">
+        <h3 style="margin-bottom: 1rem;">Profile & Security Preferences</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="settingsFullName" class="form-control" value="COLLO" readonly>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nickname / Username</label>
+            <input type="text" id="settingsNickname" class="form-control" value="@collo" readonly>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Registered Email</label>
+            <input type="email" id="settingsEmail" class="form-control" value="macollocollins@gmail.com" readonly>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Unique Account ID (CR)</label>
+            <input type="text" id="settingsCrNumber" class="form-control" value="CR8779020" readonly style="color:var(--color-green); font-family:var(--font-mono);">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Default Base Currency</label>
+            <select class="form-control">
+              <option selected>USD ($)</option>
+              <option>EUR (€)</option>
+              <option>GBP (£)</option>
+              <option>BTC (₿)</option>
+            </select>
+          </div>
+
+          <div style="padding-top: 1rem; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600;">Two-Factor Authentication (2FA)</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Require OTP verification upon logins and withdrawals.</div>
+            </div>
+            <input type="checkbox" checked style="accent-color: var(--color-green); width: 18px; height: 18px;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="js/main.js"></script>
+  <script>
+    // Robust Canvas Image Compressor (Any image size downscaled to clean 256x256 square ~20KB)
+    window.compressAndResizeImage = function(file, maxSize = 256, quality = 0.85) {
+      return new Promise((resolve, reject) => {
+        if (!file) return reject(new Error('No image file selected.'));
+        if (file.type && !file.type.startsWith('image/')) {
+          return reject(new Error('Selected file is not an image. Please choose a JPG, PNG, WEBP, or GIF.'));
+        }
+
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Error reading image file from disk.'));
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onerror = () => reject(new Error('Unable to decode image. Please select a valid photo.'));
+          img.onload = function() {
+            try {
+              const srcW = img.naturalWidth || img.width;
+              const srcH = img.naturalHeight || img.height;
+              const cropDim = Math.min(srcW, srcH);
+              const sx = (srcW - cropDim) / 2;
+              const sy = (srcH - cropDim) / 2;
+              const targetSize = Math.min(cropDim, maxSize);
+
+              const canvas = document.createElement('canvas');
+              canvas.width = targetSize;
+              canvas.height = targetSize;
+              const ctx = canvas.getContext('2d');
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
+
+              // Dark subtle backdrop in case of transparent PNG
+              ctx.fillStyle = '#16162a';
+              ctx.fillRect(0, 0, targetSize, targetSize);
+
+              // Draw centered square crop
+              ctx.drawImage(img, sx, sy, cropDim, cropDim, 0, 0, targetSize, targetSize);
+
+              // Export as compressed JPEG base64 (~20KB)
+              const dataUrl = canvas.toDataURL('image/jpeg', quality);
+              resolve(dataUrl);
+            } catch (err) {
+              reject(err);
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
+    // Render User Profile & Avatar to DOM
+    function applyUserProfileDOM(u) {
+      if (!u) return;
+      const nick = u.nickname || u.name || 'collo';
+      const fullName = u.name || nick;
+      const cr = u.crNumber || 'CR8779020';
+      const email = u.email || 'macollocollins@gmail.com';
+
+      const nameEl = document.getElementById('accountUserDisplayName');
+      const crEl = document.getElementById('accountUserCrNumber');
+      const avEl = document.getElementById('accountUserAvatar');
+      const removeBtn = document.getElementById('btnRemoveAvatar');
+      const exportBtn = document.getElementById('btnExportAvatar');
+
+      const setFullName = document.getElementById('settingsFullName');
+      const setNick = document.getElementById('settingsNickname');
+      const setEmail = document.getElementById('settingsEmail');
+      const setCr = document.getElementById('settingsCrNumber');
+
+      if (nameEl) nameEl.textContent = nick;
+      if (crEl) crEl.textContent = cr;
+      if (setFullName) setFullName.value = fullName;
+      if (setNick) setNick.value = '@' + nick;
+      if (setEmail) setEmail.value = email;
+      if (setCr) setCr.value = cr;
+
+      if (avEl) {
+        if (u.profilePic && u.profilePic.startsWith('data:image')) {
+          avEl.innerHTML = `<img src="${u.profilePic}" alt="${nick}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+          if (removeBtn) removeBtn.style.display = 'inline-block';
+          if (exportBtn) exportBtn.style.display = 'inline-block';
+        } else {
+          avEl.innerHTML = `<span style="font-weight: 800; font-size: 1.3rem;">${nick.charAt(0).toUpperCase()}</span>`;
+          if (removeBtn) removeBtn.style.display = 'none';
+          if (exportBtn) exportBtn.style.display = 'none';
+        }
+      }
+    }
+
+    // Synchronous immediate render & automatic server refresh
+    (function syncProfileInstantly() {
+      try {
+        let u = JSON.parse(localStorage.getItem('ms_user') || 'null');
+        if (!u) {
+          u = {
+            name: 'COLLO',
+            nickname: 'collo',
+            email: 'macollocollins@gmail.com',
+            crNumber: 'CR8779020'
+          };
+          localStorage.setItem('ms_user', JSON.stringify(u));
+          localStorage.setItem('ms_logged_in', '1');
+        }
+        applyUserProfileDOM(u);
+
+        // Verify with server
+        const queryEmail = u.email || 'macollocollins@gmail.com';
+        fetch(`/api/user-profile?email=${encodeURIComponent(queryEmail)}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data && data.success && data.user) {
+              const fresh = Object.assign({}, u, data.user);
+              localStorage.setItem('ms_user', JSON.stringify(fresh));
+              applyUserProfileDOM(fresh);
+            }
+          })
+          .catch(() => {});
+      } catch (e) {
+        console.warn('Sync profile notice:', e);
+      }
+    })();
+
+    // Global Avatar Upload Handler with Zero Size Rejection
+    window.handleAvatarUpload = async function(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const avEl = document.getElementById('accountUserAvatar');
+      const prevHtml = avEl ? avEl.innerHTML : '';
+      if (avEl) {
+        avEl.innerHTML = `<div style="font-size:0.75rem; color:#00c49f; font-weight:700; text-align:center;">Saving...</div>`;
+      }
+
+      try {
+        // Compress & resize any photo to optimized 256x256 square (~20KB)
+        const base64Data = await window.compressAndResizeImage(file, 256, 0.85);
+
+        let user = JSON.parse(localStorage.getItem('ms_user') || 'null');
+        if (!user) {
+          user = {
+            name: 'COLLO',
+            nickname: 'collo',
+            email: 'macollocollins@gmail.com',
+            crNumber: 'CR8779020'
+          };
+        }
+        user.profilePic = base64Data;
+        localStorage.setItem('ms_user', JSON.stringify(user));
+
+        // Render immediately to DOM
+        applyUserProfileDOM(user);
+
+        // Update top navigation avatar if present
+        const topNav = document.getElementById('topNavUserAvatar');
+        if (topNav) {
+          topNav.innerHTML = `<img src="${base64Data}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+
+        // Persist to server backend data/users.json
+        try {
+          const resp = await fetch('/api/update-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email || 'macollocollins@gmail.com', profilePic: base64Data })
+          });
+          const resData = await resp.json();
+          if (resData.success) {
+            if (typeof MoneySpread !== 'undefined' && MoneySpread.toast) {
+              MoneySpread.toast('Profile Picture Updated', 'Your photo has been saved permanently to your account.', 'win');
+            }
+          }
+        } catch (serverErr) {
+          console.warn('Backend sync warning:', serverErr);
+        }
+      } catch (err) {
+        alert('Image Import Notice: ' + (err.message || 'Could not process selected image.'));
+        if (avEl) avEl.innerHTML = prevHtml;
+      } finally {
+        event.target.value = '';
+      }
+    };
+
+    // Export Profile Photo
+    window.exportProfilePhoto = function() {
+      const user = JSON.parse(localStorage.getItem('ms_user') || 'null');
+      if (!user || !user.profilePic) {
+        alert('No custom picture to export. Click "Import Picture" to choose one first.');
+        return;
+      }
+      const a = document.createElement('a');
+      a.href = user.profilePic;
+      a.download = `moneyspread-avatar-${user.nickname || 'collo'}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      if (typeof MoneySpread !== 'undefined' && MoneySpread.toast) {
+        MoneySpread.toast('Picture Exported', 'Saved profile avatar to your device.', 'info');
+      }
+    };
+
+    // Remove Profile Photo
+    window.removeProfilePhoto = async function() {
+      if (!confirm('Are you sure you want to remove your profile picture?')) return;
+      let user = JSON.parse(localStorage.getItem('ms_user') || 'null');
+      if (!user) {
+        user = { name: 'COLLO', nickname: 'collo', email: 'macollocollins@gmail.com', crNumber: 'CR8779020' };
+      }
+      user.profilePic = null;
+      localStorage.setItem('ms_user', JSON.stringify(user));
+
+      applyUserProfileDOM(user);
+
+      const topNav = document.getElementById('topNavUserAvatar');
+      if (topNav) {
+        topNav.textContent = ((user.nickname || user.name || 'collo').charAt(0) || 'C').toUpperCase();
+      }
+
+      try {
+        await fetch('/api/update-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email || 'macollocollins@gmail.com', profilePic: null })
+        });
+      } catch (e) {}
+
+      if (typeof MoneySpread !== 'undefined' && MoneySpread.toast) {
+        MoneySpread.toast('Picture Removed', 'Default letter avatar restored.', 'info');
+      }
+    };
+
+    function switchAccount() {
+      localStorage.removeItem('ms_logged_in');
+      localStorage.removeItem('ms_user');
+      window.location.href = 'register.html?tab=login';
+    }
+    function logoutAccount() {
+      localStorage.removeItem('ms_logged_in');
+      localStorage.removeItem('ms_user');
+      window.location.href = 'register.html';
+    }
+  </script>
+</body>
+</html>

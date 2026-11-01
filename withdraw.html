@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Spread | Instant Withdrawal</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    if (!localStorage.getItem('ms_logged_in')) {
+      window.location.href = 'register.html';
+    }
+  </script>
+  <style>
+    .withdraw-container {
+      max-width: 520px;
+      margin: 3.5rem auto;
+      padding: 2.2rem;
+      background: var(--bg-card, #16162a);
+      border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .input-field-group {
+      margin-bottom: 1.25rem;
+    }
+    .input-field-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: #a0a0ba;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: #111122;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      overflow: hidden;
+      padding: 0 12px;
+    }
+    .input-wrapper:focus-within {
+      border-color: #ff444f;
+      box-shadow: 0 0 0 2px rgba(255, 68, 79, 0.2);
+    }
+    .input-wrapper span {
+      color: #888;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .input-wrapper input, .input-wrapper select {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      padding: 12px 0;
+      outline: none;
+      font-family: inherit;
+    }
+    .balance-card-summary {
+      background: rgba(255, 68, 79, 0.08);
+      border: 1px solid rgba(255, 68, 79, 0.25);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rate-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 196, 159, 0.08);
+      border: 1px solid rgba(0, 196, 159, 0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      margin-bottom: 1.5rem;
+      color: #ccc;
+    }
+    .rate-badge strong {
+      color: #00c49f;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .btn-withdraw {
+      width: 100%;
+      background: linear-gradient(135deg, #ff444f, #d63031);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-withdraw:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(255, 68, 79, 0.4);
+    }
+
+    /* Modal for Payout Processing */
+    .payout-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+    }
+    .payout-modal {
+      background: #18182e;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 420px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      animation: popIn 0.2s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Live Market Ticker Marquee -->
+  <div class="ticker-tape">
+    <div class="ticker-inner"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="trading.html" class="navbar-brand">
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2V22" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M16 6.5C16 4.5 14.2 3 12 3C9.5 3 8 4.5 8 6.5C8 9.5 16 9 16 12.5C16 15 14 17 12 17C9.5 17 8 15 8 13.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M4 12L2 9M2 9L5 7M2 9H6" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20 12L22 15M22 15L19 17M22 15H18" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="brand-text">Money Spread</span>
+    </a>
+
+    <ul class="navbar-menu">
+      <li><a href="index.html" class="nav-link">Home</a></li>
+      <li><a href="trading.html" class="nav-link">Trade</a></li>
+      <li><a href="markets.html" class="nav-link">Markets</a></li>
+      <li><a href="deposit.html" class="nav-link">Deposit</a></li>
+      <li><a href="withdraw.html" class="nav-link active">Withdraw</a></li>
+      <li><a href="account.html" class="nav-link">Account</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      <a href="trading.html" class="btn btn-primary btn-sm">Launch Trader &rarr;</a>
+    </div>
+  </nav>
+
+  <!-- Withdraw Container -->
+  <div class="withdraw-container">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: rgba(255, 68, 79, 0.15); border: 1px solid rgba(255, 68, 79, 0.3); border-radius: 12px; margin-bottom: 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff444f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="19" x2="12" y2="5"></line>
+          <polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+      </div>
+      <h2 style="font-size: 1.4rem; font-weight: 800;">Withdraw Real Funds</h2>
+      <p style="color: #a0a0ba; font-size: 0.85rem; margin-top: 4px;">Direct payout to your M-Pesa or payment account within minutes.</p>
+    </div>
+
+    <!-- Available Real Balance Summary -->
+    <div class="balance-card-summary">
+      <div>
+        <span style="font-size: 0.8rem; color: #a0a0ba; text-transform: uppercase;">Available Real Balance</span>
+        <div id="displayRealBalance" style="font-size: 1.4rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace;">$0.00 USD</div>
+      </div>
+      <a href="deposit.html" style="font-size: 0.8rem; color: #00c49f; text-decoration: underline; font-weight: 700;">+ Deposit More</a>
+    </div>
+
+    <div class="rate-badge">
+      <span>Exchange Rate Guarantee:</span>
+      <strong>1 USD = 129.90 KES</strong>
+    </div>
+
+    <form id="withdrawForm" onsubmit="processWithdrawal(event)">
+      <div class="input-field-group">
+        <label for="withdrawMethod">Withdrawal Channel</label>
+        <div class="input-wrapper">
+          <span>🏦</span>
+          <select id="withdrawMethod" onchange="handleMethodChange()">
+            <option value="mpesa" selected>📱 M-Pesa Instant Cashout (Direct STK Disbursement)</option>
+            <option value="bank">💳 Visa / Mastercard Direct Wire</option>
+            <option value="crypto">₿ Crypto (USDT / BTC Network)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-field-group">
+        <label for="withdrawAmount">Amount in USD ($)</label>
+        <div class="input-wrapper">
+          <span>$</span>
+          <input type="number" id="withdrawAmount" min="5" step="1" placeholder="Min. $5" required oninput="updateKESConversion()">
+        </div>
+        <small id="kesConversionText" style="color: #00c49f; font-size: 0.8rem; margin-top: 4px; display: block;">≈ KES 0.00</small>
+      </div>
+
+      <div class="input-field-group" id="phoneFieldGroup">
+        <label for="phoneNumber">M-Pesa Mobile Number</label>
+        <div class="input-wrapper">
+          <span>🇰🇪</span>
+          <input type="tel" id="phoneNumber" placeholder="07XXXXXXXX or 01XXXXXXXX" pattern="^(07|01)[0-9]{8}$" required>
+        </div>
+      </div>
+
+      <div class="input-field-group">
+        <label for="withdrawPin">Account Security PIN</label>
+        <div class="input-wrapper">
+          <span>🔒</span>
+          <input type="password" id="withdrawPin" maxlength="6" placeholder="Enter PIN to authorize" required autocomplete="off">
+        </div>
+      </div>
+
+      <div id="withdrawError" style="color: #ff6b6b; font-size: 0.82rem; margin-bottom: 1rem; min-height: 18px;"></div>
+
+      <button type="submit" class="btn-withdraw" id="submitBtn">
+        <span>Request Instant Cashout</span>
+        <span>→</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Payout Processing Modal -->
+  <div class="payout-modal-overlay" id="payoutModal">
+    <div class="payout-modal">
+      <div style="font-size: 2.2rem; margin-bottom: 8px;">💸</div>
+      <h3 style="margin-bottom: 6px; color:#fff;">Withdrawal Dispatched!</h3>
+      <p style="color: #a0a0ba; font-size: 0.85rem;" id="modalSubtitle">Funds have been released to your payment provider.</p>
+      
+      <div style="margin: 16px 0; padding: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; font-size: 0.88rem; text-align: left;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+          <span style="color:#888;">Recipient:</span>
+          <strong id="modalRecipient" style="color:#fff;">07XXXXXXXX</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+          <span style="color:#888;">Payout Amount:</span>
+          <strong id="modalKesAmount" style="color:#00c49f; font-family:'JetBrains Mono',monospace;">KES 0.00</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+          <span style="color:#888;">Deducted USD:</span>
+          <strong id="modalUsdAmount" style="color:#ff6b6b; font-family:'JetBrains Mono',monospace;">$0.00</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#888;">M-Pesa Ref ID:</span>
+          <strong id="modalRefId" style="color:#fff; font-family:'JetBrains Mono',monospace;">QBC1234567</strong>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="window.location.href='trading.html'" style="width:100%; padding:11px;">Return to Trading Terminal &rarr;</button>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="js/main.js"></script>
+  <script>
+    const USD_RATE = 129.90;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshBalanceDisplay();
+      
+      // Auto-populate phone if user has one registered
+      const user = JSON.parse(localStorage.getItem('ms_user') || 'null');
+      if (user && user.phone) {
+        document.getElementById('phoneNumber').value = user.phone;
+      }
+    });
+
+    function refreshBalanceDisplay() {
+      const realBal = parseFloat(localStorage.getItem('ms_real_balance') || '0');
+      document.getElementById('displayRealBalance').textContent = '$' + realBal.toLocaleString('en-US', {minimumFractionDigits: 2}) + ' USD';
+    }
+
+    function handleMethodChange() {
+      const method = document.getElementById('withdrawMethod').value;
+      const phoneGroup = document.getElementById('phoneFieldGroup');
+      if (method === 'mpesa') {
+        phoneGroup.style.display = 'block';
+        document.getElementById('phoneNumber').required = true;
+      } else {
+        phoneGroup.style.display = 'none';
+        document.getElementById('phoneNumber').required = false;
+      }
+    }
+
+    function updateKESConversion() {
+      const usd = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+      const kes = (usd * USD_RATE).toFixed(2);
+      document.getElementById('kesConversionText').textContent = `≈ KES ${parseFloat(kes).toLocaleString('en-KE', {minimumFractionDigits: 2})}`;
+    }
+
+    async function processWithdrawal(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('withdrawError');
+      errEl.textContent = '';
+
+      const usd = parseFloat(document.getElementById('withdrawAmount').value);
+      const phone = document.getElementById('phoneNumber').value.trim();
+      const method = document.getElementById('withdrawMethod').value;
+      const currentReal = parseFloat(localStorage.getItem('ms_real_balance') || '0');
+
+      if (!usd || usd < 5) {
+        errEl.textContent = 'Minimum withdrawal amount is $5.00 USD.';
+        return;
+      }
+
+      if (usd > currentReal) {
+        errEl.textContent = `Insufficient funds: Your available real balance is $${currentReal.toFixed(2)} USD.`;
+        return;
+      }
+
+      // Deduct balance
+      const newReal = parseFloat((currentReal - usd).toFixed(2));
+      localStorage.setItem('ms_real_balance', newReal.toFixed(2));
+
+      const currentUser = JSON.parse(localStorage.getItem('ms_user') || 'null');
+      if (currentUser) {
+        currentUser.realBalance = newReal;
+        localStorage.setItem('ms_user', JSON.stringify(currentUser));
+
+        const users = JSON.parse(localStorage.getItem('ms_users') || '[]');
+        const idx = users.findIndex(u => (u.email || '').toLowerCase() === (currentUser.email || '').toLowerCase());
+        if (idx !== -1) {
+          users[idx].realBalance = newReal;
+          localStorage.setItem('ms_users', JSON.stringify(users));
+        }
+
+        // Sync balance with server
+        try {
+          await fetch('/api/update-balance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: currentUser.email, realBalance: newReal })
+          });
+        } catch (err) {}
+
+        // Record withdrawal transaction to server permanently
+        const refId = 'WDR-' + Math.floor(10000000 + Math.random() * 90000000);
+        try {
+          await fetch('/api/record-transaction', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: currentUser.email,
+              transaction: {
+                id: refId,
+                type: 'withdrawal',
+                amount: usd,
+                method: method === 'mpesa' ? 'M-Pesa Instant Cashout' : 'Bank / Wallet',
+                status: 'COMPLETED',
+                date: new Date().toISOString()
+              }
+            })
+          });
+        } catch (err) {}
+      }
+
+      // Record local transaction history
+      const txns = JSON.parse(localStorage.getItem('ms_transactions') || '[]');
+      const localRefId = 'WS' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      txns.unshift({
+        id: localRefId,
+        date: new Date().toLocaleString(),
+        type: method === 'mpesa' ? 'M-Pesa Instant Cashout' : 'Withdrawal Request',
+        amount: -usd,
+        status: 'Completed'
+      });
+      localStorage.setItem('ms_transactions', JSON.stringify(txns));
+
+      const kes = (usd * USD_RATE).toFixed(2);
+      document.getElementById('modalRecipient').textContent = method === 'mpesa' ? phone : 'Bank / Wallet';
+      document.getElementById('modalKesAmount').textContent = `KES ${parseFloat(kes).toLocaleString('en-KE', {minimumFractionDigits: 2})}`;
+      document.getElementById('modalUsdAmount').textContent = `-$${usd.toFixed(2)} USD`;
+      document.getElementById('modalRefId').textContent = localRefId;
+
+      document.getElementById('payoutModal').style.display = 'flex';
+      refreshBalanceDisplay();
+    }
+  </script>
+</body>
+</html>

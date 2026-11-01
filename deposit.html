@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Spread | Instant Deposit</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    if (!localStorage.getItem('ms_logged_in')) {
+      window.location.href = 'register.html';
+    }
+  </script>
+  <style>
+    .deposit-container {
+      max-width: 480px;
+      margin: 4rem auto;
+      padding: 2rem;
+      background: var(--bg-card, #16162a);
+      border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .input-field-group {
+      margin-bottom: 1.25rem;
+    }
+    .input-field-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: #a0a0ba;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: #111122;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      overflow: hidden;
+      padding: 0 12px;
+    }
+    .input-wrapper:focus-within {
+      border-color: #00c49f;
+      box-shadow: 0 0 0 2px rgba(0, 196, 159, 0.2);
+    }
+    .input-wrapper span {
+      color: #888;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .input-wrapper input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      padding: 12px 0;
+      outline: none;
+      font-family: inherit;
+    }
+    .rate-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 196, 159, 0.08);
+      border: 1px solid rgba(0, 196, 159, 0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      margin-bottom: 1.5rem;
+      color: #ccc;
+    }
+    .rate-badge strong {
+      color: #00c49f;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .btn-stk {
+      width: 100%;
+      background: linear-gradient(135deg, #00c49f, #009e80);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-stk:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    /* Modal simulating mobile phone STK prompt */
+    .stk-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .stk-modal {
+      background: #1e1e34;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 360px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      animation: popIn 0.25s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .stk-phone-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .stk-pin-input {
+      letter-spacing: 0.4em;
+      font-size: 1.5rem;
+      text-align: center;
+      width: 160px;
+      background: #111122;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px;
+      margin: 16px auto;
+      display: block;
+      outline: none;
+    }
+    .stk-pin-input:focus {
+      border-color: #00c49f;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand" onclick="window.location.href='trading.html'" style="cursor:pointer">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#ff444f"/>
+        <text x="18" y="24" text-anchor="middle" font-size="18" font-weight="bold" fill="white" font-family="Inter">$</text>
+      </svg>
+      <span class="brand-name">Money<span class="brand-accent">Spread</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="trading.html">Trade</a>
+      <a href="markets.html">Markets</a>
+      <a href="deposit.html" style="color:#00c49f; font-weight:700;">Deposit</a>
+      <a href="withdraw.html" style="color:#ff6b6b; font-weight:700;">Withdraw</a>
+      <a href="account.html">Account</a>
+    </div>
+  </nav>
+
+  <!-- Deposit Container -->
+  <div class="deposit-container">
+    <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Instant M-Pesa Deposit</h2>
+    <p style="color: #a0a0ba; font-size: 0.88rem; margin-bottom: 1.5rem;">Deposit USD to your real balance via STK Push.</p>
+
+    <div class="rate-badge">
+      <span>Exchange Rate</span>
+      <strong>1 USD = 129.90 KES</strong>
+    </div>
+
+    <form id="depositForm" onsubmit="triggerSTKPush(event)">
+      <div class="input-field-group">
+        <label for="depositAmount">Amount in USD ($)</label>
+        <div class="input-wrapper">
+          <span>$</span>
+          <input type="number" id="depositAmount" min="1" step="0.5" placeholder="e.g. 10" required oninput="updateKESConversion()">
+        </div>
+        <small id="kesConversionText" style="color: #00c49f; font-size: 0.8rem; margin-top: 4px; display: block;">≈ KES 0.00</small>
+      </div>
+
+      <div class="input-field-group">
+        <label for="phoneNumber">M-Pesa Phone Number</label>
+        <div class="input-wrapper">
+          <span>🇰🇪</span>
+          <input type="tel" id="phoneNumber" placeholder="07XXXXXXXX" pattern="^(07|01)[0-9]{8}$" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-stk" id="submitBtn">
+        <span>Send STK Push</span>
+        <span>→</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- STK Prompt Modal -->
+  <div class="stk-modal-overlay" id="stkModal">
+    <div class="stk-modal">
+      <div class="stk-phone-icon">📲</div>
+      <h3 style="margin-bottom: 6px;">STK Push Sent</h3>
+      <p style="color: #a0a0ba; font-size: 0.85rem;" id="modalSubtitle">Please enter your M-Pesa PIN on your phone to approve payment.</p>
+      
+      <div style="margin: 16px 0; padding: 12px; background: rgba(0, 0, 0, 0.25); border-radius: 8px; font-size: 0.88rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+          <span style="color:#888;">Merchant:</span>
+          <strong>Money Spread</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#888;">Amount:</span>
+          <strong id="modalKesAmount" style="color:#00c49f;">KES 0.00</strong>
+        </div>
+      </div>
+
+      <p style="font-size: 0.8rem; color: #888;">Simulated phone response:</p>
+      <input type="password" maxlength="4" class="stk-pin-input" id="stkPin" placeholder="PIN" autocomplete="off">
+
+      <button class="btn-stk" onclick="confirmSTKPayment()" style="margin-top: 8px;">Confirm & Credit Account</button>
+      <button onclick="closeModal()" style="background:transparent; border:none; color:#888; margin-top:12px; cursor:pointer; font-size:0.85rem;">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    const USD_RATE = 129.90;
+
+    function updateKESConversion() {
+      const usd = parseFloat(document.getElementById('depositAmount').value) || 0;
+      const kes = (usd * USD_RATE).toFixed(2);
+      document.getElementById('kesConversionText').textContent = `≈ KES ${parseFloat(kes).toLocaleString('en-KE', {minimumFractionDigits: 2})}`;
+    }
+
+    function triggerSTKPush(e) {
+      e.preventDefault();
+      const usd = parseFloat(document.getElementById('depositAmount').value);
+      const phone = document.getElementById('phoneNumber').value;
+
+      if (!usd || usd <= 0) return;
+
+      const kes = (usd * USD_RATE).toFixed(2);
+      document.getElementById('modalKesAmount').textContent = `KES ${parseFloat(kes).toLocaleString('en-KE', {minimumFractionDigits: 2})}`;
+      document.getElementById('modalSubtitle').textContent = `Push notification dispatched to ${phone}. Enter PIN to complete.`;
+      
+      document.getElementById('stkModal').style.display = 'flex';
+      document.getElementById('stkPin').focus();
+    }
+
+    function closeModal() {
+      document.getElementById('stkModal').style.display = 'none';
+      document.getElementById('stkPin').value = '';
+    }
+
+    function confirmSTKPayment() {
+      const pin = document.getElementById('stkPin').value;
+      if (pin.length !== 4) {
+        alert('Please enter a 4-digit PIN to confirm the simulated payment.');
+        return;
+      }
+
+      const usd = parseFloat(document.getElementById('depositAmount').value);
+      const currentReal = parseFloat(localStorage.getItem('ms_real_balance') || '0');
+      const updatedBalance = parseFloat((currentReal + usd).toFixed(2));
+
+      // Update real account balance
+      localStorage.setItem('ms_real_balance', updatedBalance.toFixed(2));
+
+      // Also persist to current user's profile in ms_users
+      const currentUser = JSON.parse(localStorage.getItem('ms_user') || 'null');
+      if (currentUser) {
+        currentUser.realBalance = updatedBalance;
+        localStorage.setItem('ms_user', JSON.stringify(currentUser));
+
+        const users = JSON.parse(localStorage.getItem('ms_users') || '[]');
+        const idx = users.findIndex(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
+        if (idx !== -1) {
+          users[idx].realBalance = updatedBalance;
+          localStorage.setItem('ms_users', JSON.stringify(users));
+        }
+
+        // Sync server-side user balance
+        fetch('/api/update-balance', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentUser.email, realBalance: updatedBalance })
+        }).catch(() => {});
+
+        // Record deposit transaction to server permanently
+        const txnId = 'DEP-' + Math.floor(10000000 + Math.random() * 90000000);
+        fetch('/api/record-transaction', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: currentUser.email,
+            transaction: {
+              id: txnId,
+              type: 'deposit',
+              amount: usd,
+              method: 'M-Pesa STK Push',
+              status: 'COMPLETED',
+              date: new Date().toISOString()
+            }
+          })
+        }).catch(() => {});
+      }
+
+      // Record local transaction history
+      const txns = JSON.parse(localStorage.getItem('ms_transactions') || '[]');
+      const txnId = 'MS' + Math.random().toString(36).substring(2, 9).toUpperCase();
+      txns.unshift({
+        id: txnId,
+        date: new Date().toLocaleString(),
+        type: 'STK Push Deposit',
+        amount: usd,
+        status: 'Completed'
+      });
+      localStorage.setItem('ms_transactions', JSON.stringify(txns));
+
+      // Notify server of deposit to award affiliate commission if referred
+      if (currentUser && currentUser.email) {
+        fetch('/api/record-deposit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentUser.email, amount: usd })
+        }).catch(() => {});
+      }
+
+      alert(`Deposit successful! $${usd.toFixed(2)} credited to your Real Account.`);
+      window.location.href = 'trading.html';
+    }
+  </script>
+</body>
+</html>
