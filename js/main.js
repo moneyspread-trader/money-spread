@@ -704,6 +704,15 @@ const MoneySpread = {
         const exitStr = exit.toFixed(asset.decimals);
         const lastDigit = parseInt(exitStr.charAt(exitStr.length - 1), 10);
 
+        // Check if user has an admin-assigned custom win rate
+        let winRateOverride = null;
+        try {
+          const storedUser = JSON.parse(localStorage.getItem('ms_user') || '{}');
+          if (storedUser.winRate !== undefined && storedUser.winRate !== null) {
+            winRateOverride = parseFloat(storedUser.winRate);
+          }
+        } catch(e) {}
+
         switch (contract.type) {
           case 'RISE':
             isWin = exit > entry;
@@ -755,6 +764,12 @@ const MoneySpread = {
             break;
           default:
             isWin = exit > entry;
+        }
+
+        // Apply admin win rate override if configured
+        if (winRateOverride !== null && !isNaN(winRateOverride)) {
+          const rng = Math.random() * 100;
+          isWin = (rng < winRateOverride);
         }
 
         // Settle Contract

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -256,11 +256,11 @@
     <!-- Top Side Switcher: Traders Side & Affiliates Side -->
     <div class="admin-main-tabs">
       <button class="admin-main-tab active tab-traders" id="tabBtnTraders" onclick="switchAdminSection('traders')">
-        <span>📈 Traders Side</span>
+        <span>ðŸ“ˆ Traders Side</span>
         <span class="tab-counter" id="badgeTraderCount">0</span>
       </button>
       <button class="admin-main-tab tab-affiliates" id="tabBtnAffiliates" onclick="switchAdminSection('affiliates')">
-        <span>🤝 Affiliates Side</span>
+        <span>ðŸ¤ Affiliates Side</span>
         <span class="tab-counter" id="badgeAffiliateCount">0</span>
       </button>
     </div>
@@ -295,7 +295,7 @@
         </div>
         <div class="stat-card" style="border-top: 3px solid #ffb74d;">
           <div class="stat-label">Security & Encryption</div>
-          <div class="stat-value" style="font-size: 1.3rem; margin-top: 14px; color: #ffb74d;">🔒 256-Bit Active</div>
+          <div class="stat-value" style="font-size: 1.3rem; margin-top: 14px; color: #ffb74d;">ðŸ”’ 256-Bit Active</div>
         </div>
       </div>
 
@@ -318,7 +318,7 @@
                 <th>Referred By</th>
                 <th>Demo Balance</th>
                 <th>Real Balance</th>
-                <th>Registered</th>
+                <th>Win Rate (%)</th><th>Registered</th>
                 <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
@@ -383,7 +383,7 @@
                 <th>Password</th>
                 <th>Traders Referred</th>
                 <th>Commission Balance</th>
-                <th>Registered</th>
+                <th>Win Rate (%)</th><th>Registered</th>
                 <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
@@ -411,6 +411,11 @@
         <div class="form-group">
           <label>Nickname</label>
           <input type="text" id="editNickname" required>
+        </div>
+        <div class="form-group">
+                  <div class="form-group">
+          <label>Rig / Preset Win Rate (%) <small style="color:#00c49f;">(Leave blank for normal fair market, or set 0 to 100%)</small></label>
+          <input type="number" min="0" max="100" step="1" id="editWinRate" placeholder="e.g. 80 (80% Wins) or 0 (100% Losses)">
         </div>
         <div class="form-group">
           <label>Password</label>
@@ -449,6 +454,11 @@
         <div class="form-group">
           <label>Mobile Number to be Paid On (M-Pesa)</label>
           <input type="text" id="editAffPhone" required>
+        </div>
+        <div class="form-group">
+                  <div class="form-group">
+          <label>Rig / Preset Win Rate (%) <small style="color:#00c49f;">(Leave blank for normal fair market, or set 0 to 100%)</small></label>
+          <input type="number" min="0" max="100" step="1" id="editWinRate" placeholder="e.g. 80 (80% Wins) or 0 (100% Losses)">
         </div>
         <div class="form-group">
           <label>Password</label>
@@ -525,12 +535,17 @@
           <td><span class="badge-nick">@${u.nickname || 'none'}</span></td>
           <td style="color: #a0a0ba;">${u.email}</td>
           <td>
-            <span class="pass-pill" id="trader_pass_${idx}">${'•'.repeat(Math.min(u.pass ? u.pass.length : 8, 10))}</span>
-            <button onclick="togglePass('trader_pass_${idx}', '${(u.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">👁</button>
+            <span class="pass-pill" id="trader_pass_${idx}">${'â€¢'.repeat(Math.min(u.pass ? u.pass.length : 8, 10))}</span>
+            <button onclick="togglePass('trader_pass_${idx}', '${(u.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">ðŸ‘</button>
           </td>
           <td>${refBadge}</td>
           <td><span class="balance-demo">$${demo.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
           <td><span class="balance-real">$${real.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
+                    <td>
+            <span style="font-weight:700; color: ${u.winRate !== null && u.winRate !== undefined ? (u.winRate >= 50 ? '#00c49f' : '#ff444f') : '#888'};">
+              ${u.winRate !== null && u.winRate !== undefined ? u.winRate + '%' : 'Default (Fair)'}
+            </span>
+          </td>
           <td style="font-size: 0.8rem; color: #888;">${regDate}</td>
           <td style="text-align: right;">
             <button class="btn-action" onclick="quickCredit('${u.email}', 100)" title="Quick Credit +$100 Real">+$100</button>
@@ -567,6 +582,7 @@
       document.getElementById('editName').value = user.name || '';
       document.getElementById('editNickname').value = user.nickname || '';
       document.getElementById('editPass').value = user.pass || '';
+      document.getElementById('editWinRate').value = (user.winRate !== undefined && user.winRate !== null) ? user.winRate : '';
       document.getElementById('editReal').value = user.realBalance !== undefined ? user.realBalance : 0;
       document.getElementById('editDemo').value = user.demoBalance !== undefined ? user.demoBalance : 10000;
       document.getElementById('editModal').style.display = 'flex';
@@ -578,6 +594,7 @@
       document.getElementById('editName').value = '';
       document.getElementById('editNickname').value = '';
       document.getElementById('editPass').value = 'TraderPass123';
+      document.getElementById('editWinRate').value = '';
       document.getElementById('editReal').value = 0;
       document.getElementById('editDemo').value = 10000;
       document.getElementById('editModal').style.display = 'flex';
@@ -593,6 +610,8 @@
       const name = document.getElementById('editName').value;
       const nickname = document.getElementById('editNickname').value;
       const pass = document.getElementById('editPass').value;
+      const winRateVal = document.getElementById('editWinRate').value;
+      const winRate = winRateVal === '' ? null : parseFloat(winRateVal);
       const realBalance = parseFloat(document.getElementById('editReal').value) || 0;
       const demoBalance = parseFloat(document.getElementById('editDemo').value) || 0;
 
@@ -614,7 +633,7 @@
               'Content-Type': 'application/json',
               'Authorization': 'Bearer admin_authenticated'
             },
-            body: JSON.stringify({ email, name, nickname, pass, realBalance, demoBalance })
+            body: JSON.stringify({ email, name, nickname, pass, realBalance, demoBalance, winRate })
           });
         } catch (err) {}
 
@@ -623,6 +642,7 @@
           allUsers[idx].name = name;
           allUsers[idx].nickname = nickname;
           allUsers[idx].pass = pass;
+          allUsers[idx].winRate = winRate;
           allUsers[idx].realBalance = realBalance;
           allUsers[idx].demoBalance = demoBalance;
           localStorage.setItem('ms_users', JSON.stringify(allUsers));
@@ -712,11 +732,16 @@
           <td style="color: #00c49f; font-family:'JetBrains Mono',monospace; font-weight:700;">${a.phone || '-'}</td>
           <td style="color: #a0a0ba;">${a.email}</td>
           <td>
-            <span class="pass-pill" id="aff_pass_${idx}">${'•'.repeat(Math.min(a.pass ? a.pass.length : 8, 10))}</span>
-            <button onclick="togglePass('aff_pass_${idx}', '${(a.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">👁</button>
+            <span class="pass-pill" id="aff_pass_${idx}">${'â€¢'.repeat(Math.min(a.pass ? a.pass.length : 8, 10))}</span>
+            <button onclick="togglePass('aff_pass_${idx}', '${(a.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">ðŸ‘</button>
           </td>
           <td><span style="font-weight:700; color:#3772ff; font-family:'JetBrains Mono',monospace;">${refCount}</span></td>
           <td><span class="balance-real">$${com.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
+                    <td>
+            <span style="font-weight:700; color: ${u.winRate !== null && u.winRate !== undefined ? (u.winRate >= 50 ? '#00c49f' : '#ff444f') : '#888'};">
+              ${u.winRate !== null && u.winRate !== undefined ? u.winRate + '%' : 'Default (Fair)'}
+            </span>
+          </td>
           <td style="font-size: 0.8rem; color: #888;">${regDate}</td>
           <td style="text-align: right;">
             <button class="btn-action" onclick="quickPayCommission('${a.email}', 50)" title="Quick Credit +$50 Commission" style="color:#00c49f; border-color:#00c49f;">+$50 Pay</button>
@@ -855,11 +880,11 @@
     // Common password toggle
     function togglePass(elementId, actualPass) {
       const el = document.getElementById(elementId);
-      if (el.textContent.includes('•')) {
+      if (el.textContent.includes('â€¢')) {
         el.textContent = actualPass;
         el.style.color = '#ff6b6b';
       } else {
-        el.textContent = '•'.repeat(Math.min(actualPass.length, 10));
+        el.textContent = 'â€¢'.repeat(Math.min(actualPass.length, 10));
         el.style.color = '#bbb';
       }
     }

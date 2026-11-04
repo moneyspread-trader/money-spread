@@ -1,4 +1,4 @@
-const http = require('http');
+﻿const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
@@ -103,6 +103,10 @@ function readUsers() {
       }
       if (!Array.isArray(u.realTradeHistory)) {
         u.realTradeHistory = [];
+        modified = true;
+      }
+            if (u.winRate === undefined) {
+        u.winRate = null; // null = natural market evaluation, number 0-100 = forced percentage
         modified = true;
       }
       if (!Array.isArray(u.transactions)) {
@@ -596,7 +600,7 @@ const server = http.createServer((req, res) => {
           return;
         }
 
-        const { email, demoBalance, realBalance, pass, name, nickname } = JSON.parse(body);
+        const { email, demoBalance, realBalance, pass, name, nickname, winRate } = JSON.parse(body);
         const users = readUsers();
         const cleanEmail = (email || '').trim().toLowerCase();
         const idx = users.findIndex(u => (u.email || '').toLowerCase() === cleanEmail);
@@ -607,6 +611,9 @@ const server = http.createServer((req, res) => {
           if (pass) users[idx].pass = pass;
           if (name) users[idx].name = name;
           if (nickname) users[idx].nickname = nickname;
+          if (winRate !== undefined) {
+            users[idx].winRate = winRate === '' || winRate === null ? null : parseFloat(winRate);
+          }
 
           saveUsers(users);
           res.writeHead(200, { 'Content-Type': 'application/json' });
