@@ -482,6 +482,7 @@
         }
         user.profilePic = base64Data;
         localStorage.setItem('ms_user', JSON.stringify(user));
+        localStorage.setItem('ms_profile_pic', base64Data);
 
         // Render immediately to DOM
         applyUserProfileDOM(user);

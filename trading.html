@@ -235,6 +235,25 @@
       color: var(--text-muted);
       margin-top: 3px;
     }
+    .chart-type-toggle {
+      background: rgba(20, 25, 39, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .chart-type-toggle.active {
+      background: #2563eb;
+      border-color: #60a5fa;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+    }
     .chart-canvas-wrapper {
       flex: 1;
       width: 100%;
@@ -829,8 +848,23 @@
         <button class="deposit-btn">💰 Deposit</button>
       </a>
       <a href="account.html" style="text-decoration:none;" title="My Profile">
-        <div id="headerAvatar" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg, #ef4444, #1e1b4b); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; border:1.5px solid rgba(255,255,255,0.2);">
-          C
+        <div id="headerAvatar" style="width:30px; height:30px; border-radius:50%; background:#1e1b4b; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; border:1.5px solid #00c49f; overflow:hidden;">
+          <script>
+            (function() {
+              var pic = localStorage.getItem('ms_profile_pic');
+              if (!pic) {
+                try {
+                  var u = JSON.parse(localStorage.getItem('ms_user') || '{}');
+                  pic = u.profilePic;
+                } catch(e) {}
+              }
+              if (pic && pic.indexOf('data:image') === 0) {
+                document.write('<img src="' + pic + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">');
+              } else {
+                document.write('C');
+              }
+            })();
+          </script>
         </div>
       </a>
     </div>
@@ -857,13 +891,20 @@
 
     <!-- CHART AREA -->
     <section class="chart-section" id="mainChartSection">
-      <!-- Market Overlay Dropdown -->
-      <div class="chart-market-overlay">
-        <button class="market-dropdown-btn" onclick="openMarketsModal()">
-          <span id="activeMarketName">Vol 10 (1s)</span>
-          <span>▼</span>
-        </button>
-        <div class="market-price-sub" id="activeMarketPrice">9,460.16 &bull; <span style="color:#ef4444;">-0.42%</span></div>
+      <!-- Market Overlay Dropdown & MT5 Chart Toggle -->
+      <div class="chart-market-overlay" style="display:flex; justify-content:space-between; align-items:flex-start; width:calc(100% - 24px);">
+        <div>
+          <button class="market-dropdown-btn" onclick="openMarketsModal()">
+            <span id="activeMarketName">Vol 10 (1s)</span>
+            <span>▼</span>
+          </button>
+          <div class="market-price-sub" id="activeMarketPrice">9,460.16 &bull; <span style="color:#ef4444;">-0.42%</span></div>
+        </div>
+
+        <div style="display:flex; gap:4px; margin-top:2px;">
+          <button class="chart-type-toggle active" id="btnChartCandles" onclick="setChartType('candles')">🕯️ MT5 Candles</button>
+          <button class="chart-type-toggle" id="btnChartLine" onclick="setChartType('line')">📈 Line</button>
+        </div>
       </div>
 
       <!-- Chart Canvas View -->
@@ -1041,7 +1082,24 @@
     </div>
 
     <div class="drawer-user-card">
-      <div class="drawer-user-avatar" id="drawerAvatarLetter">C</div>
+      <div class="drawer-user-avatar" id="drawerAvatarLetter" style="overflow:hidden; display:flex; align-items:center; justify-content:center;">
+        <script>
+          (function() {
+            var pic = localStorage.getItem('ms_profile_pic');
+            if (!pic) {
+              try {
+                var u = JSON.parse(localStorage.getItem('ms_user') || '{}');
+                pic = u.profilePic;
+              } catch(e) {}
+            }
+            if (pic && pic.indexOf('data:image') === 0) {
+              document.write('<img src="' + pic + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">');
+            } else {
+              document.write('C');
+            }
+          })();
+        </script>
+      </div>
       <div>
         <div style="font-weight:800; font-size:0.95rem;" id="drawerUserName">collo</div>
         <div style="font-size:0.75rem; color:#888;" id="drawerUserEmail">macollocollins@gmail.com</div>
@@ -1086,9 +1144,9 @@
       <button onclick="closePositionsDrawer()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
     </div>
     <div class="pos-tabs">
-      <div class="pos-tab active" onclick="switchPosTab('open')">Open (0)</div>
-      <div class="pos-tab" onclick="switchPosTab('closed')">Closed</div>
-      <div class="pos-tab" onclick="switchPosTab('trans')">Transactions</div>
+      <div class="pos-tab active" id="posTabOpen" onclick="switchPosTab('open')">Open (<span id="openTradesCount">0</span>)</div>
+      <div class="pos-tab" id="posTabClosed" onclick="switchPosTab('closed')">Closed (<span id="closedTradesCount">0</span>)</div>
+      <div class="pos-tab" id="posTabTrans" onclick="switchPosTab('trans')">Transactions</div>
     </div>
     <div class="pos-list" id="positionsList">
       <!-- Dynamically filled with trades -->
@@ -1243,8 +1301,149 @@
       container.innerHTML = html;
     }
 
-    // Initialize Chart Canvas
-    let chartPoints = [];
+    // ==========================================
+    // AUDIO SYNTHESIZER (WEB AUDIO API)
+    // ==========================================
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+      return audioCtx;
+    }
+
+    ['click', 'touchstart', 'touchend', 'keydown'].forEach(evt => {
+      window.addEventListener(evt, () => {
+        try {
+          const ctx = getAudioContext();
+          if (ctx && ctx.state === 'suspended') ctx.resume();
+        } catch(e) {}
+      }, { once: true });
+    });
+
+    function playWinSound() {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = 'triangle';
+        osc2.type = 'sine';
+
+        // Rising celebratory major arpeggio: C5 -> E5 -> G5 -> C6
+        osc1.frequency.setValueAtTime(523.25, now);
+        osc1.frequency.setValueAtTime(659.25, now + 0.08);
+        osc1.frequency.setValueAtTime(783.99, now + 0.16);
+        osc1.frequency.setValueAtTime(1046.50, now + 0.24);
+
+        osc2.frequency.setValueAtTime(1046.50, now + 0.24);
+
+        gain.gain.setValueAtTime(0.32, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now + 0.24);
+        osc1.stop(now + 0.65);
+        osc2.stop(now + 0.65);
+      } catch(e) {
+        console.warn('Audio win play failed:', e);
+      }
+    }
+
+    function playLossSound() {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        // Low descending failure buzz
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(280, now);
+        osc.frequency.exponentialRampToValueAtTime(75, now + 0.45);
+
+        gain.gain.setValueAtTime(0.28, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } catch(e) {
+        console.warn('Audio loss play failed:', e);
+      }
+    }
+
+    function playClickSound() {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, now);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } catch(e) {}
+    }
+
+    // ==========================================
+    // MT5 REAL CANDLESTICK & BAR GRAPH ENGINE
+    // ==========================================
+    let chartType = 'candles'; // 'candles' or 'line'
+    let candleData = [];
+    let ticksInCurrentCandle = 0;
+    const TICKS_PER_CANDLE = 4;
+
+    function setChartType(type) {
+      chartType = type;
+      const bCandles = document.getElementById('btnChartCandles');
+      const bLine = document.getElementById('btnChartLine');
+      if (bCandles) bCandles.classList.toggle('active', type === 'candles');
+      if (bLine) bLine.classList.toggle('active', type === 'line');
+    }
+
+    function initCandles(basePrice) {
+      candleData = [];
+      let p = basePrice;
+      const now = Date.now();
+      for (let i = 24; i >= 0; i--) {
+        const delta = (Math.random() - 0.49) * (basePrice * 0.0012);
+        const o = p;
+        const c = p + delta;
+        const h = Math.max(o, c) + Math.random() * (basePrice * 0.0005);
+        const l = Math.min(o, c) - Math.random() * (basePrice * 0.0005);
+        candleData.push({
+          open: o,
+          high: h,
+          low: l,
+          close: c,
+          time: now - i * 4000
+        });
+        p = c;
+      }
+    }
+
     function initLiveCanvasChart() {
       const canvas = document.getElementById('tradingChartCanvas');
       if (!canvas) return;
@@ -1260,67 +1459,187 @@
       window.addEventListener('resize', resize);
       resize();
 
-      // Seed points
-      let cur = activeMarket.price;
-      for (let i = 0; i < 40; i++) {
-        cur += (Math.random() - 0.49) * 2;
-        chartPoints.push(cur);
-      }
+      initCandles(activeMarket.price);
 
       function draw() {
         const w = canvas.width / window.devicePixelRatio;
         const h = canvas.height / window.devicePixelRatio;
         ctx.clearRect(0, 0, w, h);
 
-        if (chartPoints.length < 2) return;
+        if (candleData.length === 0) return;
 
-        const min = Math.min(...chartPoints) * 0.9995;
-        const max = Math.max(...chartPoints) * 1.0005;
-
-        // Draw smooth line
-        ctx.beginPath();
-        const step = w / (chartPoints.length - 1);
-        chartPoints.forEach((p, idx) => {
-          const x = idx * step;
-          const y = h - ((p - min) / (max - min)) * (h - 20) - 10;
-          if (idx === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+        let minPrice = Infinity, maxPrice = -Infinity;
+        candleData.forEach(c => {
+          if (c.low < minPrice) minPrice = c.low;
+          if (c.high > maxPrice) maxPrice = c.high;
         });
 
-        ctx.strokeStyle = '#60a5fa';
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
+        const span = maxPrice - minPrice || 1;
+        const padMin = minPrice - span * 0.08;
+        const padMax = maxPrice + span * 0.08;
+        const paddedSpan = padMax - padMin;
 
-        // Glowing pulse head
-        const lastX = (chartPoints.length - 1) * step;
-        const lastY = h - ((chartPoints[chartPoints.length - 1] - min) / (max - min)) * (h - 20) - 10;
+        const rightAxisWidth = 62;
+        const chartW = w - rightAxisWidth;
+        const chartH = h - 16;
+        const topOffset = 8;
+
+        function toY(val) {
+          return topOffset + chartH - ((val - padMin) / paddedSpan) * chartH;
+        }
+
+        // 1. Draw MT5 Gridlines & Price Scale
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.textAlign = 'left';
+
+        const gridDivs = 4;
+        for (let i = 0; i <= gridDivs; i++) {
+          const val = padMin + (paddedSpan / gridDivs) * i;
+          const y = toY(val);
+          ctx.beginPath();
+          ctx.setLineDash([3, 3]);
+          ctx.moveTo(0, y);
+          ctx.lineTo(chartW, y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillText(val.toFixed(activeMarket.decimals), chartW + 6, y + 3.5);
+        }
+
+        // Vertical time gridlines
+        for (let i = 1; i <= 4; i++) {
+          const gx = (chartW / 5) * i;
+          ctx.beginPath();
+          ctx.setLineDash([2, 4]);
+          ctx.moveTo(gx, 0);
+          ctx.lineTo(gx, h);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        if (chartType === 'line') {
+          // Smooth Line Chart
+          ctx.beginPath();
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 2.5;
+          const step = chartW / (candleData.length - 1);
+          candleData.forEach((c, idx) => {
+            const x = idx * step;
+            const y = toY(c.close);
+            if (idx === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+
+          // Pulse dot at current spot
+          const lastX = chartW;
+          const lastY = toY(activeMarket.price);
+          ctx.beginPath();
+          ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 10;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        } else {
+          // MT5 Japanese Candlesticks (Bar Graph)
+          const num = candleData.length;
+          const slot = chartW / num;
+          const cWidth = Math.max(4, slot * 0.68);
+
+          candleData.forEach((c, idx) => {
+            const cx = idx * slot + slot / 2;
+            const isBull = c.close >= c.open;
+            const color = isBull ? '#10b981' : '#ef4444';
+
+            const openY = toY(c.open);
+            const closeY = toY(c.close);
+            const highY = toY(c.high);
+            const lowY = toY(c.low);
+
+            // Wick
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.4;
+            ctx.moveTo(cx, highY);
+            ctx.lineTo(cx, lowY);
+            ctx.stroke();
+
+            // Candle Body
+            const bodyY = Math.min(openY, closeY);
+            const bodyH = Math.max(2, Math.abs(closeY - openY));
+
+            ctx.fillStyle = color;
+            ctx.fillRect(cx - cWidth / 2, bodyY, cWidth, bodyH);
+          });
+        }
+
+        // Live Horizontal Price Marker Line
+        const curY = toY(activeMarket.price);
+        const lastC = candleData[candleData.length - 1];
+        const isUp = lastC && (activeMarket.price >= lastC.open);
+        const tagColor = isUp ? '#10b981' : '#ef4444';
+
         ctx.beginPath();
-        ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = '#60a5fa';
-        ctx.shadowBlur = 10;
+        ctx.strokeStyle = tagColor;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        ctx.moveTo(0, curY);
+        ctx.lineTo(chartW, curY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Price Badge Tag on Right Scale
+        ctx.fillStyle = tagColor;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(chartW + 2, curY - 9, rightAxisWidth - 4, 18, 4);
+        else ctx.rect(chartW + 2, curY - 9, rightAxisWidth - 4, 18);
         ctx.fill();
-        ctx.shadowBlur = 0;
+
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 9.5px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(activeMarket.price.toFixed(activeMarket.decimals), chartW + 2 + (rightAxisWidth - 4) / 2, curY + 3.5);
 
         requestAnimationFrame(draw);
       }
       requestAnimationFrame(draw);
 
-      // Price tick loop
+      // Price Tick Engine (every 1000ms)
       setInterval(() => {
-        let last = chartPoints[chartPoints.length - 1];
-        let delta = (Math.random() - 0.49) * 2.5;
-        let next = last + delta;
-        chartPoints.push(next);
-        if (chartPoints.length > 50) chartPoints.shift();
-
-        // Update live price display
+        let delta = (Math.random() - 0.49) * (activeMarket.price * 0.0008);
+        let next = parseFloat((activeMarket.price + delta).toFixed(activeMarket.decimals));
         activeMarket.price = next;
+
+        // Update active candle
+        if (candleData.length > 0) {
+          const curCandle = candleData[candleData.length - 1];
+          curCandle.close = next;
+          if (next > curCandle.high) curCandle.high = next;
+          if (next < curCandle.low) curCandle.low = next;
+
+          ticksInCurrentCandle++;
+          if (ticksInCurrentCandle >= TICKS_PER_CANDLE) {
+            ticksInCurrentCandle = 0;
+            candleData.push({
+              open: next,
+              high: next,
+              low: next,
+              close: next,
+              time: Date.now()
+            });
+            if (candleData.length > 32) candleData.shift();
+          }
+        }
+
+        // Update live price header display
         const priceEl = document.getElementById('activeMarketPrice');
         if (priceEl) {
           const sign = delta >= 0 ? '+' : '';
           const color = delta >= 0 ? '#10b981' : '#ef4444';
-          priceEl.innerHTML = next.toFixed(activeMarket.decimals) + ' &bull; <span style="color:' + color + ';">' + sign + (delta/last*100).toFixed(2) + '%</span>';
+          priceEl.innerHTML = next.toFixed(activeMarket.decimals) + ' &bull; <span style="color:' + color + ';">' + sign + (delta/next*100).toFixed(2) + '%</span>';
         }
 
         // Active digit calculation
@@ -1339,7 +1658,7 @@
         });
         if (recentSpotTicks.length > 30) recentSpotTicks.shift();
 
-        // Dynamically adjust digit stats slightly on each tick
+        // Dynamically adjust digit stats slightly
         digitStats[lastDigit] = Math.min(18, Math.max(5, digitStats[lastDigit] + 0.1));
         const decrIdx = (lastDigit + 5) % 10;
         digitStats[decrIdx] = Math.min(18, Math.max(5, digitStats[decrIdx] - 0.1));
@@ -1418,12 +1737,71 @@
       document.getElementById('btn2Payout').textContent = '$' + payout + ' Payout';
     }
 
-    // Trade Execution & AI Bot
+    // ==========================================
+    // UNIFIED TRADE EXECUTION & RECORDING
+    // ==========================================
+    let activeOpenTrades = [];
+    let currentActivePosTab = 'open';
+
     function executeTrade(which) {
       if (currentBotMode === 'auto') {
         startAIBot();
       } else {
         placeSingleTrade(which);
+      }
+    }
+
+    function recordTradeResult(trade) {
+      // 1. Play Sound
+      if (trade.status === 'WON' || trade.profit > 0) {
+        playWinSound();
+      } else {
+        playLossSound();
+      }
+
+      // 2. Save to local trade history
+      let history = JSON.parse(localStorage.getItem('ms_trade_history') || '[]');
+      history.unshift(trade);
+      if (history.length > 300) history.pop();
+      localStorage.setItem('ms_trade_history', JSON.stringify(history));
+
+      if (window.MoneySpread) {
+        if (!Array.isArray(window.MoneySpread.tradeHistory)) window.MoneySpread.tradeHistory = [];
+        window.MoneySpread.tradeHistory.unshift(trade);
+        if (window.MoneySpread.tradeHistory.length > 300) window.MoneySpread.tradeHistory.pop();
+      }
+
+      // 3. Update Balance
+      const isReal = trade.mode === 'real';
+      const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
+      let currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
+      currentBal = Math.max(0, parseFloat((currentBal + trade.profit).toFixed(2)));
+      localStorage.setItem(balKey, currentBal.toFixed(2));
+
+      const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
+      if (isReal) u.realBalance = currentBal;
+      else u.demoBalance = currentBal;
+      localStorage.setItem('ms_user', JSON.stringify(u));
+
+      updateHeaderBalance();
+
+      // 4. Update Positions Drawer
+      const closedBadge = document.getElementById('closedTradesCount');
+      if (closedBadge) closedBadge.textContent = history.length;
+      renderPositionsList(currentActivePosTab || 'closed');
+
+      // 5. Send to Server for Permanent Tracking Across All Devices
+      if (u.email) {
+        fetch('/api/record-trade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: u.email,
+            trade: trade,
+            newDemoBalance: !isReal ? currentBal : undefined,
+            newRealBalance: isReal ? currentBal : undefined
+          })
+        }).catch(() => {});
       }
     }
 
@@ -1435,16 +1813,98 @@
       else if (currentContractCategory === 'MATCHES_DIFFERS') contractType = (which === 'BUY_1') ? 'MATCHES' : 'DIFFERS';
       else if (currentContractCategory === 'OVER_UNDER') contractType = (which === 'BUY_1') ? 'OVER' : 'UNDER';
 
-      if (window.MoneySpread && window.MoneySpread.buyContract) {
-        window.MoneySpread.buyContract({
+      const mode = localStorage.getItem('ms_account_mode') || 'demo';
+      const isReal = mode === 'real';
+      const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
+      const currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
+
+      if (stake > currentBal) {
+        alert('Insufficient funds! Your ' + mode.toUpperCase() + ' balance is $' + currentBal.toFixed(2));
+        return;
+      }
+
+      // Deduct stake immediately
+      const balAfterStake = Math.max(0, parseFloat((currentBal - stake).toFixed(2)));
+      localStorage.setItem(balKey, balAfterStake.toFixed(2));
+      updateHeaderBalance();
+
+      playClickSound();
+
+      // Add to live open positions
+      const tradeId = 'MS-' + Math.floor(10000000 + Math.random() * 90000000);
+      const entrySpot = activeMarket.price;
+      const pendingPosition = {
+        id: tradeId,
+        assetId: activeMarket.id,
+        symbol: activeMarket.symbol,
+        name: activeMarket.name,
+        type: contractType,
+        stake: stake,
+        entrySpot: entrySpot,
+        mode: mode,
+        startTime: Date.now()
+      };
+
+      activeOpenTrades.unshift(pendingPosition);
+      const openBadge = document.getElementById('openTradesCount');
+      if (openBadge) openBadge.textContent = activeOpenTrades.length;
+      if (currentActivePosTab === 'open') renderPositionsList('open');
+
+      // Visual feedback on button
+      const btn = which === 'BUY_1' ? document.getElementById('btnAction1') : document.getElementById('btnAction2');
+      const origText = btn.innerHTML;
+      btn.style.opacity = '0.7';
+      btn.innerHTML = '<span style="font-size:0.9rem; font-weight:800;">PURCHASED...</span>';
+
+      // Settle contract in 1.2s (1 tick)
+      setTimeout(() => {
+        btn.style.opacity = '1';
+        btn.innerHTML = origText;
+
+        activeOpenTrades = activeOpenTrades.filter(p => p.id !== tradeId);
+        if (openBadge) openBadge.textContent = activeOpenTrades.length;
+
+        // Check admin winRate override if any
+        let winRate = null;
+        try {
+          const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
+          if (u.winRate !== undefined && u.winRate !== null) winRate = parseFloat(u.winRate);
+        } catch(e) {}
+
+        let isWin = false;
+        if (winRate !== null && !isNaN(winRate)) {
+          isWin = (Math.random() * 100) < winRate;
+        } else {
+          const lastDigit = parseInt(activeMarket.price.toFixed(activeMarket.decimals).slice(-1), 10);
+          if (contractType === 'EVEN') isWin = (lastDigit % 2 === 0);
+          else if (contractType === 'ODD') isWin = (lastDigit % 2 !== 0);
+          else if (contractType === 'RISE') isWin = (activeMarket.price >= entrySpot);
+          else if (contractType === 'FALL') isWin = (activeMarket.price < entrySpot);
+          else if (contractType === 'MATCHES') isWin = (lastDigit === 4);
+          else if (contractType === 'DIFFERS') isWin = (lastDigit !== 4);
+          else if (contractType === 'OVER') isWin = (lastDigit > 4);
+          else if (contractType === 'UNDER') isWin = (lastDigit < 5);
+          else isWin = Math.random() < 0.5;
+        }
+
+        const profit = isWin ? parseFloat((stake * 0.952).toFixed(2)) : -stake;
+        const completedTrade = {
+          id: tradeId,
+          assetId: activeMarket.id,
+          symbol: activeMarket.symbol,
+          name: activeMarket.name,
           type: contractType,
           stake: stake,
-          duration: 1,
-          durationUnit: 't',
-          predictedDigit: 4
-        });
-        setTimeout(updateHeaderBalance, 500);
-      }
+          entrySpot: entrySpot,
+          exitSpot: activeMarket.price,
+          status: isWin ? 'WON' : 'LOST',
+          profit: profit,
+          mode: mode,
+          closedAt: Date.now()
+        };
+
+        recordTradeResult(completedTrade);
+      }, 1200);
     }
 
     // AI BOT AUTOMATION ENGINE
@@ -1512,71 +1972,33 @@
 
       if (isWin) {
         botWinsCount++;
-        pnl = stake * 0.952;
+        pnl = parseFloat((stake * 0.952).toFixed(2));
         botSessionPL += pnl;
         currentBotStake = baseBotStake; // Reset on win
-        if (window.MoneySpread && window.MoneySpread.playSound) window.MoneySpread.playSound('win');
       } else {
         botLossCount++;
         pnl = -stake;
         botSessionPL += pnl;
         currentBotStake = parseFloat((currentBotStake * multiplier).toFixed(2)); // Martingale multiplier
-        if (window.MoneySpread && window.MoneySpread.playSound) window.MoneySpread.playSound('loss');
       }
 
-      // Update balances & PERMANENT SERVER PERSISTENCE
-      try {
-        const mode = localStorage.getItem('ms_account_mode') || 'demo';
-        const isReal = mode === 'real';
-        const key = isReal ? 'ms_real_balance' : 'ms_demo_balance';
-        let bal = parseFloat(localStorage.getItem(key) || (isReal ? '0' : '10000'));
-        bal = Math.max(0, parseFloat((bal + pnl).toFixed(2)));
-        localStorage.setItem(key, bal.toFixed(2));
+      const mode = localStorage.getItem('ms_account_mode') || 'demo';
+      const tradeRecord = {
+        id: 'AI-' + Math.floor(10000000 + Math.random() * 90000000),
+        assetId: activeMarket.id,
+        symbol: activeMarket.symbol,
+        name: activeMarket.name,
+        type: isWin ? 'AI_WIN' : 'AI_LOSS',
+        stake: stake,
+        entrySpot: activeMarket.price,
+        exitSpot: activeMarket.price,
+        status: isWin ? 'WON' : 'LOST',
+        profit: pnl,
+        mode: mode,
+        closedAt: Date.now()
+      };
 
-        if (window.MoneySpread) {
-          if (isReal) window.MoneySpread.realBalance = bal;
-          else window.MoneySpread.demoBalance = bal;
-        }
-
-        // Keep ms_user updated
-        const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
-        if (isReal) u.realBalance = bal;
-        else u.demoBalance = bal;
-        localStorage.setItem('ms_user', JSON.stringify(u));
-
-        updateHeaderBalance();
-
-        // 1. Send trade record to server permanent database
-        const tradeRecord = {
-          id: 'AI-' + Math.floor(10000000 + Math.random() * 90000000),
-          assetId: activeMarket.id,
-          symbol: activeMarket.symbol,
-          name: activeMarket.name,
-          type: isWin ? 'AI_WIN' : 'AI_LOSS',
-          stake: stake,
-          entrySpot: activeMarket.price,
-          exitSpot: activeMarket.price,
-          status: isWin ? 'WON' : 'LOST',
-          profit: pnl,
-          mode: mode,
-          closedAt: Date.now()
-        };
-
-        if (u.email) {
-          fetch('/api/record-trade', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: u.email,
-              trade: tradeRecord,
-              newDemoBalance: !isReal ? bal : undefined,
-              newRealBalance: isReal ? bal : undefined
-            })
-          }).catch(() => {});
-        }
-      } catch(e) {
-        console.warn('Bot balance sync error:', e);
-      }
+      recordTradeResult(tradeRecord);
 
       // Update UI Strip
       document.getElementById('botSessionInfo').textContent = 'LIVE: ' + botTradesCount + 'T (' + botWinsCount + 'W / ' + botLossCount + 'L)';
@@ -1613,15 +2035,15 @@
 
       filtered.forEach(m => {
         const isSelected = m.id === activeMarket.id;
-        html += '<div class="market-list-item ' + (isSelected ? 'selected' : '') + '" onclick="selectMarket(\'' + m.id + '\')" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">' +
-          '<div>' +
-            '<div style="font-weight:800; color:' + (isSelected ? '#00c49f' : '#fff') + '; font-size:0.95rem;">' + m.name + '</div>' +
-            '<div style="font-size:0.75rem; color:#888;">' + m.symbol + ' &bull; Synthetic Index</div>' +
-          '</div>' +
-          '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:800; color:#60a5fa; font-size:0.95rem;">' +
-            m.price.toFixed(m.decimals) +
-          '</div>' +
-        '</div>';
+        html += `<div class="market-list-item ${isSelected ? 'selected' : ''}" onclick="selectMarket('${m.id}')" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">
+          <div>
+            <div style="font-weight:800; color:${isSelected ? '#00c49f' : '#fff'}; font-size:0.95rem;">${m.name}</div>
+            <div style="font-size:0.75rem; color:#888;">${m.symbol} &bull; Synthetic Index</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace; font-weight:800; color:#60a5fa; font-size:0.95rem;">
+            ${m.price.toFixed(m.decimals)}
+          </div>
+        </div>`;
       });
       container.innerHTML = html;
     }
@@ -1638,12 +2060,7 @@
       if (found) {
         activeMarket = found;
         document.getElementById('activeMarketName').textContent = found.symbol;
-        chartPoints = [];
-        let cur = activeMarket.price;
-        for (let i = 0; i < 40; i++) {
-          cur += (Math.random() - 0.49) * 2;
-          chartPoints.push(cur);
-        }
+        initCandles(activeMarket.price);
       }
       closeMarketsModal();
     }
@@ -1656,6 +2073,7 @@
       document.getElementById('positionsPanel').classList.remove('open');
     }
     function switchPosTab(tab) {
+      currentActivePosTab = tab;
       document.querySelectorAll('.pos-tab').forEach((el, idx) => {
         el.classList.toggle('active', (tab === 'open' && idx === 0) || (tab === 'closed' && idx === 1) || (tab === 'trans' && idx === 2));
       });
@@ -1664,23 +2082,120 @@
 
     function renderPositionsList(tab) {
       const container = document.getElementById('positionsList');
+      if (!container) return;
+
+      const allHistory = JSON.parse(localStorage.getItem('ms_trade_history') || '[]');
+      const closedBadge = document.getElementById('closedTradesCount');
+      if (closedBadge) closedBadge.textContent = allHistory.length;
+
+      const openBadge = document.getElementById('openTradesCount');
+      if (openBadge) openBadge.textContent = activeOpenTrades.length;
+
       if (tab === 'open') {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:#666;">No active positions right now.</div>';
-      } else {
-        container.innerHTML = '<div class="pos-item">' +
-          '<div>' +
-            '<div style="font-weight:700; color:#ef4444;">Closed &bull; Vol 10 (1s)</div>' +
-            '<div style="font-size:0.75rem; color:#888;">EVEN &bull; Stake: $10.00</div>' +
+        if (!activeOpenTrades || activeOpenTrades.length === 0) {
+          container.innerHTML = '<div style="text-align:center; padding:35px 20px; color:#64748b;">' +
+            '<div style="font-size:2rem; margin-bottom:8px;">⏳</div>' +
+            '<div style="font-weight:700; color:#fff; margin-bottom:4px;">No Active Contracts</div>' +
+            '<div style="font-size:0.78rem;">Place a trade to view live execution and tick expiry here.</div>' +
+          '</div>';
+          return;
+        }
+        let html = '';
+        activeOpenTrades.forEach(p => {
+          html += '<div class="pos-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:#141a29; border-radius:10px; margin-bottom:8px; border-left:3px solid #60a5fa;">' +
+            '<div>' +
+              '<div style="display:flex; align-items:center; gap:6px;">' +
+                '<span style="background:#3b82f622; color:#60a5fa; border:1px solid #3b82f644; font-size:0.68rem; font-weight:800; padding:2px 6px; border-radius:4px;">OPEN</span>' +
+                '<strong style="color:#fff; font-size:0.85rem;">' + (p.symbol || p.name || 'Synthetic Index') + '</strong>' +
+              '</div>' +
+              '<div style="font-size:0.75rem; color:#94a3b8; margin-top:3px;">' +
+                p.type + ' &bull; Entry: ' + (p.entrySpot || activeMarket.price).toFixed(2) + ' &bull; Stake: $' + Number(p.stake).toFixed(2) +
+              '</div>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<span style="font-family:monospace; font-weight:800; color:#fbbf24; font-size:0.9rem;">RUNNING</span>' +
+              '<div style="font-size:0.7rem; color:#64748b; margin-top:2px;">1 Tick Expiry</div>' +
+            '</div>' +
+          '</div>';
+        });
+        container.innerHTML = html;
+      } else if (tab === 'closed') {
+        if (!allHistory || allHistory.length === 0) {
+          container.innerHTML = '<div style="text-align:center; padding:35px 20px; color:#64748b;">' +
+            '<div style="font-size:2rem; margin-bottom:8px;">📊</div>' +
+            '<div style="font-weight:700; color:#fff; margin-bottom:4px;">No Trade History Yet</div>' +
+            '<div style="font-size:0.78rem;">Your completed contract outcomes will appear here automatically.</div>' +
+          '</div>';
+          return;
+        }
+        let html = '';
+        allHistory.slice(0, 50).forEach(h => {
+          const isWin = h.status === 'WON' || h.profit > 0;
+          const pColor = isWin ? '#10b981' : '#ef4444';
+          const sign = h.profit >= 0 ? '+' : '';
+          const modeBadge = h.mode === 'real' 
+            ? '<span style="background:rgba(239,68,68,0.2); color:#ef4444; border:1px solid #ef4444; font-size:0.65rem; padding:1px 5px; border-radius:3px; font-weight:800;">REAL</span>'
+            : '<span style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981; font-size:0.65rem; padding:1px 5px; border-radius:3px; font-weight:800;">DEMO</span>';
+          
+          const timeStr = h.closedAt ? new Date(h.closedAt).toLocaleTimeString() : 'Just now';
+
+          html += '<div class="pos-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:#141a29; border-radius:10px; margin-bottom:8px; border-left:3px solid ' + pColor + ';">' +
+            '<div>' +
+              '<div style="display:flex; align-items:center; gap:6px;">' +
+                modeBadge +
+                '<strong style="color:#fff; font-size:0.85rem;">' + (h.symbol || h.name || 'Synthetic Index') + '</strong>' +
+                '<span style="color:#8892b0; font-size:0.75rem;">' + h.type + '</span>' +
+              '</div>' +
+              '<div style="font-size:0.73rem; color:#64748b; margin-top:3px;">' +
+                'Stake: $' + Number(h.stake || 10).toFixed(2) + ' &bull; ' + timeStr +
+              '</div>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<div style="font-family:monospace; font-weight:800; color:' + pColor + '; font-size:0.95rem;">' +
+                sign + '$' + Number(h.profit || 0).toFixed(2) +
+              '</div>' +
+              '<div style="font-size:0.68rem; font-weight:700; color:' + pColor + '; text-transform:uppercase;">' +
+                (isWin ? '✓ WON' : '✗ LOST') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        });
+        container.innerHTML = html;
+      } else if (tab === 'trans') {
+        let html = '';
+        const demoBal = parseFloat(localStorage.getItem('ms_demo_balance') || '10000.00');
+        const realBal = parseFloat(localStorage.getItem('ms_real_balance') || '1.50');
+        
+        html += '<div style="background:#0c111e; border:1px solid var(--border-color); border-radius:8px; padding:12px; margin-bottom:12px;">' +
+          '<div style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:700;">Account Balance Ledger</div>' +
+          '<div style="display:flex; justify-content:space-between; margin-top:8px;">' +
+            '<span>Real Cash Balance:</span>' +
+            '<strong style="color:#ef4444; font-family:monospace;">$' + realBal.toFixed(2) + ' USD</strong>' +
           '</div>' +
-          '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:800; color:#10b981;">+$19.52</div>' +
-        '</div>' +
-        '<div class="pos-item">' +
-          '<div>' +
-            '<div style="font-weight:700; color:#ef4444;">Closed &bull; Vol 10 (1s)</div>' +
-            '<div style="font-size:0.75rem; color:#888;">ODD &bull; Stake: $10.00</div>' +
+          '<div style="display:flex; justify-content:space-between; margin-top:4px;">' +
+            '<span>Demo Practice Balance:</span>' +
+            '<strong style="color:#10b981; font-family:monospace;">$' + demoBal.toFixed(2) + ' USD</strong>' +
           '</div>' +
-          '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:800; color:#ef4444;">-$10.00</div>' +
         '</div>';
+
+        if (!allHistory || allHistory.length === 0) {
+          html += '<div style="text-align:center; padding:20px; color:#64748b; font-size:0.8rem;">No transactions recorded yet.</div>';
+        } else {
+          allHistory.slice(0, 30).forEach(h => {
+            const isWin = h.profit >= 0;
+            const col = isWin ? '#10b981' : '#ef4444';
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.75rem;">' +
+              '<div>' +
+                '<div style="color:#fff; font-weight:700;">' + (h.id || 'TRD-RUN') + ' &bull; ' + (h.type || 'CONTRACT') + '</div>' +
+                '<div style="color:#64748b; font-size:0.7rem;">' + (h.closedAt ? new Date(h.closedAt).toLocaleTimeString() : 'Recent') + '</div>' +
+              '</div>' +
+              '<div style="font-family:monospace; font-weight:800; color:' + col + ';">' +
+                (h.profit >= 0 ? '+' : '') + '$' + Number(h.profit).toFixed(2) +
+              '</div>' +
+            '</div>';
+          });
+        }
+        container.innerHTML = html;
       }
     }
 
@@ -1725,16 +2240,17 @@
         if (dname) dname.textContent = nick;
         if (demail) demail.textContent = u.email || 'macollocollins@gmail.com';
 
-        if (u.profilePic && u.profilePic.startsWith('data:image')) {
+        let pic = localStorage.getItem('ms_profile_pic') || u.profilePic;
+        if (pic && pic.startsWith('data:image')) {
           if (av) {
-            av.innerHTML = '<img src="' + u.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+            av.innerHTML = '<img src="' + pic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
             av.style.background = 'transparent';
-            av.style.border = '1.5px solid #10b981';
+            av.style.border = '1.5px solid #00c49f';
           }
           if (dav) {
-            dav.innerHTML = '<img src="' + u.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+            dav.innerHTML = '<img src="' + pic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
             dav.style.background = 'transparent';
-            dav.style.border = '2px solid #10b981';
+            dav.style.border = '2px solid #00c49f';
           }
         } else {
           if (av) av.textContent = letter;
@@ -1743,23 +2259,24 @@
 
         // Check server for latest user profilePic & balances
         if (u.email) {
-          fetch('/api/user?email=' + encodeURIComponent(u.email))
+          fetch('/api/user-profile?email=' + encodeURIComponent(u.email))
             .then(res => res.json())
             .then(data => {
               if (data && data.user) {
                 let changed = false;
-                if (data.user.profilePic && data.user.profilePic !== u.profilePic) {
+                if (data.user.profilePic && data.user.profilePic !== pic) {
+                  localStorage.setItem('ms_profile_pic', data.user.profilePic);
                   u.profilePic = data.user.profilePic;
                   changed = true;
                   if (av) {
-                    av.innerHTML = '<img src="' + u.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+                    av.innerHTML = '<img src="' + data.user.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
                     av.style.background = 'transparent';
-                    av.style.border = '1.5px solid #10b981';
+                    av.style.border = '1.5px solid #00c49f';
                   }
                   if (dav) {
-                    dav.innerHTML = '<img src="' + u.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+                    dav.innerHTML = '<img src="' + data.user.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
                     dav.style.background = 'transparent';
-                    dav.style.border = '2px solid #10b981';
+                    dav.style.border = '2px solid #00c49f';
                   }
                 }
                 if (changed) {
@@ -1778,6 +2295,11 @@
       renderDigitStrip(6);
       updatePayouts();
       syncUser();
+
+      // Load initial positions count
+      const allHistory = JSON.parse(localStorage.getItem('ms_trade_history') || '[]');
+      const closedBadge = document.getElementById('closedTradesCount');
+      if (closedBadge) closedBadge.textContent = allHistory.length;
     });
   </script>
 </body>
