@@ -132,6 +132,42 @@
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.1); }
     }
+
+    @media (max-width: 640px) {
+      body {
+        overflow-x: hidden;
+      }
+      .navbar {
+        padding: 8px 12px;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+      }
+      .navbar-menu {
+        display: none !important;
+      }
+      .navbar-actions .btn {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+      }
+      .deposit-container {
+        margin: 1.25rem 10px 2.5rem;
+        padding: 1.25rem 14px;
+        border-radius: 14px;
+        max-width: calc(100vw - 20px);
+        box-sizing: border-box;
+      }
+      .rate-badge {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        font-size: 0.82rem;
+        padding: 8px 12px;
+      }
+      .input-wrapper input {
+        font-size: 0.95rem;
+        min-width: 0;
+      }
+    }
     .stk-pin-input {
       letter-spacing: 0.4em;
       font-size: 1.5rem;

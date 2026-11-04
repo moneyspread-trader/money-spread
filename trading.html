@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -247,41 +247,141 @@
       display: block;
     }
 
-    /* STATS STRIP: DIGIT FREQUENCY (0 to 9) */
-    .digit-stats-strip {
-      background: #0e121e;
+    /* MARKET VIEW SELECTOR BAR ABOVE DIGITS */
+    .market-view-mode-bar {
+      display: flex;
+      background: #090d16;
       border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 4px 6px;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .view-mode-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .view-mode-btn.active {
+      background: rgba(96, 165, 250, 0.22);
+      border-color: #60a5fa;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+    }
+
+    /* STATS STRIP: CIRCULAR DIGITS (0 to 9) WITH GOLD CURSOR & GREEN/RED GLOW */
+    .digit-stats-strip {
+      background: #0b0f19;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 6px 4px;
+      padding: 6px 2px 4px;
     }
-    .digit-cell {
+    .digit-col {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 3px 6px;
-      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      position: relative;
+      min-width: 28px;
     }
-    .digit-cell.active-spot {
-      background: rgba(16, 185, 129, 0.25);
-      border: 1px solid #10b981;
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-    }
-    .digit-val {
+    .digit-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.85rem;
       font-weight: 800;
       color: #fff;
+      background: #141a29;
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.2s ease;
     }
-    .digit-pct {
+    .digit-circle.most-frequent {
+      border: 2px solid #10b981;
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.85);
+      animation: pulseGreen 1.6s infinite ease-in-out;
+    }
+    .digit-circle.least-frequent {
+      border: 2px solid #ef4444;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.2);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.85);
+      animation: pulseRed 1.6s infinite ease-in-out;
+    }
+    .digit-circle.is-active {
+      border: 2px solid #fbbf24;
+      color: #0b0f19;
+      background: #fbbf24;
+      font-weight: 900;
+      box-shadow: 0 0 14px rgba(251, 191, 36, 0.95);
+      transform: scale(1.08);
+    }
+    .digit-pct-label {
       font-size: 0.58rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      margin-top: 2px;
+      color: #8892b0;
+      font-weight: 700;
+      margin-top: 3px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .digit-gold-cursor {
+      color: #fbbf24;
+      font-size: 0.65rem;
+      line-height: 1;
+      margin-top: 1px;
+      filter: drop-shadow(0 0 5px #fbbf24);
+      animation: goldBounce 0.8s infinite alternate ease-in-out;
+    }
+    .digit-gold-cursor-placeholder {
+      height: 9px;
+    }
+    @keyframes pulseGreen {
+      0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+      50% { box-shadow: 0 0 16px rgba(16, 185, 129, 0.95); }
+    }
+    @keyframes pulseRed {
+      0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+      50% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.95); }
+    }
+    @keyframes goldBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-2px); }
+    }
+
+    /* Market Categories in Modal */
+    .mkt-cat-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #94a3b8;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mkt-cat-btn.active {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      color: #fff;
     }
 
     /* TRADING CONTROLS DOCK */
@@ -701,32 +801,32 @@
   <!-- TOP PROMO BANNER -->
   <div class="top-promo-banner" id="topPromoBanner">
     <div class="promo-left">
-      <span>ðŸ“±</span>
+      <span>📱</span>
       <span>Money Spread Smart Trader &bull; Mobile Optimized</span>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
       <a href="trading.html" style="text-decoration:none;"><button class="promo-btn">Trade</button></a>
-      <span style="cursor:pointer;" onclick="document.getElementById('topPromoBanner').style.display='none'">âœ•</span>
+      <span style="cursor:pointer;" onclick="document.getElementById('topPromoBanner').style.display='none'">✕</span>
     </div>
   </div>
 
   <!-- HEADER -->
   <header class="top-header">
     <div class="header-left">
-      <button class="menu-btn" onclick="toggleSidebar(true)" title="Menu">â˜°</button>
+      <button class="menu-btn" onclick="toggleSidebar(true)" title="Menu">☰</button>
       <div class="logo-badge" title="Money Spread">MS</div>
       
       <!-- Account Mode Pill -->
       <div class="account-pill" onclick="switchAccountMode()" title="Tap to switch Demo / Real">
         <div class="account-badge-letter" id="accountBadge">D</div>
         <span class="account-balance-text" id="headerBalance">$10,000.00</span>
-        <span style="font-size:0.6rem; color:#888;">â–¼</span>
+        <span style="font-size:0.6rem; color:#888;">▼</span>
       </div>
     </div>
 
     <div class="header-right">
       <a href="deposit.html" style="text-decoration:none;">
-        <button class="deposit-btn">ðŸ’° Deposit</button>
+        <button class="deposit-btn">💰 Deposit</button>
       </a>
       <a href="account.html" style="text-decoration:none;" title="My Profile">
         <div id="headerAvatar" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg, #ef4444, #1e1b4b); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; border:1.5px solid rgba(255,255,255,0.2);">
@@ -739,16 +839,16 @@
   <!-- TRADE TYPE SELECTOR BAR -->
   <div class="trade-type-tabs">
     <div class="trade-tab active" data-type="EVEN_ODD" onclick="setContractCategory('EVEN_ODD')">
-      <span>â–¦</span> Even / Odd
+      <span>◫</span> Even / Odd
     </div>
     <div class="trade-tab" data-type="RISE_FALL" onclick="setContractCategory('RISE_FALL')">
-      <span>â‡…</span> Rise / Fall
+      <span>⇅</span> Rise / Fall
     </div>
     <div class="trade-tab" data-type="MATCHES_DIFFERS" onclick="setContractCategory('MATCHES_DIFFERS')">
-      <span>â—Ž</span> Matches / Differs
+      <span>◎</span> Matches / Differs
     </div>
     <div class="trade-tab" data-type="OVER_UNDER" onclick="setContractCategory('OVER_UNDER')">
-      <span>â‡•</span> Over / Under
+      <span>⇕</span> Over / Under
     </div>
   </div>
 
@@ -756,25 +856,80 @@
   <main class="main-viewport">
 
     <!-- CHART AREA -->
-    <section class="chart-section">
+    <section class="chart-section" id="mainChartSection">
       <!-- Market Overlay Dropdown -->
       <div class="chart-market-overlay">
         <button class="market-dropdown-btn" onclick="openMarketsModal()">
           <span id="activeMarketName">Vol 10 (1s)</span>
-          <span>â–¼</span>
+          <span>▼</span>
         </button>
         <div class="market-price-sub" id="activeMarketPrice">9,460.16 &bull; <span style="color:#ef4444;">-0.42%</span></div>
       </div>
 
-      <!-- Chart Canvas -->
+      <!-- Chart Canvas View -->
       <div class="chart-canvas-wrapper" id="chartWrapper">
         <canvas id="tradingChartCanvas"></canvas>
       </div>
+
+      <!-- Signals View -->
+      <div id="chartViewSignals" style="display:none; padding:12px 14px; height:100%; box-sizing:border-box; overflow-y:auto; justify-content:center; flex-direction:column; gap:8px;">
+        <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.35); border-radius:10px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:0.68rem; color:#888; text-transform:uppercase; font-weight:700;">Algorithmic AI Engine</div>
+            <div style="font-size:1.15rem; font-weight:900; color:#10b981;" id="signalRecommendation">STRONG BUY EVEN</div>
+          </div>
+          <span style="background:#10b981; color:#000; font-weight:800; font-size:0.75rem; padding:4px 8px; border-radius:12px;" id="signalConfidence">94.8% ACCURACY</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div style="background:#131826; border:1px solid var(--border-color); border-radius:8px; padding:8px 10px;">
+            <div style="font-size:0.68rem; color:#888;">Momentum Bias</div>
+            <div style="font-weight:800; color:#60a5fa; font-size:0.9rem;" id="signalMomentum">+1.82 Bullish</div>
+          </div>
+          <div style="background:#131826; border:1px solid var(--border-color); border-radius:8px; padding:8px 10px;">
+            <div style="font-size:0.68rem; color:#888;">Digit Sentiment</div>
+            <div style="font-weight:800; color:#fbbf24; font-size:0.9rem;" id="signalSentiment">Even 58% vs Odd 42%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats View -->
+      <div id="chartViewStats" style="display:none; padding:10px 14px; height:100%; box-sizing:border-box; overflow-y:auto;">
+        <div style="font-size:0.75rem; font-weight:800; color:#aaa; margin-bottom:6px; display:flex; justify-content:space-between;">
+          <span>Digit Breakdown (Last 1,000 Ticks)</span>
+          <span style="color:#10b981;">Live Quant</span>
+        </div>
+        <div id="statsBarContainer" style="display:flex; flex-direction:column; gap:3px;"></div>
+      </div>
+
+      <!-- Ticks View -->
+      <div id="chartViewTicks" style="display:none; padding:8px 12px; height:100%; box-sizing:border-box; overflow-y:auto;">
+        <div style="font-size:0.75rem; font-weight:800; color:#aaa; margin-bottom:6px; display:flex; justify-content:space-between;">
+          <span>Live Tick Stream</span>
+          <span style="color:#60a5fa;">● Feed Active</span>
+        </div>
+        <div id="ticksStreamList" style="display:flex; flex-direction:column; gap:4px; font-family:'JetBrains Mono',monospace; font-size:0.78rem;"></div>
+      </div>
     </section>
+
+    <!-- MARKET VIEW MODE SELECTOR (Graph, Signals, Stats, Ticks) -->
+    <div class="market-view-mode-bar">
+      <button class="view-mode-btn active" id="viewBtnGraph" onclick="switchMarketView('graph')">
+        <span>📈</span> Graph
+      </button>
+      <button class="view-mode-btn" id="viewBtnSignals" onclick="switchMarketView('signals')">
+        <span>⚡</span> Signals
+      </button>
+      <button class="view-mode-btn" id="viewBtnStats" onclick="switchMarketView('stats')">
+        <span>📊</span> Stats
+      </button>
+      <button class="view-mode-btn" id="viewBtnTicks" onclick="switchMarketView('ticks')">
+        <span>⏱️</span> Ticks
+      </button>
+    </div>
 
     <!-- DIGIT STREAM (0 - 9) FREQUENCY PERCENTAGES -->
     <div class="digit-stats-strip" id="digitStatsStrip">
-      <!-- 0 through 9 dynamically filled -->
+      <!-- 0 through 9 dynamically filled with circular cells and gold cursor -->
     </div>
 
     <!-- TRADING CONTROLS DOCK -->
@@ -793,7 +948,7 @@
           <span id="payoutMultiplier">95.2% Payout</span>
         </div>
         <div class="stake-input-row">
-          <button class="qty-btn" onclick="adjustStake(-1)">âˆ’</button>
+          <button class="qty-btn" onclick="adjustStake(-1)">−</button>
           <input type="number" class="stake-num-input" id="tradeStake" value="10" min="1" step="1" oninput="updatePayouts()">
           <button class="qty-btn" onclick="adjustStake(1)">+</button>
         </div>
@@ -850,7 +1005,7 @@
 
         <!-- STOP BOT BUTTON (Hidden until bot running) -->
         <button class="action-btn btn-stop-bot" id="btnStopBot" style="display:none;" onclick="stopAIBot()">
-          â–  STOP AI BOT
+          ■ STOP AI BOT
         </button>
       </div>
 
@@ -867,7 +1022,7 @@
 
     <!-- Center Glowing AI Button -->
     <div class="center-ai-btn" onclick="triggerAICenterAction()" title="Money Spread AI Trader">
-      <span style="font-size:1.1rem;">âœ¨</span>
+      <span style="font-size:1.1rem;">✨</span>
       <span>AI</span>
     </div>
 
@@ -882,7 +1037,7 @@
   <aside class="sidebar-drawer" id="sidebarDrawer">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="font-weight:800; font-size:1.1rem; color:#fff;">Menu</h3>
-      <button onclick="toggleSidebar(false)" style="background:none; border:none; color:#888; font-size:1.4rem; cursor:pointer;">âœ•</button>
+      <button onclick="toggleSidebar(false)" style="background:none; border:none; color:#888; font-size:1.4rem; cursor:pointer;">✕</button>
     </div>
 
     <div class="drawer-user-card">
@@ -893,12 +1048,11 @@
       </div>
     </div>
 
-    <a href="trading.html" class="drawer-link" style="color:#60a5fa;">ðŸ“Š Smart Trader</a>
-    <a href="account.html" class="drawer-link">âš™ï¸ Account Settings</a>
-    <a href="deposit.html" class="drawer-link">â¬‡ï¸ Deposit Funds</a>
-    <a href="withdraw.html" class="drawer-link">â¬†ï¸ Withdraw Funds</a>
-    <a href="affiliate.html" class="drawer-link">ðŸŽ Refer & Earn (Affiliate)</a>
-    <a href="admin.html" class="drawer-link" style="color:#f59e0b;">ðŸ›¡ï¸ Admin Portal</a>
+    <a href="trading.html" class="drawer-link" style="color:#60a5fa;">📊 Smart Trader</a>
+    <a href="account.html" class="drawer-link">⚙️ Account Settings</a>
+    <a href="deposit.html" class="drawer-link">⬇️ Deposit Funds</a>
+    <a href="withdraw.html" class="drawer-link">⬆️ Withdraw Funds</a>
+    <a href="affiliate.html" class="drawer-link">🎁 Refer & Earn (Affiliate)</a>
     
     <div style="margin-top:auto; padding-top:12px; border-top:1px solid var(--border-color); font-size:0.75rem; color:#666; text-align:center;">
       Money Spread v2.0 &bull; 2026
@@ -909,9 +1063,18 @@
   <div class="modal-fullscreen" id="marketsModal">
     <div class="modal-header">
       <h3 style="font-weight:800; font-size:1.2rem;">Select Synthetic Market</h3>
-      <button onclick="closeMarketsModal()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">âœ•</button>
+      <button onclick="closeMarketsModal()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
     </div>
-    <div id="marketsListContainer" style="overflow-y:auto; flex:1;">
+    <!-- Market Categories Filter Bar -->
+    <div class="market-category-filters" style="display:flex; gap:6px; padding:10px 14px; background:#0c101c; border-bottom:1px solid var(--border-color); overflow-x:auto;">
+      <button class="mkt-cat-btn active" onclick="filterMarkets('all', this)">All (26)</button>
+      <button class="mkt-cat-btn" onclick="filterMarkets('vol', this)">Volatilities</button>
+      <button class="mkt-cat-btn" onclick="filterMarkets('1s', this)">1-Second (1s)</button>
+      <button class="mkt-cat-btn" onclick="filterMarkets('boom_crash', this)">Boom & Crash</button>
+      <button class="mkt-cat-btn" onclick="filterMarkets('jump', this)">Jump</button>
+      <button class="mkt-cat-btn" onclick="filterMarkets('range', this)">Range Break</button>
+    </div>
+    <div id="marketsListContainer" style="overflow-y:auto; flex:1; padding:4px 10px;">
       <!-- Populated dynamically -->
     </div>
   </div>
@@ -920,7 +1083,7 @@
   <div class="positions-panel" id="positionsPanel">
     <div style="height:52px; background:#0d111d; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; padding:0 16px;">
       <h3 style="font-weight:800; font-size:1.1rem;">Trade Activity</h3>
-      <button onclick="closePositionsDrawer()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">âœ•</button>
+      <button onclick="closePositionsDrawer()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
     </div>
     <div class="pos-tabs">
       <div class="pos-tab active" onclick="switchPosTab('open')">Open (0)</div>
@@ -947,27 +1110,134 @@
     let currentBotStake = 10;
 
     const MARKETS = [
-      { id: 'vol_10_1s', name: 'Vol 10 (1s)', symbol: 'V10 (1s)', price: 9460.16, decimals: 2 },
-      { id: 'vol_10', name: 'Volatility 10 Index', symbol: 'Vol 10', price: 6520.40, decimals: 2 },
-      { id: 'vol_25', name: 'Volatility 25 Index', symbol: 'Vol 25', price: 1840.10, decimals: 2 },
-      { id: 'vol_50', name: 'Volatility 50 Index', symbol: 'Vol 50', price: 245.80, decimals: 2 },
-      { id: 'vol_75', name: 'Volatility 75 Index', symbol: 'Vol 75', price: 74210.00, decimals: 2 },
-      { id: 'vol_100', name: 'Volatility 100 Index', symbol: 'Vol 100', price: 1240.50, decimals: 2 }
+      // Volatility Indices (Continuous)
+      { id: 'vol_10', name: 'Volatility 10 Index', symbol: 'Vol 10', price: 6520.40, decimals: 2, category: 'vol' },
+      { id: 'vol_25', name: 'Volatility 25 Index', symbol: 'Vol 25', price: 1840.10, decimals: 2, category: 'vol' },
+      { id: 'vol_50', name: 'Volatility 50 Index', symbol: 'Vol 50', price: 245.80, decimals: 2, category: 'vol' },
+      { id: 'vol_75', name: 'Volatility 75 Index', symbol: 'Vol 75', price: 74210.00, decimals: 2, category: 'vol' },
+      { id: 'vol_100', name: 'Volatility 100 Index', symbol: 'Vol 100', price: 1240.50, decimals: 2, category: 'vol' },
+      { id: 'vol_150_1s', name: 'Volatility 150 (1s) Index', symbol: 'Vol 150 (1s)', price: 3420.75, decimals: 2, category: 'vol' },
+      { id: 'vol_200_1s', name: 'Volatility 200 (1s) Index', symbol: 'Vol 200 (1s)', price: 5120.30, decimals: 2, category: 'vol' },
+      { id: 'vol_250_1s', name: 'Volatility 250 (1s) Index', symbol: 'Vol 250 (1s)', price: 8940.60, decimals: 2, category: 'vol' },
+      { id: 'vol_300_1s', name: 'Volatility 300 (1s) Index', symbol: 'Vol 300 (1s)', price: 12450.80, decimals: 2, category: 'vol' },
+
+      // 1-Second (1s) Volatilities
+      { id: 'vol_10_1s', name: 'Volatility 10 (1s) Index', symbol: 'Vol 10 (1s)', price: 9460.16, decimals: 2, category: '1s' },
+      { id: 'vol_25_1s', name: 'Volatility 25 (1s) Index', symbol: 'Vol 25 (1s)', price: 4310.25, decimals: 2, category: '1s' },
+      { id: 'vol_50_1s', name: 'Volatility 50 (1s) Index', symbol: 'Vol 50 (1s)', price: 680.50, decimals: 2, category: '1s' },
+      { id: 'vol_75_1s', name: 'Volatility 75 (1s) Index', symbol: 'Vol 75 (1s)', price: 98140.20, decimals: 2, category: '1s' },
+      { id: 'vol_100_1s', name: 'Volatility 100 (1s) Index', symbol: 'Vol 100 (1s)', price: 2890.10, decimals: 2, category: '1s' },
+
+      // Boom & Crash
+      { id: 'boom_300', name: 'Boom 300 Index', symbol: 'Boom 300', price: 3450.20, decimals: 2, category: 'boom_crash' },
+      { id: 'boom_500', name: 'Boom 500 Index', symbol: 'Boom 500', price: 5620.80, decimals: 2, category: 'boom_crash' },
+      { id: 'boom_1000', name: 'Boom 1000 Index', symbol: 'Boom 1000', price: 10240.40, decimals: 2, category: 'boom_crash' },
+      { id: 'crash_300', name: 'Crash 300 Index', symbol: 'Crash 300', price: 6540.30, decimals: 2, category: 'boom_crash' },
+      { id: 'crash_500', name: 'Crash 500 Index', symbol: 'Crash 500', price: 4890.10, decimals: 2, category: 'boom_crash' },
+      { id: 'crash_1000', name: 'Crash 1000 Index', symbol: 'Crash 1000', price: 8720.50, decimals: 2, category: 'boom_crash' },
+
+      // Jump Indices
+      { id: 'jump_10', name: 'Jump 10 Index', symbol: 'Jump 10', price: 1120.40, decimals: 2, category: 'jump' },
+      { id: 'jump_25', name: 'Jump 25 Index', symbol: 'Jump 25', price: 2450.60, decimals: 2, category: 'jump' },
+      { id: 'jump_50', name: 'Jump 50 Index', symbol: 'Jump 50', price: 4780.20, decimals: 2, category: 'jump' },
+      { id: 'jump_75', name: 'Jump 75 Index', symbol: 'Jump 75', price: 7320.90, decimals: 2, category: 'jump' },
+      { id: 'jump_100', name: 'Jump 100 Index', symbol: 'Jump 100', price: 9840.50, decimals: 2, category: 'jump' },
+
+      // Range Break
+      { id: 'range_100', name: 'Range Break 100 Index', symbol: 'Range Break 100', price: 5230.10, decimals: 2, category: 'range' },
+      { id: 'range_200', name: 'Range Break 200 Index', symbol: 'Range Break 200', price: 8420.70, decimals: 2, category: 'range' }
     ];
-    let activeMarket = MARKETS[0];
+    let activeMarket = MARKETS[9]; // default Vol 10 (1s)
+    let currentMarketCatFilter = 'all';
 
     // DIGIT FREQUENCY (0 - 9)
-    const digitStats = [10.0, 11.4, 10.4, 9.0, 10.8, 10.6, 9.8, 9.4, 8.6, 9.8];
+    const digitStats = [9.8, 11.6, 10.4, 8.8, 11.2, 10.6, 9.4, 9.8, 8.2, 10.2];
+    let recentSpotTicks = [];
+
+    // MARKET VIEW SWITCHER
+    let currentMarketView = 'graph';
+    function switchMarketView(mode) {
+      currentMarketView = mode;
+      document.querySelectorAll('.view-mode-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById('viewBtn' + mode.charAt(0).toUpperCase() + mode.slice(1));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.getElementById('chartWrapper').style.display = mode === 'graph' ? 'block' : 'none';
+      document.getElementById('chartViewSignals').style.display = mode === 'signals' ? 'flex' : 'none';
+      document.getElementById('chartViewStats').style.display = mode === 'stats' ? 'block' : 'none';
+      document.getElementById('chartViewTicks').style.display = mode === 'ticks' ? 'block' : 'none';
+
+      if (mode === 'stats') renderStatsBars();
+      if (mode === 'ticks') renderTicksStream();
+    }
+
+    function renderStatsBars() {
+      const container = document.getElementById('statsBarContainer');
+      if (!container) return;
+      let maxVal = Math.max(...digitStats);
+      let minVal = Math.min(...digitStats);
+      let html = '';
+      for (let i = 0; i <= 9; i++) {
+        const val = digitStats[i];
+        const isMax = val === maxVal;
+        const isMin = val === minVal;
+        const barColor = isMax ? '#10b981' : (isMin ? '#ef4444' : '#60a5fa');
+        html += '<div style="display:flex; align-items:center; gap:8px; font-family:\'JetBrains Mono\',monospace; font-size:0.75rem;">' +
+          '<span style="width:16px; font-weight:800; color:' + barColor + ';">' + i + '</span>' +
+          '<div style="flex:1; background:#1e293b; height:7px; border-radius:4px; overflow:hidden;">' +
+            '<div style="width:' + (val * 7) + '%; height:100%; background:' + barColor + '; border-radius:4px;"></div>' +
+          '</div>' +
+          '<span style="width:42px; text-align:right; color:#cbd5e1; font-size:0.7rem;">' + val.toFixed(1) + '%</span>' +
+        '</div>';
+      }
+      container.innerHTML = html;
+    }
+
+    function renderTicksStream() {
+      const container = document.getElementById('ticksStreamList');
+      if (!container) return;
+      let html = '';
+      recentSpotTicks.slice(-15).reverse().forEach(t => {
+        const color = t.delta >= 0 ? '#10b981' : '#ef4444';
+        const sign = t.delta >= 0 ? '+' : '';
+        html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:3px 6px; background:#141a29; border-radius:4px;">' +
+          '<span style="color:#888; font-size:0.7rem;">' + t.time + '</span>' +
+          '<span style="color:#fff; font-weight:700;">' + t.price.toFixed(activeMarket.decimals) + '</span>' +
+          '<span style="color:' + color + ';">' + sign + t.delta.toFixed(2) + '</span>' +
+          '<span style="background:#20293d; color:#fbbf24; font-weight:800; padding:1px 6px; border-radius:3px;">' + t.digit + '</span>' +
+        '</div>';
+      });
+      container.innerHTML = html;
+    }
 
     function renderDigitStrip(activeDigit) {
       const container = document.getElementById('digitStatsStrip');
       if (!container) return;
+
+      // Find max and min frequency
+      let maxVal = -1, minVal = 999;
+      let maxIdx = -1, minIdx = -1;
+      for (let i = 0; i <= 9; i++) {
+        const v = digitStats[i];
+        if (v > maxVal) { maxVal = v; maxIdx = i; }
+        if (v < minVal) { minVal = v; minIdx = i; }
+      }
+
       let html = '';
       for (let i = 0; i <= 9; i++) {
-        const isActive = i === activeDigit;
-        html += '<div class="digit-cell ' + (isActive ? 'active-spot' : '') + '">' +
-          '<span class="digit-val">' + i + '</span>' +
-          '<span class="digit-pct">' + digitStats[i].toFixed(1) + '%</span>' +
+        const isActive = (i === activeDigit);
+        const isMost = (i === maxIdx);
+        const isLeast = (i === minIdx);
+
+        let circleClass = 'digit-circle';
+        if (isActive) circleClass += ' is-active';
+        else if (isMost) circleClass += ' most-frequent';
+        else if (isLeast) circleClass += ' least-frequent';
+
+        html += '<div class="digit-col ' + (isActive ? 'active-col' : '') + '">' +
+          '<div class="' + circleClass + '">' + i + '</div>' +
+          '<span class="digit-pct-label">' + digitStats[i].toFixed(1) + '%</span>' +
+          (isActive ? '<div class="digit-gold-cursor">▲</div>' : '<div class="digit-gold-cursor-placeholder"></div>') +
         '</div>';
       }
       container.innerHTML = html;
@@ -1057,6 +1327,39 @@
         const s = next.toFixed(activeMarket.decimals);
         const lastDigit = parseInt(s.charAt(s.length - 1), 10);
         renderDigitStrip(lastDigit);
+
+        // Record recent tick
+        const now = new Date();
+        const timeStr = now.toTimeString().split(' ')[0];
+        recentSpotTicks.push({
+          time: timeStr,
+          price: next,
+          delta: delta,
+          digit: lastDigit
+        });
+        if (recentSpotTicks.length > 30) recentSpotTicks.shift();
+
+        // Dynamically adjust digit stats slightly on each tick
+        digitStats[lastDigit] = Math.min(18, Math.max(5, digitStats[lastDigit] + 0.1));
+        const decrIdx = (lastDigit + 5) % 10;
+        digitStats[decrIdx] = Math.min(18, Math.max(5, digitStats[decrIdx] - 0.1));
+
+        if (currentMarketView === 'stats') renderStatsBars();
+        if (currentMarketView === 'ticks') renderTicksStream();
+        if (currentMarketView === 'signals') {
+          const recEl = document.getElementById('signalRecommendation');
+          const momEl = document.getElementById('signalMomentum');
+          const sentEl = document.getElementById('signalSentiment');
+          if (delta >= 0) {
+            if (recEl) recEl.textContent = lastDigit % 2 === 0 ? 'STRONG BUY EVEN' : 'STRONG BUY RISE';
+            if (momEl) momEl.textContent = '+' + (delta * 1.5).toFixed(2) + ' Bullish';
+            if (sentEl) sentEl.textContent = 'Even 58% vs Odd 42%';
+          } else {
+            if (recEl) recEl.textContent = lastDigit % 2 !== 0 ? 'STRONG BUY ODD' : 'STRONG BUY FALL';
+            if (momEl) momEl.textContent = (delta * 1.5).toFixed(2) + ' Bearish';
+            if (sentEl) sentEl.textContent = 'Odd 56% vs Even 44%';
+          }
+        }
       }, 1000);
     }
 
@@ -1293,21 +1596,38 @@
       document.getElementById('drawerOverlay').classList.toggle('open', open);
     }
 
-    function openMarketsModal() {
+    function filterMarkets(cat, btn) {
+      currentMarketCatFilter = cat;
+      document.querySelectorAll('.mkt-cat-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderMarketsList();
+    }
+
+    function renderMarketsList() {
       const container = document.getElementById('marketsListContainer');
+      if (!container) return;
       let html = '';
-      MARKETS.forEach(m => {
-        html += '<div class="market-list-item" onclick="selectMarket(\'' + m.id + '\')">' +
+      const filtered = currentMarketCatFilter === 'all' 
+        ? MARKETS 
+        : MARKETS.filter(m => m.category === currentMarketCatFilter);
+
+      filtered.forEach(m => {
+        const isSelected = m.id === activeMarket.id;
+        html += '<div class="market-list-item ' + (isSelected ? 'selected' : '') + '" onclick="selectMarket(\'' + m.id + '\')" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">' +
           '<div>' +
-            '<div style="font-weight:800; color:#fff;">' + m.name + '</div>' +
+            '<div style="font-weight:800; color:' + (isSelected ? '#00c49f' : '#fff') + '; font-size:0.95rem;">' + m.name + '</div>' +
             '<div style="font-size:0.75rem; color:#888;">' + m.symbol + ' &bull; Synthetic Index</div>' +
           '</div>' +
-          '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:800; color:#60a5fa;">' +
+          '<div style="font-family:\'JetBrains Mono\',monospace; font-weight:800; color:#60a5fa; font-size:0.95rem;">' +
             m.price.toFixed(m.decimals) +
           '</div>' +
         '</div>';
       });
       container.innerHTML = html;
+    }
+
+    function openMarketsModal() {
+      renderMarketsList();
       document.getElementById('marketsModal').classList.add('open');
     }
     function closeMarketsModal() {
@@ -1318,6 +1638,12 @@
       if (found) {
         activeMarket = found;
         document.getElementById('activeMarketName').textContent = found.symbol;
+        chartPoints = [];
+        let cur = activeMarket.price;
+        for (let i = 0; i < 40; i++) {
+          cur += (Math.random() - 0.49) * 2;
+          chartPoints.push(cur);
+        }
       }
       closeMarketsModal();
     }
@@ -1386,30 +1712,72 @@
       }
     }
 
-    // Auto-sync User Info
-    (function syncUser() {
+    // Auto-sync User Info & Profile Picture
+    function syncUser() {
       try {
         const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
-        if (u.nickname || u.name) {
-          const nick = u.nickname || u.name;
-          const letter = nick.charAt(0).toUpperCase();
-          const av = document.getElementById('headerAvatar');
+        const nick = u.nickname || u.name || 'collo';
+        const letter = nick.charAt(0).toUpperCase();
+        const av = document.getElementById('headerAvatar');
+        const dav = document.getElementById('drawerAvatarLetter');
+        const dname = document.getElementById('drawerUserName');
+        const demail = document.getElementById('drawerUserEmail');
+        if (dname) dname.textContent = nick;
+        if (demail) demail.textContent = u.email || 'macollocollins@gmail.com';
+
+        if (u.profilePic && u.profilePic.startsWith('data:image')) {
+          if (av) {
+            av.innerHTML = '<img src="' + u.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+            av.style.background = 'transparent';
+            av.style.border = '1.5px solid #10b981';
+          }
+          if (dav) {
+            dav.innerHTML = '<img src="' + u.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+            dav.style.background = 'transparent';
+            dav.style.border = '2px solid #10b981';
+          }
+        } else {
           if (av) av.textContent = letter;
-          const dav = document.getElementById('drawerAvatarLetter');
           if (dav) dav.textContent = letter;
-          const dname = document.getElementById('drawerUserName');
-          if (dname) dname.textContent = nick;
-          const demail = document.getElementById('drawerUserEmail');
-          if (demail) demail.textContent = u.email || '';
+        }
+
+        // Check server for latest user profilePic & balances
+        if (u.email) {
+          fetch('/api/user?email=' + encodeURIComponent(u.email))
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.user) {
+                let changed = false;
+                if (data.user.profilePic && data.user.profilePic !== u.profilePic) {
+                  u.profilePic = data.user.profilePic;
+                  changed = true;
+                  if (av) {
+                    av.innerHTML = '<img src="' + u.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+                    av.style.background = 'transparent';
+                    av.style.border = '1.5px solid #10b981';
+                  }
+                  if (dav) {
+                    dav.innerHTML = '<img src="' + u.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+                    dav.style.background = 'transparent';
+                    dav.style.border = '2px solid #10b981';
+                  }
+                }
+                if (changed) {
+                  localStorage.setItem('ms_user', JSON.stringify(u));
+                }
+              }
+            })
+            .catch(() => {});
         }
       } catch(e) {}
       updateHeaderBalance();
-    })();
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       initLiveCanvasChart();
       renderDigitStrip(6);
       updatePayouts();
+      syncUser();
     });
   </script>
 </body>

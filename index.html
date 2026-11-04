@@ -110,9 +110,150 @@
       color: #00c49f !important;
       transform: translateY(-2px);
     }
+
+    /* 4-Dots Admin Trigger */
+    .admin-dots-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 99999;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.6);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .admin-dots-btn:hover, .admin-dots-btn:active {
+      background: rgba(255, 68, 79, 0.3);
+      border-color: #ff444f;
+      color: #ff444f;
+      transform: scale(1.08);
+    }
+
+    /* 3-Dots Partner / Affiliate Trigger */
+    .affiliate-dots-btn {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      z-index: 99999;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.6);
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+    .affiliate-dots-btn:hover, .affiliate-dots-btn:active {
+      background: rgba(0, 196, 159, 0.3);
+      border-color: #00c49f;
+      color: #00c49f;
+      transform: scale(1.08);
+    }
+
+    .admin-modal-overlay, .affiliate-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+      z-index: 100000;
+      align-items: center;
+      justify-content: center;
+    }
+    .admin-modal-box, .affiliate-modal-box {
+      background: #18182e;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 380px;
+      padding: 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      position: relative;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 8px 12px !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+      }
+      .nav-links {
+        display: none !important;
+      }
+      .nav-mobile-cta {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+      .main-viewport-content {
+        padding: 1.25rem 14px 2.5rem !important;
+        justify-content: flex-start !important;
+        height: auto !important;
+        min-height: calc(100vh - 80px) !important;
+      }
+      .hero-pill {
+        font-size: 0.72rem !important;
+        margin-bottom: 0.8rem !important;
+      }
+      .hero-title-compact {
+        font-size: 1.55rem !important;
+        line-height: 1.25 !important;
+        margin-bottom: 0.75rem !important;
+      }
+      .hero-desc-compact {
+        font-size: 0.82rem !important;
+        margin-bottom: 1.2rem !important;
+      }
+      .hero-two-options-compact {
+        flex-direction: column !important;
+        gap: 10px !important;
+        margin-bottom: 1.5rem !important;
+      }
+      .btn-start-trading-compact, .btn-login-compact {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .terminal-compact {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Top-Left 4 Dots Secret Admin Trigger -->
+  <button type="button" class="admin-dots-btn" onclick="openAdminModal()" title="Admin Command Center">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="pointer-events: none;">
+      <circle cx="6" cy="6" r="3"/>
+      <circle cx="18" cy="6" r="3"/>
+      <circle cx="6" cy="18" r="3"/>
+      <circle cx="18" cy="18" r="3"/>
+    </svg>
+  </button>
+
+  <!-- Bottom-Right 3-Dots Secret Affiliate Trigger -->
+  <button type="button" class="affiliate-dots-btn" onclick="openAffiliateModal()" title="Money Spread Partner Program (Affiliate)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="pointer-events: none;">
+      <circle cx="12" cy="5" r="3.2"/>
+      <circle cx="5" cy="18" r="3.2"/>
+      <circle cx="19" cy="18" r="3.2"/>
+    </svg>
+  </button>
 
   <!-- Live Market Ticker Tape Marquee (Gentle 160s scroll) -->
   <div class="ticker-tape">
@@ -129,12 +270,12 @@
       <span class="brand-name" style="font-size: 1.15rem;">Money<span class="brand-accent">Spread</span></span>
     </a>
 
+    <!-- Desktop Nav Links -->
     <div class="nav-links">
       <a href="trading.html" style="color: #00c49f; font-weight: 700;">⚡ Live Signals & Trade</a>
       <a href="markets.html">Markets</a>
       <a href="deposit.html">Deposit</a>
       <a href="withdraw.html" style="color: #ff6b6b; font-weight: 700;">Withdraw</a>
-      <a href="affiliate.html">Partner Program</a>
       <a href="account.html">Account</a>
       
       <!-- Guest Action Buttons in Navbar -->
@@ -148,6 +289,12 @@
         <a href="trading.html" class="btn btn-primary btn-sm" style="background: #00c49f; color: #000; font-weight: 800; padding: 5px 12px; font-size: 0.82rem;">Launch Terminal &rarr;</a>
         <button class="btn-logout" onclick="doLogout()" style="padding: 4px 10px; font-size: 0.78rem;">Logout</button>
       </div>
+    </div>
+
+    <!-- Mobile-only compact CTA (never wraps or overlaps) -->
+    <div class="nav-mobile-cta" style="display: none;">
+      <a href="register.html?tab=login" class="btn btn-outline btn-sm" style="padding: 5px 10px; font-size: 0.75rem; border-color: rgba(255,255,255,0.25);">Log In</a>
+      <a href="register.html?tab=signup" class="btn btn-primary btn-sm" style="padding: 5px 12px; font-size: 0.75rem; background: #ff444f; font-weight: 800;">Trade</a>
     </div>
   </nav>
 
@@ -706,6 +853,64 @@
       }
       render();
     }
+
+    // Admin & Affiliate Modal Handlers
+    function openAdminModal() {
+      document.getElementById('adminModal').style.display = 'flex';
+      document.getElementById('adminSecretInput').value = '';
+      document.getElementById('adminModalError').textContent = '';
+      setTimeout(() => document.getElementById('adminSecretInput').focus(), 50);
+    }
+    function closeAdminModal() {
+      document.getElementById('adminModal').style.display = 'none';
+    }
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const pass = document.getElementById('adminSecretInput').value.trim();
+      if (pass === 'COLWAY16') {
+        localStorage.setItem('ms_admin_auth', 'admin_authenticated');
+        window.location.href = 'admin.html';
+      } else {
+        document.getElementById('adminModalError').textContent = 'Invalid security passkey.';
+      }
+    }
+    function openAffiliateModal() {
+      document.getElementById('affiliateModal').style.display = 'flex';
+    }
+    function closeAffiliateModal() {
+      document.getElementById('affiliateModal').style.display = 'none';
+    }
   </script>
+
+  <!-- Admin Secret PIN Modal -->
+  <div class="admin-modal-overlay" id="adminModal">
+    <div class="admin-modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0;">🛡️ Admin Portal Authentication</h3>
+        <button type="button" onclick="closeAdminModal()" style="background:none; border:none; color:#888; font-size:1.4rem; cursor:pointer;">✕</button>
+      </div>
+      <p style="color: #a0a0ba; font-size: 0.82rem; margin-bottom: 1rem;">Enter root command passkey to access system administration.</p>
+      <form onsubmit="handleAdminLogin(event)">
+        <input type="password" id="adminSecretInput" placeholder="Enter root security passkey" style="width:100%; box-sizing:border-box; background:#101020; border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:12px; color:#fff; font-size:1rem; margin-bottom:12px;" required>
+        <div id="adminModalError" style="color: #ff444f; font-size: 0.8rem; margin-bottom: 10px; min-height: 18px;"></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; background: #ff444f; padding: 12px; font-weight: 800;">Authenticate Admin &rarr;</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Affiliate / Partner Modal -->
+  <div class="affiliate-modal-overlay" id="affiliateModal">
+    <div class="affiliate-modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; color: #00c49f; margin: 0;">🤝 Partner Affiliate Portal</h3>
+        <button type="button" onclick="closeAffiliateModal()" style="background:none; border:none; color:#888; font-size:1.4rem; cursor:pointer;">✕</button>
+      </div>
+      <p style="color: #a0a0ba; font-size: 0.82rem; margin-bottom: 1rem;">Direct access to Affiliate & Partner Program. Earn 10% instant commissions on invited trader deposits.</p>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <a href="affiliate.html" class="btn btn-primary" style="background:#00c49f; color:#000; font-weight:800; text-align:center; padding:12px; text-decoration:none; border-radius:8px;">Open Partner Dashboard &rarr;</a>
+        <a href="register.html?tab=signup" class="btn btn-outline" style="text-align:center; padding:10px; text-decoration:none; border-radius:8px; font-size:0.85rem;">Register as Affiliate Partner</a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

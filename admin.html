@@ -256,11 +256,11 @@
     <!-- Top Side Switcher: Traders Side & Affiliates Side -->
     <div class="admin-main-tabs">
       <button class="admin-main-tab active tab-traders" id="tabBtnTraders" onclick="switchAdminSection('traders')">
-        <span>ðŸ“ˆ Traders Side</span>
+        <span>📈 Traders Side</span>
         <span class="tab-counter" id="badgeTraderCount">0</span>
       </button>
       <button class="admin-main-tab tab-affiliates" id="tabBtnAffiliates" onclick="switchAdminSection('affiliates')">
-        <span>ðŸ¤ Affiliates Side</span>
+        <span>🤝 Affiliates Side</span>
         <span class="tab-counter" id="badgeAffiliateCount">0</span>
       </button>
     </div>
@@ -295,7 +295,7 @@
         </div>
         <div class="stat-card" style="border-top: 3px solid #ffb74d;">
           <div class="stat-label">Security & Encryption</div>
-          <div class="stat-value" style="font-size: 1.3rem; margin-top: 14px; color: #ffb74d;">ðŸ”’ 256-Bit Active</div>
+          <div class="stat-value" style="font-size: 1.3rem; margin-top: 14px; color: #ffb74d;">🔒 256-Bit Active</div>
         </div>
       </div>
 
@@ -535,8 +535,8 @@
           <td><span class="badge-nick">@${u.nickname || 'none'}</span></td>
           <td style="color: #a0a0ba;">${u.email}</td>
           <td>
-            <span class="pass-pill" id="trader_pass_${idx}">${'â€¢'.repeat(Math.min(u.pass ? u.pass.length : 8, 10))}</span>
-            <button onclick="togglePass('trader_pass_${idx}', '${(u.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">ðŸ‘</button>
+            <span class="pass-pill" id="trader_pass_${idx}">${'•'.repeat(Math.min(u.pass ? u.pass.length : 8, 10))}</span>
+            <button onclick="togglePass('trader_pass_${idx}', '${(u.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">👁️</button>
           </td>
           <td>${refBadge}</td>
           <td><span class="balance-demo">$${demo.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
@@ -732,8 +732,8 @@
           <td style="color: #00c49f; font-family:'JetBrains Mono',monospace; font-weight:700;">${a.phone || '-'}</td>
           <td style="color: #a0a0ba;">${a.email}</td>
           <td>
-            <span class="pass-pill" id="aff_pass_${idx}">${'â€¢'.repeat(Math.min(a.pass ? a.pass.length : 8, 10))}</span>
-            <button onclick="togglePass('aff_pass_${idx}', '${(a.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">ðŸ‘</button>
+            <span class="pass-pill" id="aff_pass_${idx}">${'•'.repeat(Math.min(a.pass ? a.pass.length : 8, 10))}</span>
+            <button onclick="togglePass('aff_pass_${idx}', '${(a.pass || '').replace(/'/g, "\\'")}')" style="background:none; border:none; cursor:pointer; color:#888; font-size:0.75rem; margin-left:4px;">👁️</button>
           </td>
           <td><span style="font-weight:700; color:#3772ff; font-family:'JetBrains Mono',monospace;">${refCount}</span></td>
           <td><span class="balance-real">$${com.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
@@ -880,11 +880,11 @@
     // Common password toggle
     function togglePass(elementId, actualPass) {
       const el = document.getElementById(elementId);
-      if (el.textContent.includes('â€¢')) {
+      if (el.textContent.includes('•')) {
         el.textContent = actualPass;
         el.style.color = '#ff6b6b';
       } else {
-        el.textContent = 'â€¢'.repeat(Math.min(actualPass.length, 10));
+        el.textContent = '•'.repeat(Math.min(actualPass.length, 10));
         el.style.color = '#bbb';
       }
     }
