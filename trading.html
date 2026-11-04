@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -701,32 +701,32 @@
   <!-- TOP PROMO BANNER -->
   <div class="top-promo-banner" id="topPromoBanner">
     <div class="promo-left">
-      <span>📱</span>
+      <span>ðŸ“±</span>
       <span>Money Spread Smart Trader &bull; Mobile Optimized</span>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
       <a href="trading.html" style="text-decoration:none;"><button class="promo-btn">Trade</button></a>
-      <span style="cursor:pointer;" onclick="document.getElementById('topPromoBanner').style.display='none'">✕</span>
+      <span style="cursor:pointer;" onclick="document.getElementById('topPromoBanner').style.display='none'">âœ•</span>
     </div>
   </div>
 
   <!-- HEADER -->
   <header class="top-header">
     <div class="header-left">
-      <button class="menu-btn" onclick="toggleSidebar(true)" title="Menu">☰</button>
+      <button class="menu-btn" onclick="toggleSidebar(true)" title="Menu">â˜°</button>
       <div class="logo-badge" title="Money Spread">MS</div>
       
       <!-- Account Mode Pill -->
       <div class="account-pill" onclick="switchAccountMode()" title="Tap to switch Demo / Real">
         <div class="account-badge-letter" id="accountBadge">D</div>
         <span class="account-balance-text" id="headerBalance">$10,000.00</span>
-        <span style="font-size:0.6rem; color:#888;">▼</span>
+        <span style="font-size:0.6rem; color:#888;">â–¼</span>
       </div>
     </div>
 
     <div class="header-right">
       <a href="deposit.html" style="text-decoration:none;">
-        <button class="deposit-btn">💰 Deposit</button>
+        <button class="deposit-btn">ðŸ’° Deposit</button>
       </a>
       <a href="account.html" style="text-decoration:none;" title="My Profile">
         <div id="headerAvatar" style="width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg, #ef4444, #1e1b4b); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; border:1.5px solid rgba(255,255,255,0.2);">
@@ -739,16 +739,16 @@
   <!-- TRADE TYPE SELECTOR BAR -->
   <div class="trade-type-tabs">
     <div class="trade-tab active" data-type="EVEN_ODD" onclick="setContractCategory('EVEN_ODD')">
-      <span>▦</span> Even / Odd
+      <span>â–¦</span> Even / Odd
     </div>
     <div class="trade-tab" data-type="RISE_FALL" onclick="setContractCategory('RISE_FALL')">
-      <span>⇅</span> Rise / Fall
+      <span>â‡…</span> Rise / Fall
     </div>
     <div class="trade-tab" data-type="MATCHES_DIFFERS" onclick="setContractCategory('MATCHES_DIFFERS')">
-      <span>◎</span> Matches / Differs
+      <span>â—Ž</span> Matches / Differs
     </div>
     <div class="trade-tab" data-type="OVER_UNDER" onclick="setContractCategory('OVER_UNDER')">
-      <span>⇕</span> Over / Under
+      <span>â‡•</span> Over / Under
     </div>
   </div>
 
@@ -761,7 +761,7 @@
       <div class="chart-market-overlay">
         <button class="market-dropdown-btn" onclick="openMarketsModal()">
           <span id="activeMarketName">Vol 10 (1s)</span>
-          <span>▼</span>
+          <span>â–¼</span>
         </button>
         <div class="market-price-sub" id="activeMarketPrice">9,460.16 &bull; <span style="color:#ef4444;">-0.42%</span></div>
       </div>
@@ -793,7 +793,7 @@
           <span id="payoutMultiplier">95.2% Payout</span>
         </div>
         <div class="stake-input-row">
-          <button class="qty-btn" onclick="adjustStake(-1)">−</button>
+          <button class="qty-btn" onclick="adjustStake(-1)">âˆ’</button>
           <input type="number" class="stake-num-input" id="tradeStake" value="10" min="1" step="1" oninput="updatePayouts()">
           <button class="qty-btn" onclick="adjustStake(1)">+</button>
         </div>
@@ -850,7 +850,7 @@
 
         <!-- STOP BOT BUTTON (Hidden until bot running) -->
         <button class="action-btn btn-stop-bot" id="btnStopBot" style="display:none;" onclick="stopAIBot()">
-          ■ STOP AI BOT
+          â–  STOP AI BOT
         </button>
       </div>
 
@@ -867,7 +867,7 @@
 
     <!-- Center Glowing AI Button -->
     <div class="center-ai-btn" onclick="triggerAICenterAction()" title="Money Spread AI Trader">
-      <span style="font-size:1.1rem;">✨</span>
+      <span style="font-size:1.1rem;">âœ¨</span>
       <span>AI</span>
     </div>
 
@@ -882,7 +882,7 @@
   <aside class="sidebar-drawer" id="sidebarDrawer">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h3 style="font-weight:800; font-size:1.1rem; color:#fff;">Menu</h3>
-      <button onclick="toggleSidebar(false)" style="background:none; border:none; color:#888; font-size:1.4rem; cursor:pointer;">✕</button>
+      <button onclick="toggleSidebar(false)" style="background:none; border:none; color:#888; font-size:1.4rem; cursor:pointer;">âœ•</button>
     </div>
 
     <div class="drawer-user-card">
@@ -893,12 +893,12 @@
       </div>
     </div>
 
-    <a href="trading.html" class="drawer-link" style="color:#60a5fa;">📊 Smart Trader</a>
-    <a href="account.html" class="drawer-link">⚙️ Account Settings</a>
-    <a href="deposit.html" class="drawer-link">⬇️ Deposit Funds</a>
-    <a href="withdraw.html" class="drawer-link">⬆️ Withdraw Funds</a>
-    <a href="affiliate.html" class="drawer-link">🎁 Refer & Earn (Affiliate)</a>
-    <a href="admin.html" class="drawer-link" style="color:#f59e0b;">🛡️ Admin Portal</a>
+    <a href="trading.html" class="drawer-link" style="color:#60a5fa;">ðŸ“Š Smart Trader</a>
+    <a href="account.html" class="drawer-link">âš™ï¸ Account Settings</a>
+    <a href="deposit.html" class="drawer-link">â¬‡ï¸ Deposit Funds</a>
+    <a href="withdraw.html" class="drawer-link">â¬†ï¸ Withdraw Funds</a>
+    <a href="affiliate.html" class="drawer-link">ðŸŽ Refer & Earn (Affiliate)</a>
+    <a href="admin.html" class="drawer-link" style="color:#f59e0b;">ðŸ›¡ï¸ Admin Portal</a>
     
     <div style="margin-top:auto; padding-top:12px; border-top:1px solid var(--border-color); font-size:0.75rem; color:#666; text-align:center;">
       Money Spread v2.0 &bull; 2026
@@ -909,7 +909,7 @@
   <div class="modal-fullscreen" id="marketsModal">
     <div class="modal-header">
       <h3 style="font-weight:800; font-size:1.2rem;">Select Synthetic Market</h3>
-      <button onclick="closeMarketsModal()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
+      <button onclick="closeMarketsModal()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">âœ•</button>
     </div>
     <div id="marketsListContainer" style="overflow-y:auto; flex:1;">
       <!-- Populated dynamically -->
@@ -920,7 +920,7 @@
   <div class="positions-panel" id="positionsPanel">
     <div style="height:52px; background:#0d111d; border-bottom:1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between; padding:0 16px;">
       <h3 style="font-weight:800; font-size:1.1rem;">Trade Activity</h3>
-      <button onclick="closePositionsDrawer()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
+      <button onclick="closePositionsDrawer()" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">âœ•</button>
     </div>
     <div class="pos-tabs">
       <div class="pos-tab active" onclick="switchPosTab('open')">Open (0)</div>
@@ -1140,6 +1140,7 @@
           durationUnit: 't',
           predictedDigit: 4
         });
+        setTimeout(updateHeaderBalance, 500);
       }
     }
 
@@ -1220,19 +1221,59 @@
         if (window.MoneySpread && window.MoneySpread.playSound) window.MoneySpread.playSound('loss');
       }
 
-      // Update balances
+      // Update balances & PERMANENT SERVER PERSISTENCE
       try {
-        const isReal = (localStorage.getItem('ms_account_mode') || 'demo') === 'real';
+        const mode = localStorage.getItem('ms_account_mode') || 'demo';
+        const isReal = mode === 'real';
         const key = isReal ? 'ms_real_balance' : 'ms_demo_balance';
-        let bal = parseFloat(localStorage.getItem(key) || '10000');
-        bal = Math.max(0, bal + pnl);
+        let bal = parseFloat(localStorage.getItem(key) || (isReal ? '0' : '10000'));
+        bal = Math.max(0, parseFloat((bal + pnl).toFixed(2)));
         localStorage.setItem(key, bal.toFixed(2));
+
         if (window.MoneySpread) {
           if (isReal) window.MoneySpread.realBalance = bal;
           else window.MoneySpread.demoBalance = bal;
         }
+
+        // Keep ms_user updated
+        const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
+        if (isReal) u.realBalance = bal;
+        else u.demoBalance = bal;
+        localStorage.setItem('ms_user', JSON.stringify(u));
+
         updateHeaderBalance();
-      } catch(e) {}
+
+        // 1. Send trade record to server permanent database
+        const tradeRecord = {
+          id: 'AI-' + Math.floor(10000000 + Math.random() * 90000000),
+          assetId: activeMarket.id,
+          symbol: activeMarket.symbol,
+          name: activeMarket.name,
+          type: isWin ? 'AI_WIN' : 'AI_LOSS',
+          stake: stake,
+          entrySpot: activeMarket.price,
+          exitSpot: activeMarket.price,
+          status: isWin ? 'WON' : 'LOST',
+          profit: pnl,
+          mode: mode,
+          closedAt: Date.now()
+        };
+
+        if (u.email) {
+          fetch('/api/record-trade', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: u.email,
+              trade: tradeRecord,
+              newDemoBalance: !isReal ? bal : undefined,
+              newRealBalance: isReal ? bal : undefined
+            })
+          }).catch(() => {});
+        }
+      } catch(e) {
+        console.warn('Bot balance sync error:', e);
+      }
 
       // Update UI Strip
       document.getElementById('botSessionInfo').textContent = 'LIVE: ' + botTradesCount + 'T (' + botWinsCount + 'W / ' + botLossCount + 'L)';

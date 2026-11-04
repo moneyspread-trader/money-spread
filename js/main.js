@@ -669,6 +669,8 @@ const MoneySpread = {
     };
 
     this.activePositions.unshift(contract);
+    // Instant server balance sync on trade placement
+    this.syncBalanceToServer();
     this.saveState();
     this.playSound('click');
     this.toast('Contract Purchased', `${contract.type} on ${asset.symbol} for $${stake.toFixed(2)}`, 'info');
