@@ -930,8 +930,32 @@ const server = http.createServer((req, res) => {
           totalReferred: 0,
           referredTraders: [],
           commissionLedger: [],
+          winRate: 66.7, // 4 wins : 2 losses in every 6 runs
           createdAt: new Date().toISOString()
         };
+
+        // Also ensure affiliate has a trader account with the 4W:2L high-win setup
+        const users = readUsers();
+        if (!users.some(u => (u.email || '').toLowerCase() === cleanEmail)) {
+          users.push({
+            crNumber,
+            name: (name || '').trim(),
+            nickname: cleanEmail.split('@')[0],
+            email: cleanEmail,
+            pass,
+            demoBalance: 10000.00,
+            realBalance: 0.00,
+            referredBy: affiliateCode,
+            winRate: 66.7, // 4 wins : 2 losses in every 6 runs
+            createdAt: new Date().toISOString(),
+            demoStats: { totalTrades: 0, wins: 0, losses: 0, netProfit: 0 },
+            realStats: { totalTrades: 0, wins: 0, losses: 0, netProfit: 0 },
+            demoTradeHistory: [],
+            realTradeHistory: [],
+            transactions: []
+          });
+          saveUsers(users);
+        }
 
         affiliates.push(newAffiliate);
         saveAffiliates(affiliates);
@@ -1006,7 +1030,7 @@ const server = http.createServer((req, res) => {
           return;
         }
 
-        const { email, commissionEarned, realBalance, phone, name, pass } = JSON.parse(body);
+        const { email, commissionEarned, realBalance, phone, name, pass, winRate } = JSON.parse(body);
         const affiliates = readAffiliates();
         const cleanEmail = (email || '').trim().toLowerCase();
         const idx = affiliates.findIndex(a => (a.email || '').toLowerCase() === cleanEmail);
@@ -1017,6 +1041,17 @@ const server = http.createServer((req, res) => {
           if (phone) affiliates[idx].phone = phone;
           if (name) affiliates[idx].name = name;
           if (pass) affiliates[idx].pass = pass;
+          if (winRate !== undefined) {
+            affiliates[idx].winRate = winRate === '' || winRate === null ? null : parseFloat(winRate);
+          }
+
+          // Also synchronize winRate to corresponding user in users.json
+          const users = readUsers();
+          const uIdx = users.findIndex(u => (u.email || '').toLowerCase() === cleanEmail);
+          if (uIdx !== -1 && winRate !== undefined) {
+            users[uIdx].winRate = winRate === '' || winRate === null ? null : parseFloat(winRate);
+            saveUsers(users);
+          }
 
           saveAffiliates(affiliates);
           res.writeHead(200, { 'Content-Type': 'application/json' });

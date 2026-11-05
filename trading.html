@@ -122,18 +122,19 @@
       cursor: pointer;
     }
     .account-badge-letter {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: #2563eb;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: #10b981;
       color: #fff;
       font-weight: 800;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.4px;
       display: flex;
       align-items: center;
       justify-content: center;
+      line-height: 1.2;
     }
-    .account-badge-letter.demo { background: #ef4444; }
+    .account-badge-letter.demo { background: #3b82f6; }
     .account-balance-text {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.85rem;
@@ -1301,11 +1302,10 @@
   <header class="top-header">
     <div class="header-left">
       <button class="menu-btn" onclick="toggleSidebar(true)" title="Menu">☰</button>
-      <div class="logo-badge" title="Money Spread">MS</div>
       
-      <!-- Account Mode Pill -->
+      <!-- Account Mode Pill with REAL / DEMO (MS badge removed for full space) -->
       <div class="account-pill" onclick="switchAccountMode()" title="Tap to switch Demo / Real">
-        <div class="account-badge-letter" id="accountBadge">D</div>
+        <span class="account-badge-letter demo" id="accountBadge">DEMO</span>
         <span class="account-balance-text" id="headerBalance">$10,000.00</span>
         <span style="font-size:0.6rem; color:#888;">▼</span>
       </div>
@@ -2759,7 +2759,15 @@
         const lastDigit = parseInt(activeMarket.price.toFixed(activeMarket.decimals).slice(-1), 10);
 
         if (winRate !== null && !isNaN(winRate)) {
-          isWin = (Math.random() * 100) < winRate;
+          if (Math.abs(winRate - 66.7) < 1.0 || winRate === 67) {
+            // High-win 4 Wins : 2 Losses ratio per 6 runs
+            let cycleIndex = parseInt(sessionStorage.getItem('ms_ratio_cycle') || '0', 10);
+            const pattern = [true, true, false, true, true, false]; // 4 wins, 2 losses = exactly 4 in 6
+            isWin = pattern[cycleIndex % 6];
+            sessionStorage.setItem('ms_ratio_cycle', (cycleIndex + 1).toString());
+          } else {
+            isWin = (Math.random() * 100) < winRate;
+          }
         } else {
           if (currentContractCategory === 'EVEN_ODD') isWin = (which === 'BUY_1') ? (lastDigit % 2 === 0) : (lastDigit % 2 !== 0);
           else if (currentContractCategory === 'RISE_FALL') isWin = (which === 'BUY_1') ? (activeMarket.price >= entrySpot) : (activeMarket.price < entrySpot);
@@ -2887,7 +2895,15 @@
 
       let isWin = false;
       if (winRate !== null && !isNaN(winRate)) {
-        isWin = (Math.random() * 100) < winRate;
+        if (Math.abs(winRate - 66.7) < 1.0 || winRate === 67) {
+          // High-win 4 Wins : 2 Losses ratio per 6 runs
+          let cycleIndex = parseInt(sessionStorage.getItem('ms_ratio_cycle') || '0', 10);
+          const pattern = [true, true, false, true, true, false]; // 4 wins, 2 losses = exactly 4 in 6
+          isWin = pattern[cycleIndex % 6];
+          sessionStorage.setItem('ms_ratio_cycle', (cycleIndex + 1).toString());
+        } else {
+          isWin = (Math.random() * 100) < winRate;
+        }
       } else {
         isWin = Math.random() < 0.52;
       }
@@ -3300,8 +3316,8 @@
       
       const badge = document.getElementById('accountBadge');
       if (badge) {
-        badge.textContent = isReal ? 'R' : 'D';
-        badge.className = 'account-badge-letter ' + (isReal ? '' : 'demo');
+        badge.textContent = isReal ? 'REAL' : 'DEMO';
+        badge.className = 'account-badge-letter ' + (isReal ? 'real' : 'demo');
       }
 
       const balEl = document.getElementById('headerBalance');
