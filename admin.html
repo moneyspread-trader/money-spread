@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -638,19 +638,43 @@
 
     // ---------------- TRADERS LOGIC ----------------
     async function loadUsers() {
+      let serverUsers = [];
       try {
         const resp = await fetch('/api/admin/users', {
           headers: { 'Authorization': 'Bearer admin_authenticated' }
         });
         const data = await resp.json();
         if (data.success && Array.isArray(data.users)) {
-          allUsers = data.users;
-        } else {
-          allUsers = JSON.parse(localStorage.getItem('ms_users') || '[]');
+          serverUsers = data.users;
         }
-      } catch (err) {
-        allUsers = JSON.parse(localStorage.getItem('ms_users') || '[]');
+      } catch (err) {}
+
+      // Also read local cached accounts
+      const localUsers = JSON.parse(localStorage.getItem('ms_users') || '[]');
+      const activeUser = JSON.parse(localStorage.getItem('ms_user') || 'null');
+      if (activeUser && activeUser.email && !localUsers.some(u => (u.email||'').toLowerCase() === activeUser.email.toLowerCase())) {
+        localUsers.push(activeUser);
       }
+
+      // Merge server and local accounts so NONE is ever missed
+      const mergedMap = new Map();
+      serverUsers.forEach(u => mergedMap.set((u.email || u.crNumber || '').toLowerCase(), u));
+
+      localUsers.forEach(lu => {
+        const key = (lu.email || lu.crNumber || '').toLowerCase();
+        if (key && !mergedMap.has(key)) {
+          mergedMap.set(key, lu);
+          // Sync missing local user back to server so server also knows about them!
+          fetch('/api/sync-client-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(lu)
+          }).catch(() => {});
+        }
+      });
+
+      allUsers = Array.from(mergedMap.values());
+      localStorage.setItem('ms_users', JSON.stringify(allUsers));
       renderUsers(allUsers);
     }
 

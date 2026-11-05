@@ -1054,6 +1054,149 @@
       transform: translateY(-1px);
     }
 
+  
+    /* WITHDRAW BUTTON IN HEADER */
+    .withdraw-header-btn {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ff6b6b;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .withdraw-header-btn:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* SHINY GLOWING BLUE DIGIT SELECTION */
+    .digit-circle.user-selected {
+      border: 2px solid #38bdf8 !important;
+      background: rgba(56, 189, 248, 0.32) !important;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.95), inset 0 0 8px #38bdf8 !important;
+      color: #fff !important;
+      transform: scale(1.15) !important;
+      font-weight: 900 !important;
+    }
+
+    /* DUAL ACCOUNT SWITCHER DRAWER (Deriv / DTrader style) */
+    .account-switcher-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 15, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10002;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .account-switcher-card {
+      background: #15182a;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 22px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      animation: popIn 0.2s ease-out;
+      box-sizing: border-box;
+    }
+    .account-switcher-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .acc-switch-item {
+      background: #0f1222;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .acc-switch-item:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .acc-switch-item.active-real {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.06);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+    .acc-switch-item.active-demo {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.06);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+    .acc-mode-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .acc-mode-badge.real {
+      background: #ef4444;
+      color: #fff;
+    }
+    .acc-mode-badge.demo {
+      background: #3b82f6;
+      color: #fff;
+    }
+    .acc-check-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #00c49f;
+      color: #000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+    .acc-switch-item.active-real .acc-check-icon,
+    .acc-switch-item.active-demo .acc-check-icon {
+      display: flex;
+    }
+    .acc-action-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: none;
+    }
+    .acc-action-btn.deposit {
+      background: #00c49f;
+      color: #000;
+    }
+    .acc-action-btn.withdraw {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #ff6b6b;
+    }
+    .acc-action-btn.reset {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid #3b82f6;
+      color: #60a5fa;
+    }
+
   </style>
 </head>
 <body>
@@ -1084,9 +1227,12 @@
       </div>
     </div>
 
-    <div class="header-right">
+    <div class="header-right" style="display:flex; align-items:center; gap:6px;">
       <a href="deposit.html" style="text-decoration:none;">
         <button class="deposit-btn">💰 Deposit</button>
+      </a>
+      <a href="withdraw.html" style="text-decoration:none;">
+        <button class="withdraw-header-btn">↗ Withdraw</button>
       </a>
       <a href="account.html" style="text-decoration:none;" title="My Profile">
         <div id="headerAvatar" style="width:30px; height:30px; border-radius:50%; background:#1e1b4b; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; border:1.5px solid #00c49f; overflow:hidden;">
@@ -1223,6 +1369,28 @@
         <button class="mode-switch-btn" id="btnManualMode" onclick="setBotMode('manual')">MANUAL</button>
       </div>
 
+      
+      <!-- DURATION (TICKS) BOX (Manual Mode) -->
+      <div class="stake-box" id="durationTicksBox">
+        <div class="stake-header">
+          <span>DURATION (TICKS)</span>
+          <span style="color:#60a5fa;" id="currentTickLabel">1 Tick Expiry</span>
+        </div>
+        <div class="stake-input-row">
+          <button class="qty-btn" type="button" onclick="adjustTicks(-1)">-</button>
+          <input type="number" class="stake-num-input" id="tradeDurationTicks" value="1" min="1" max="10" step="1" oninput="updateTickDurationDisplay()">
+          <button class="qty-btn" type="button" onclick="adjustTicks(1)">+</button>
+        </div>
+      </div>
+      <!-- QUICK TICKS PRESETS -->
+      <div class="quick-stakes-row" id="quickTicksRow" style="grid-template-columns: repeat(5, 1fr); margin-bottom:8px;">
+        <div class="quick-stake-chip active" onclick="setQuickTicks(1, this)">1 Tick</div>
+        <div class="quick-stake-chip" onclick="setQuickTicks(2, this)">2 Ticks</div>
+        <div class="quick-stake-chip" onclick="setQuickTicks(3, this)">3 Ticks</div>
+        <div class="quick-stake-chip" onclick="setQuickTicks(5, this)">5 Ticks</div>
+        <div class="quick-stake-chip" onclick="setQuickTicks(10, this)">10 Ticks</div>
+      </div>
+
       <!-- STAKE BOX -->
       <div class="stake-box">
         <div class="stake-header">
@@ -1357,6 +1525,62 @@
       Money Spread v2.0 &bull; 2026
     </div>
   </aside>
+
+  
+  <!-- DUAL ACCOUNT SWITCHER MODAL (DERIV STYLE) -->
+  <div class="account-switcher-overlay" id="accountSwitcherModal" onclick="if(event.target===this)closeAccountSwitcher()">
+    <div class="account-switcher-card">
+      <div class="account-switcher-header">
+        <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#fff;">Select Account</h3>
+        <button onclick="closeAccountSwitcher()" style="background:none; border:none; color:#888; font-size:1.4rem; cursor:pointer;">✕</button>
+      </div>
+
+      <!-- Real Account Card -->
+      <div class="acc-switch-item" id="switchRealCard" onclick="selectAccountMode('real')">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="acc-mode-badge real">REAL</span>
+              <strong style="color:#fff; font-size:0.95rem;">Real Cash Account</strong>
+            </div>
+            <div style="font-size:0.75rem; color:#8892b0; margin-top:3px;" id="switchRealCr">CR8779020 &bull; USD</div>
+          </div>
+          <div class="acc-check-icon" id="realActiveCheck">✓</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+          <div>
+            <span style="font-size:0.7rem; color:#888; text-transform:uppercase;">Real Balance</span>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:1.25rem; font-weight:800; color:#10b981;" id="switchRealBalance">$0.00 USD</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <a href="deposit.html" class="acc-action-btn deposit" onclick="event.stopPropagation()">+ Deposit</a>
+            <a href="withdraw.html" class="acc-action-btn withdraw" onclick="event.stopPropagation()">↗ Withdraw</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo Account Card -->
+      <div class="acc-switch-item" id="switchDemoCard" onclick="selectAccountMode('demo')">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="acc-mode-badge demo">DEMO</span>
+              <strong style="color:#fff; font-size:0.95rem;">Virtual Practice Account</strong>
+            </div>
+            <div style="font-size:0.75rem; color:#8892b0; margin-top:3px;">Risk-free synthetic training &bull; USD</div>
+          </div>
+          <div class="acc-check-icon" id="demoActiveCheck">✓</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">
+          <div>
+            <span style="font-size:0.7rem; color:#888; text-transform:uppercase;">Virtual Balance</span>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:1.25rem; font-weight:800; color:#60a5fa;" id="switchDemoBalance">$10,000.00 USD</div>
+          </div>
+          <button type="button" class="acc-action-btn reset" onclick="event.stopPropagation(); resetDemoFunds();">🔄 Reset $10k</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- MARKETS MODAL -->
   <div class="modal-fullscreen" id="marketsModal">
@@ -1633,11 +1857,46 @@
       container.innerHTML = html;
     }
 
+    let selectedTargetDigit = 4;
+    let selectedDurationTicks = 1;
+
+    function selectTradeDigit(d) {
+      selectedTargetDigit = d;
+      playClickSound();
+      renderDigitStrip();
+      updatePayouts();
+    }
+
+    function adjustTicks(delta) {
+      const input = document.getElementById('tradeDurationTicks');
+      if (!input) return;
+      let val = (parseInt(input.value, 10) || 1) + delta;
+      val = Math.max(1, Math.min(10, val));
+      input.value = val;
+      updateTickDurationDisplay();
+    }
+
+    function setQuickTicks(ticks, el) {
+      selectedDurationTicks = ticks;
+      const input = document.getElementById('tradeDurationTicks');
+      if (input) input.value = ticks;
+      document.querySelectorAll('#quickTicksRow .quick-stake-chip').forEach(c => c.classList.remove('active'));
+      if (el) el.classList.add('active');
+      updateTickDurationDisplay();
+    }
+
+    function updateTickDurationDisplay() {
+      const input = document.getElementById('tradeDurationTicks');
+      const val = parseInt(input ? input.value : 1, 10) || 1;
+      selectedDurationTicks = val;
+      const lbl = document.getElementById('currentTickLabel');
+      if (lbl) lbl.textContent = val + (val === 1 ? ' Tick Expiry' : ' Ticks Expiry');
+    }
+
     function renderDigitStrip(activeDigit) {
       const container = document.getElementById('digitStatsStrip');
       if (!container) return;
 
-      // Find max and min frequency
       let maxVal = -1, minVal = 999;
       let maxIdx = -1, minIdx = -1;
       for (let i = 0; i <= 9; i++) {
@@ -1649,21 +1908,122 @@
       let html = '';
       for (let i = 0; i <= 9; i++) {
         const isActive = (i === activeDigit);
+        const isSelected = (i === selectedTargetDigit);
         const isMost = (i === maxIdx);
         const isLeast = (i === minIdx);
 
         let circleClass = 'digit-circle';
-        if (isActive) circleClass += ' is-active';
+        if (isSelected) circleClass += ' user-selected';
+        else if (isActive) circleClass += ' is-active';
         else if (isMost) circleClass += ' most-frequent';
         else if (isLeast) circleClass += ' least-frequent';
 
-        html += '<div class="digit-col ' + (isActive ? 'active-col' : '') + '">' +
+        html += '<div class="digit-col ' + (isActive ? 'active-col' : '') + '" onclick="selectTradeDigit(' + i + ')" style="cursor:pointer;" title="Tap to set Target Digit ' + i + '">' +
           '<div class="' + circleClass + '">' + i + '</div>' +
-          '<span class="digit-pct-label">' + digitStats[i].toFixed(1) + '%</span>' +
-          (isActive ? '<div class="digit-gold-cursor">▲</div>' : '<div class="digit-gold-cursor-placeholder"></div>') +
+          '<div class="digit-pct ' + (isMost ? 'pct-most' : (isLeast ? 'pct-least' : '')) + '">' + digitStats[i].toFixed(1) + '%</div>' +
+          (isActive ? '<div class="digit-arrow">▲</div>' : '') +
         '</div>';
       }
       container.innerHTML = html;
+    }
+
+    function updatePayouts() {
+      const stake = parseFloat(document.getElementById('tradeStake').value) || 10;
+      const b1Title = document.getElementById('btn1Title');
+      const b2Title = document.getElementById('btn2Title');
+      const b1Payout = document.getElementById('btn1Payout');
+      const b2Payout = document.getElementById('btn2Payout');
+
+      if (!b1Title || !b2Title) return;
+
+      if (currentContractCategory === 'EVEN_ODD') {
+        b1Title.textContent = 'Even';
+        b2Title.textContent = 'Odd';
+        const p = (stake * 1.952).toFixed(2);
+        b1Payout.textContent = '$' + p + ' Payout (95.2%)';
+        b2Payout.textContent = '$' + p + ' Payout (95.2%)';
+      } else if (currentContractCategory === 'RISE_FALL') {
+        b1Title.textContent = 'Rise';
+        b2Title.textContent = 'Fall';
+        const p = (stake * 1.952).toFixed(2);
+        b1Payout.textContent = '$' + p + ' Payout (95.2%)';
+        b2Payout.textContent = '$' + p + ' Payout (95.2%)';
+      } else if (currentContractCategory === 'MATCHES_DIFFERS') {
+        b1Title.textContent = 'Matches (' + selectedTargetDigit + ')';
+        b2Title.textContent = 'Differs (' + selectedTargetDigit + ')';
+        // Matches: High payout (~850% return, 1 in 10 chance)
+        const matchPayout = (stake * 9.5).toFixed(2);
+        // Differs: Low payout (~9.5% return, 9 in 10 chance)
+        const diffPayout = (stake * 1.095).toFixed(2);
+        b1Payout.textContent = '$' + matchPayout + ' Payout (850%)';
+        b2Payout.textContent = '$' + diffPayout + ' Payout (9.5%)';
+      } else if (currentContractCategory === 'OVER_UNDER') {
+        const d = selectedTargetDigit;
+        b1Title.textContent = 'Over (' + d + ')';
+        b2Title.textContent = 'Under (' + d + ')';
+
+        // Over d: digits (d+1)..9 => count = 9 - d
+        const overCount = Math.max(1, 9 - d);
+        const overMultiplier = 1 + ((10 - overCount) / overCount) * 0.952;
+        const overPayout = (stake * overMultiplier).toFixed(2);
+        const overReturnPct = (((overMultiplier - 1) * 100)).toFixed(0);
+
+        // Under d: digits 0..(d-1) => count = d
+        const underCount = Math.max(1, d);
+        const underMultiplier = 1 + ((10 - underCount) / underCount) * 0.952;
+        const underPayout = (stake * underMultiplier).toFixed(2);
+        const underReturnPct = (((underMultiplier - 1) * 100)).toFixed(0);
+
+        b1Payout.textContent = '$' + overPayout + ' Payout (+' + overReturnPct + '%)';
+        b2Payout.textContent = '$' + underPayout + ' Payout (+' + underReturnPct + '%)';
+      }
+    }
+
+    // Account Switcher Modal Functions
+    function openAccountSwitcher() {
+      const isReal = (localStorage.getItem('ms_account_mode') === 'real');
+      const realBal = parseFloat(localStorage.getItem('ms_real_balance') || '0.00');
+      const demoBal = parseFloat(localStorage.getItem('ms_demo_balance') || '10000.00');
+      const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
+
+      const realEl = document.getElementById('switchRealBalance');
+      const demoEl = document.getElementById('switchDemoBalance');
+      const crEl = document.getElementById('switchRealCr');
+
+      if (realEl) realEl.textContent = '$' + realBal.toFixed(2) + ' USD';
+      if (demoEl) demoEl.textContent = '$' + demoBal.toFixed(2) + ' USD';
+      if (crEl) crEl.textContent = (u.crNumber || 'CR8779020') + ' • USD';
+
+      document.getElementById('switchRealCard').classList.toggle('active-real', isReal);
+      document.getElementById('switchDemoCard').classList.toggle('active-demo', !isReal);
+
+      document.getElementById('accountSwitcherModal').style.display = 'flex';
+    }
+
+    function closeAccountSwitcher() {
+      document.getElementById('accountSwitcherModal').style.display = 'none';
+    }
+
+    function selectAccountMode(mode) {
+      localStorage.setItem('ms_account_mode', mode);
+      updateHeaderBalance();
+      closeAccountSwitcher();
+      playClickSound();
+    }
+
+    function resetDemoFunds() {
+      localStorage.setItem('ms_demo_balance', '10000.00');
+      const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
+      u.demoBalance = 10000.00;
+      localStorage.setItem('ms_user', JSON.stringify(u));
+      updateHeaderBalance();
+      const demoEl = document.getElementById('switchDemoBalance');
+      if (demoEl) demoEl.textContent = '$10,000.00 USD';
+      playWinSound();
+    }
+
+    function switchAccountMode() {
+      openAccountSwitcher();
     }
 
     // ==========================================
@@ -2048,6 +2408,7 @@
     }
 
     // Trade Type Tabs Logic
+    window.setCategory = setContractCategory;
     function setContractCategory(cat) {
       currentContractCategory = cat;
       document.querySelectorAll('.trade-tab').forEach(t => {
@@ -2205,6 +2566,7 @@
     function placeSingleTrade(which) {
       const stake = parseFloat(document.getElementById('tradeStake').value) || 10;
       const mode = localStorage.getItem('ms_account_mode') || 'demo';
+      const durationTicks = parseInt(document.getElementById('tradeDurationTicks') ? document.getElementById('tradeDurationTicks').value : 1, 10) || 1;
 
       // 1. Strict Balance & Stake Validation
       if (!validateStake(stake, mode)) return;
@@ -2223,8 +2585,8 @@
       let contractType = 'EVEN';
       if (currentContractCategory === 'EVEN_ODD') contractType = (which === 'BUY_1') ? 'EVEN' : 'ODD';
       else if (currentContractCategory === 'RISE_FALL') contractType = (which === 'BUY_1') ? 'RISE' : 'FALL';
-      else if (currentContractCategory === 'MATCHES_DIFFERS') contractType = (which === 'BUY_1') ? 'MATCHES' : 'DIFFERS';
-      else if (currentContractCategory === 'OVER_UNDER') contractType = (which === 'BUY_1') ? 'OVER' : 'UNDER';
+      else if (currentContractCategory === 'MATCHES_DIFFERS') contractType = (which === 'BUY_1') ? ('MATCHES (' + selectedTargetDigit + ')') : ('DIFFERS (' + selectedTargetDigit + ')');
+      else if (currentContractCategory === 'OVER_UNDER') contractType = (which === 'BUY_1') ? ('OVER (' + selectedTargetDigit + ')') : ('UNDER (' + selectedTargetDigit + ')');
 
       // Add to live open positions
       const tradeId = 'MS-' + Math.floor(10000000 + Math.random() * 90000000);
@@ -2236,6 +2598,7 @@
         name: activeMarket.name,
         type: contractType,
         stake: stake,
+        durationTicks: durationTicks,
         entrySpot: entrySpot,
         mode: mode,
         startTime: Date.now()
@@ -2246,14 +2609,26 @@
       if (openBadge) openBadge.textContent = activeOpenTrades.length;
       if (currentActivePosTab === 'open') renderPositionsList('open');
 
-      // Visual feedback on button
+      // Visual feedback on button with live tick countdown
       const btn = which === 'BUY_1' ? document.getElementById('btnAction1') : document.getElementById('btnAction2');
       const origText = btn.innerHTML;
-      btn.style.opacity = '0.7';
-      btn.innerHTML = '<span style="font-size:0.9rem; font-weight:800;">PURCHASED...</span>';
+      btn.style.opacity = '0.75';
+      
+      let ticksRemaining = durationTicks;
+      btn.innerHTML = '<span style="font-size:0.9rem; font-weight:800;">TICK ' + ticksRemaining + '...</span>';
 
-      // Settle contract in 1.2s (1 tick)
+      const tickTimer = setInterval(() => {
+        ticksRemaining--;
+        if (ticksRemaining > 0) {
+          btn.innerHTML = '<span style="font-size:0.9rem; font-weight:800;">TICK ' + ticksRemaining + '...</span>';
+        } else {
+          clearInterval(tickTimer);
+        }
+      }, 950);
+
+      // Settle contract after durationTicks ticks
       setTimeout(() => {
+        clearInterval(tickTimer);
         btn.style.opacity = '1';
         btn.innerHTML = origText;
 
@@ -2268,22 +2643,34 @@
         } catch(e) {}
 
         let isWin = false;
+        let profit = 0;
+        const lastDigit = parseInt(activeMarket.price.toFixed(activeMarket.decimals).slice(-1), 10);
+
         if (winRate !== null && !isNaN(winRate)) {
           isWin = (Math.random() * 100) < winRate;
         } else {
-          const lastDigit = parseInt(activeMarket.price.toFixed(activeMarket.decimals).slice(-1), 10);
-          if (contractType === 'EVEN') isWin = (lastDigit % 2 === 0);
-          else if (contractType === 'ODD') isWin = (lastDigit % 2 !== 0);
-          else if (contractType === 'RISE') isWin = (activeMarket.price >= entrySpot);
-          else if (contractType === 'FALL') isWin = (activeMarket.price < entrySpot);
-          else if (contractType === 'MATCHES') isWin = (lastDigit === 4);
-          else if (contractType === 'DIFFERS') isWin = (lastDigit !== 4);
-          else if (contractType === 'OVER') isWin = (lastDigit > 4);
-          else if (contractType === 'UNDER') isWin = (lastDigit < 5);
+          if (currentContractCategory === 'EVEN_ODD') isWin = (which === 'BUY_1') ? (lastDigit % 2 === 0) : (lastDigit % 2 !== 0);
+          else if (currentContractCategory === 'RISE_FALL') isWin = (which === 'BUY_1') ? (activeMarket.price >= entrySpot) : (activeMarket.price < entrySpot);
+          else if (currentContractCategory === 'MATCHES_DIFFERS') isWin = (which === 'BUY_1') ? (lastDigit === selectedTargetDigit) : (lastDigit !== selectedTargetDigit);
+          else if (currentContractCategory === 'OVER_UNDER') isWin = (which === 'BUY_1') ? (lastDigit > selectedTargetDigit) : (lastDigit < selectedTargetDigit);
           else isWin = Math.random() < 0.5;
         }
 
-        const profit = isWin ? parseFloat((stake * 0.952).toFixed(2)) : -stake;
+        // Calculate exact payout & profit based on category
+        if (isWin) {
+          if (currentContractCategory === 'MATCHES_DIFFERS') {
+            profit = (which === 'BUY_1') ? parseFloat((stake * 8.5).toFixed(2)) : parseFloat((stake * 0.095).toFixed(2));
+          } else if (currentContractCategory === 'OVER_UNDER') {
+            const d = selectedTargetDigit;
+            const cnt = (which === 'BUY_1') ? Math.max(1, 9 - d) : Math.max(1, d);
+            const mult = ((10 - cnt) / cnt) * 0.952;
+            profit = parseFloat((stake * mult).toFixed(2));
+          } else {
+            profit = parseFloat((stake * 0.952).toFixed(2));
+          }
+        } else {
+          profit = -stake;
+        }
 
         const tradeRecord = {
           id: tradeId,
@@ -2301,7 +2688,7 @@
         };
 
         recordTradeResult(tradeRecord);
-      }, 1200);
+      }, Math.max(1200, durationTicks * 1000));
     }
 
     // AI BOT AUTOMATION ENGINE
@@ -2587,11 +2974,13 @@
         selectMarket(scannedBestMarket.id);
       }
       if (scannedBestCategory) {
-        setCategory(scannedBestCategory);
+        setContractCategory(scannedBestCategory);
       }
       closeScannerModal();
       setBotMode('auto');
-      startAIBot();
+      setTimeout(() => {
+        startAIBot();
+      }, 300);
     }
 
     // Modal & Drawer Toggles
@@ -2837,6 +3226,14 @@
         } else {
           if (av) av.textContent = letter;
           if (dav) dav.textContent = letter;
+        }
+
+        if (u.email || u.crNumber) {
+          fetch('/api/sync-client-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(u)
+          }).catch(() => {});
         }
 
         // Check server for latest user profilePic & balances
