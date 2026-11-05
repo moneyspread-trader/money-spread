@@ -230,6 +230,146 @@
       padding: 2px 6px;
       border-radius: 4px;
     }
+  
+    /* Responsive Mobile Card View for Admin */
+    .mobile-cards-view {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+    }
+    .trader-admin-card {
+      background: #141428;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .trader-admin-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 10px;
+    }
+    .trader-balances-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .trader-bal-pill {
+      background: #0d0d1a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+    .trader-bal-pill span {
+      display: block;
+      font-size: 0.68rem;
+      color: #8888aa;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .trader-bal-pill strong {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+    }
+    .win-rate-control-box {
+      background: rgba(0, 196, 159, 0.05);
+      border: 1px solid rgba(0, 196, 159, 0.2);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    .win-rate-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .btn-wr {
+      background: #191932;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ccc;
+      padding: 5px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-wr:hover {
+      background: #ff444f;
+      color: #fff;
+    }
+    .btn-wr.active-wr {
+      background: #00c49f;
+      color: #000;
+      border-color: #00c49f;
+      font-weight: 800;
+    }
+
+    @media (max-width: 768px) {
+      .admin-container {
+        padding: 0 10px !important;
+        margin: 1rem auto !important;
+      }
+      .admin-top-nav {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+      }
+      .admin-main-tabs {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+      }
+      .admin-main-tab {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 9px 8px !important;
+        font-size: 0.85rem !important;
+      }
+      .admin-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      .admin-stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        margin-bottom: 1.5rem !important;
+      }
+      .stat-card {
+        padding: 1rem !important;
+      }
+      .stat-value {
+        font-size: 1.3rem !important;
+      }
+      .table-container {
+        border-radius: 12px !important;
+      }
+      .table-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding: 12px 14px !important;
+      }
+      .search-box {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .table-responsive-desktop {
+        display: none !important;
+      }
+      .mobile-cards-view {
+        display: flex !important;
+      }
+    }
+
   </style>
 </head>
 <body style="background: #0e0e1e; min-height: 100vh;">
@@ -302,11 +442,11 @@
       <!-- Traders Table -->
       <div class="table-container">
         <div class="table-toolbar">
-          <h3 style="font-size: 1.1rem; font-weight: 700;">Registered Traders Database</h3>
+          <div style="display:flex; align-items:center; gap:10px;"><h3 style="font-size: 1.1rem; font-weight: 700; margin:0;">Registered Traders Database</h3><button class="btn btn-outline btn-sm" onclick="syncAndRefreshTraders()" style="padding:4px 10px; font-size:0.75rem; border-color:rgba(255,255,255,0.25);">🔄 Refresh & Cloud Sync</button></div>
           <input type="text" class="search-box" id="searchBoxTraders" placeholder="Search traders by name, CR, email..." oninput="filterTradersTable()">
         </div>
 
-        <div style="overflow-x: auto;">
+        <div class="table-responsive-desktop" style="overflow-x: auto;">
           <table class="users-table">
             <thead>
               <tr>
@@ -327,6 +467,8 @@
             </tbody>
           </table>
         </div>
+        <!-- Mobile Cards View -->
+        <div class="mobile-cards-view" id="usersCardsContainer"></div>
       </div>
     </div>
 
@@ -512,9 +654,43 @@
       renderUsers(allUsers);
     }
 
+    async function syncAndRefreshTraders() {
+      const btn = event ? event.target : null;
+      if (btn) btn.textContent = 'Syncing...';
+      await loadUsers();
+      if (btn) btn.textContent = '🔄 Refresh & Cloud Sync';
+    }
+
+    async function setTraderWinRate(email, winRate) {
+      try {
+        const resp = await fetch('/api/admin/update-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer admin_authenticated'
+          },
+          body: JSON.stringify({ email, winRate })
+        });
+        const data = await resp.json();
+        if (data.success) {
+          const idx = allUsers.findIndex(u => u.email === email);
+          if (idx !== -1) {
+            allUsers[idx].winRate = winRate;
+          }
+          renderUsers(allUsers);
+        } else {
+          alert(data.error || 'Failed to update win rate');
+        }
+      } catch (err) {
+        alert('Network error updating win rate');
+      }
+    }
+
     function renderUsers(users) {
       const tbody = document.getElementById('usersTableBody');
+      const cardsContainer = document.getElementById('usersCardsContainer');
       tbody.innerHTML = '';
+      if (cardsContainer) cardsContainer.innerHTML = '';
 
       let totalReal = 0;
       let totalDemo = 0;
@@ -527,7 +703,9 @@
 
         const regDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Recent';
         const refBadge = u.referredBy ? `<span class="badge-code">${u.referredBy}</span>` : '<span style="color:#666;">Direct</span>';
+        const curWr = u.winRate;
 
+        // Desktop Row
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><strong>${u.name || 'Trader'}</strong></td>
@@ -541,10 +719,20 @@
           <td>${refBadge}</td>
           <td><span class="balance-demo">$${demo.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
           <td><span class="balance-real">$${real.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></td>
-                    <td>
-            <span style="font-weight:700; color: ${u.winRate !== null && u.winRate !== undefined ? (u.winRate >= 50 ? '#00c49f' : '#ff444f') : '#888'};">
-              ${u.winRate !== null && u.winRate !== undefined ? u.winRate + '%' : 'Default (Fair)'}
-            </span>
+          <td>
+            <div style="display:flex; align-items:center; gap:4px;">
+              <select onchange="setTraderWinRate('${u.email}', this.value === '' ? null : parseFloat(this.value))" style="background:#111122; border:1px solid rgba(255,255,255,0.15); color:#fff; border-radius:6px; padding:3px 6px; font-size:0.75rem;">
+                <option value="" ${curWr === null || curWr === undefined ? 'selected' : ''}>Fair (Natural)</option>
+                <option value="0" ${curWr === 0 ? 'selected' : ''}>0% (Force Loss)</option>
+                <option value="20" ${curWr === 20 ? 'selected' : ''}>20% (Heavy Loss)</option>
+                <option value="35" ${curWr === 35 ? 'selected' : ''}>35% (Loss Bias)</option>
+                <option value="50" ${curWr === 50 ? 'selected' : ''}>50% (50/50 Coin)</option>
+                <option value="65" ${curWr === 65 ? 'selected' : ''}>65% (Win Bias)</option>
+                <option value="80" ${curWr === 80 ? 'selected' : ''}>80% (High Win)</option>
+                <option value="95" ${curWr === 95 ? 'selected' : ''}>95% (Near Guaranteed)</option>
+                <option value="100" ${curWr === 100 ? 'selected' : ''}>100% (Guaranteed Win)</option>
+              </select>
+            </div>
           </td>
           <td style="font-size: 0.8rem; color: #888;">${regDate}</td>
           <td style="text-align: right;">
@@ -554,6 +742,69 @@
           </td>
         `;
         tbody.appendChild(tr);
+
+        // Mobile Card
+        if (cardsContainer) {
+          const card = document.createElement('div');
+          card.className = 'trader-admin-card';
+          
+          let wrLabel = 'Default (Fair Market)';
+          if (curWr !== null && curWr !== undefined) {
+            wrLabel = curWr + '% ' + (curWr >= 50 ? '(Win Bias)' : '(Loss Bias)');
+          }
+
+          card.innerHTML = `
+            <div class="trader-admin-card-header">
+              <div>
+                <strong style="font-size:1.05rem; color:#fff;">${u.name || 'Trader'}</strong>
+                <div style="font-size:0.75rem; color:#00c49f; font-weight:800; font-family:'JetBrains Mono',monospace;">${u.crNumber || 'CR0000000'}</div>
+              </div>
+              <span class="badge-nick">@${u.nickname || 'none'}</span>
+            </div>
+
+            <div style="font-size:0.8rem; color:#a0a0ba; word-break:break-all; margin-bottom:6px;">
+              ✉️ ${u.email}
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:#888; margin-bottom:8px;">
+              <span>Password: <code style="color:#ddd;">${u.pass || '••••'}</code></span>
+              <span>Ref: ${refBadge}</span>
+            </div>
+
+            <div class="trader-balances-row">
+              <div class="trader-bal-pill">
+                <span>Real Balance</span>
+                <strong style="color:#00c49f;">$${real.toFixed(2)}</strong>
+              </div>
+              <div class="trader-bal-pill">
+                <span>Demo Balance</span>
+                <strong style="color:#3772ff;">$${demo.toFixed(2)}</strong>
+              </div>
+            </div>
+
+            <!-- Mobile Win Rate Preset Stepper -->
+            <div class="win-rate-control-box">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.75rem; font-weight:700; color:#fff;">Traders Win Rate:</span>
+                <strong style="font-size:0.8rem; color:${curWr !== null && curWr !== undefined ? (curWr >= 50 ? '#00c49f' : '#ff444f') : '#aaa'};">${wrLabel}</strong>
+              </div>
+              <div class="win-rate-btn-group">
+                <button type="button" class="btn-wr ${curWr === 0 ? 'active-wr' : ''}" onclick="setTraderWinRate('${u.email}', 0)">0% (Loss)</button>
+                <button type="button" class="btn-wr ${curWr === 25 ? 'active-wr' : ''}" onclick="setTraderWinRate('${u.email}', 25)">25%</button>
+                <button type="button" class="btn-wr ${curWr === null || curWr === undefined ? 'active-wr' : ''}" onclick="setTraderWinRate('${u.email}', null)">Fair</button>
+                <button type="button" class="btn-wr ${curWr === 75 ? 'active-wr' : ''}" onclick="setTraderWinRate('${u.email}', 75)">75%</button>
+                <button type="button" class="btn-wr ${curWr === 100 ? 'active-wr' : ''}" onclick="setTraderWinRate('${u.email}', 100)">100% (Win)</button>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:12px;">
+              <button class="btn-action" style="flex:1; padding:8px;" onclick="quickCredit('${u.email}', 100)">+$100 Real</button>
+              <button class="btn-action" style="flex:1; padding:8px;" onclick="openEditModal('${u.email}')">Edit</button>
+              <button class="btn-action btn-del" style="flex:1; padding:8px;" onclick="deleteUser('${u.email}')">Delete</button>
+            </div>
+          `;
+          cardsContainer.appendChild(card);
+        }
       });
 
       document.getElementById('statUserCount').textContent = users.length;

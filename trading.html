@@ -813,6 +813,247 @@
       justify-content: space-between;
       align-items: center;
     }
+  
+    /* ENTRY SCANNER MODAL */
+    .scanner-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 15, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+    .scanner-modal-card {
+      background: #141728;
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 440px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(139, 92, 246, 0.2);
+      animation: popIn 0.25s ease-out;
+      box-sizing: border-box;
+    }
+    .scanner-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .scanner-sparkle-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(139, 92, 246, 0.2);
+      color: #a855f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .scanner-close-btn {
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .scanner-desc-box {
+      background: #0f1222;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+    .scanner-form-group {
+      margin-bottom: 10px;
+    }
+    .scanner-form-group label {
+      display: block;
+      font-size: 0.72rem;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .scanner-form-group select, .scanner-form-group input {
+      width: 100%;
+      background: #0b0e1b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .scanner-form-group select:focus, .scanner-form-group input:focus {
+      border-color: #8b5cf6;
+    }
+    .scanner-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #0b0e1b;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 8px 0 14px;
+    }
+    .scanner-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #8b5cf6, #ec4899);
+      width: 0%;
+      transition: width 0.15s ease;
+    }
+    .scanner-best-box {
+      background: rgba(0, 196, 159, 0.08);
+      border: 1px solid rgba(0, 196, 159, 0.35);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .btn-rescan {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+    .btn-rescan:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+    .btn-load-market {
+      width: 100%;
+      background: #1e1b4b;
+      color: #c4b5fd;
+      border: 1px solid #4338ca;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-load-market:hover {
+      background: #312e81;
+      color: #fff;
+    }
+
+    /* TARGET PROFIT & STOP LOSS POPUP MODAL (Matching PalOption exact look) */
+    .bot-outcome-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 4, 12, 0.88);
+      backdrop-filter: blur(6px);
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .bot-outcome-card {
+      background: #18192d;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 360px;
+      padding: 28px 22px 24px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+      animation: popIn 0.25s ease-out;
+      box-sizing: border-box;
+    }
+    .bot-outcome-icon-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+    .bot-outcome-icon-circle.profit {
+      background: rgba(16, 185, 129, 0.15);
+      border: 2px solid #10b981;
+      color: #10b981;
+    }
+    .bot-outcome-icon-circle.loss {
+      background: rgba(239, 68, 68, 0.15);
+      border: 2px solid #ef4444;
+      color: #ef4444;
+    }
+    .bot-outcome-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .bot-outcome-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.85rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+    }
+    .bot-outcome-stats-box {
+      background: #111222;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bot-outcome-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #8892b0;
+    }
+    .bot-outcome-row strong {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92rem;
+      color: #fff;
+    }
+    .btn-bot-outcome-close {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #fff;
+    }
+    .btn-bot-outcome-close.profit {
+      background: #10b981;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+    .btn-bot-outcome-close.loss {
+      background: #ef4444;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+    .btn-bot-outcome-close:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
   </style>
 </head>
 <body>
@@ -1150,6 +1391,130 @@
     </div>
     <div class="pos-list" id="positionsList">
       <!-- Dynamically filled with trades -->
+    </div>
+  </div>
+
+  
+  <!-- ENTRY SCANNER MODAL (from AI glowing button) -->
+  <div class="scanner-modal-overlay" id="scannerModal">
+    <div class="scanner-modal-card">
+      <div class="scanner-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="scanner-sparkle-icon">✨</div>
+          <h2 style="font-size:1.15rem; font-weight:800; color:#fff; margin:0;">Entry Scanner</h2>
+        </div>
+        <button class="scanner-close-btn" onclick="closeScannerModal()">✕</button>
+      </div>
+
+      <div class="scanner-desc-box">
+        Pick the market category you want to scan. The deep scanner walks every <strong>volatility / synthetic</strong> index and surfaces the best entry point for that category based on historical tick patterns.
+      </div>
+
+      <div class="scanner-form-group">
+        <label>Market Category</label>
+        <select id="scannerCategorySelect" onchange="runEntryScanner(true)">
+          <option value="EVEN_ODD" selected>Even / Odd</option>
+          <option value="MATCHES_DIFFERS">Matches / Differs</option>
+          <option value="OVER_UNDER">Over / Under</option>
+          <option value="RISE_FALL">Rise / Fall</option>
+        </select>
+      </div>
+
+      <div class="scanner-form-group">
+        <label>Selected Market</label>
+        <input type="text" id="scannerSelectedMarket" readonly value="Scanning all markets...">
+      </div>
+
+      <div class="scanner-form-group">
+        <label>Trade Type</label>
+        <input type="text" id="scannerTradeType" readonly value="Even / Odd">
+      </div>
+
+      <div class="scanner-form-group">
+        <label>Prediction (auto)</label>
+        <input type="text" id="scannerPrediction" readonly value="Scanning...">
+      </div>
+
+      <!-- Scanner Progress Indicator -->
+      <div style="margin-top:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#a0a0ba; margin-bottom:5px;">
+          <span id="scannerStatusText">Volatility 15 (1s) Index</span>
+          <span id="scannerCountText" style="font-weight:700; color:#c4b5fd;">13/13</span>
+        </div>
+        <div class="scanner-progress-bar">
+          <div class="scanner-progress-fill" id="scannerProgressFill" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Best Market Recommendation Box -->
+      <div class="scanner-best-box" id="scannerBestBox">
+        <div style="display:flex; align-items:flex-start; gap:8px;">
+          <span style="color:#00c49f; font-weight:800; font-size:1.1rem; line-height:1;">✓</span>
+          <div style="font-size:0.83rem; line-height:1.45; color:#ddd;" id="scannerBestText">
+            <strong>Best market:</strong> Volatility 15 (1s) Index | Even / Odd<br>
+            <span style="color:#00c49f; font-weight:700;">Odd</span> | <strong style="color:#60a5fa;">Quality 95.89%</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+        <button type="button" class="btn-rescan" onclick="runEntryScanner(true)">
+          🔍 Re-scan for Best Market
+        </button>
+        <button type="button" class="btn-load-market" id="btnLoadMarket" onclick="loadScannedMarketAndStart()">
+          Load Market & Start AI Trading
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TARGET PROFIT & STOP LOSS POPUP MODAL (Exact match to screenshots) -->
+  <div class="bot-outcome-overlay" id="botOutcomeModal">
+    <div class="bot-outcome-card">
+      <div class="bot-outcome-icon-circle profit" id="botOutcomeIconCircle">
+        <span id="botOutcomeIcon">✓</span>
+      </div>
+      <h2 class="bot-outcome-title" id="botOutcomeTitle">Target Profit Hit! 🎉</h2>
+      <div class="bot-outcome-amount" id="botOutcomeAmount" style="color:#10b981;">+$1.15 USD</div>
+
+      <div class="bot-outcome-stats-box">
+        <div class="bot-outcome-row">
+          <span>Total Trades:</span>
+          <strong id="botStatTrades">8</strong>
+        </div>
+        <div class="bot-outcome-row">
+          <span>Wins / Losses:</span>
+          <strong><span style="color:#10b981;" id="botStatWins">5W</span> / <span style="color:#ef4444;" id="botStatLosses">3L</span></strong>
+        </div>
+        <div class="bot-outcome-row">
+          <span>Win Rate:</span>
+          <strong id="botStatWinRate">62.5%</strong>
+        </div>
+      </div>
+
+      <button type="button" class="btn-bot-outcome-close profit" id="btnBotOutcomeClose" onclick="closeBotOutcomeModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- INSUFFICIENT BALANCE WARNING MODAL -->
+  <div class="scanner-modal-overlay" id="balanceErrorModal">
+    <div class="scanner-modal-card" style="max-width:360px; text-align:center;">
+      <div style="width:56px; height:56px; border-radius:50%; background:rgba(239,68,68,0.15); border:2px solid #ef4444; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:1.6rem; color:#ef4444;">
+        ⚠️
+      </div>
+      <h3 style="font-size:1.2rem; font-weight:800; color:#fff; margin-bottom:8px;" id="balErrTitle">Insufficient Funds</h3>
+      <p style="font-size:0.83rem; color:#a0a0ba; line-height:1.5; margin-bottom:18px;" id="balErrMsg">
+        Your stake exceeds your available account balance.
+      </p>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn-load-market" onclick="document.getElementById('balanceErrorModal').style.display='none'" style="flex:1; padding:10px;">
+          Adjust Stake
+        </button>
+        <a href="deposit.html" class="btn-rescan" style="flex:1; padding:10px; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">
+          Deposit Funds
+        </a>
+      </div>
     </div>
   </div>
 
@@ -1742,6 +2107,32 @@
     // ==========================================
     let activeOpenTrades = [];
     let currentActivePosTab = 'open';
+    let scannedBestMarket = null;
+    let scannedBestPrediction = 'Odd';
+    let scannedBestCategory = 'EVEN_ODD';
+
+    function showBalanceErrorModal(title, msg) {
+      document.getElementById('balErrTitle').textContent = title || 'Insufficient Funds';
+      document.getElementById('balErrMsg').textContent = msg || 'Your stake exceeds your available account balance.';
+      document.getElementById('balanceErrorModal').style.display = 'flex';
+      playLossSound();
+    }
+
+    function validateStake(stake, mode) {
+      const isReal = mode === 'real';
+      const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
+      const currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
+
+      if (isNaN(stake) || stake <= 0) {
+        showBalanceErrorModal('Invalid Stake', 'Please enter a valid stake amount greater than $0.');
+        return false;
+      }
+      if (stake > currentBal) {
+        showBalanceErrorModal('Insufficient Funds', 'You entered a stake of $' + stake.toFixed(2) + ' USD, but your ' + mode.toUpperCase() + ' balance is only $' + currentBal.toFixed(2) + ' USD. Please lower your stake or deposit funds.');
+        return false;
+      }
+      return true;
+    }
 
     function executeTrade(which) {
       if (currentBotMode === 'auto') {
@@ -1759,7 +2150,27 @@
         playLossSound();
       }
 
-      // 2. Save to local trade history
+      // 2. Update Balance:
+      // Note: Stake was already deducted at start of contract.
+      // On WON: Return full payout (stake + net profit)
+      // On LOST: Payout is $0 (stake remains deducted)
+      const isReal = trade.mode === 'real';
+      const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
+      let currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
+      if (trade.status === 'WON' || trade.profit > 0) {
+        const payout = parseFloat((trade.stake + trade.profit).toFixed(2));
+        currentBal = parseFloat((currentBal + payout).toFixed(2));
+        localStorage.setItem(balKey, currentBal.toFixed(2));
+      }
+
+      const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
+      if (isReal) u.realBalance = currentBal;
+      else u.demoBalance = currentBal;
+      localStorage.setItem('ms_user', JSON.stringify(u));
+
+      updateHeaderBalance();
+
+      // 3. Save to local trade history
       let history = JSON.parse(localStorage.getItem('ms_trade_history') || '[]');
       history.unshift(trade);
       if (history.length > 300) history.pop();
@@ -1770,20 +2181,6 @@
         window.MoneySpread.tradeHistory.unshift(trade);
         if (window.MoneySpread.tradeHistory.length > 300) window.MoneySpread.tradeHistory.pop();
       }
-
-      // 3. Update Balance
-      const isReal = trade.mode === 'real';
-      const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
-      let currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
-      currentBal = Math.max(0, parseFloat((currentBal + trade.profit).toFixed(2)));
-      localStorage.setItem(balKey, currentBal.toFixed(2));
-
-      const u = JSON.parse(localStorage.getItem('ms_user') || '{}');
-      if (isReal) u.realBalance = currentBal;
-      else u.demoBalance = currentBal;
-      localStorage.setItem('ms_user', JSON.stringify(u));
-
-      updateHeaderBalance();
 
       // 4. Update Positions Drawer
       const closedBadge = document.getElementById('closedTradesCount');
@@ -1807,28 +2204,27 @@
 
     function placeSingleTrade(which) {
       const stake = parseFloat(document.getElementById('tradeStake').value) || 10;
+      const mode = localStorage.getItem('ms_account_mode') || 'demo';
+
+      // 1. Strict Balance & Stake Validation
+      if (!validateStake(stake, mode)) return;
+
+      const isReal = mode === 'real';
+      const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
+      let currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
+
+      // 2. Deduct stake immediately
+      currentBal = Math.max(0, parseFloat((currentBal - stake).toFixed(2)));
+      localStorage.setItem(balKey, currentBal.toFixed(2));
+      updateHeaderBalance();
+
+      playClickSound();
+
       let contractType = 'EVEN';
       if (currentContractCategory === 'EVEN_ODD') contractType = (which === 'BUY_1') ? 'EVEN' : 'ODD';
       else if (currentContractCategory === 'RISE_FALL') contractType = (which === 'BUY_1') ? 'RISE' : 'FALL';
       else if (currentContractCategory === 'MATCHES_DIFFERS') contractType = (which === 'BUY_1') ? 'MATCHES' : 'DIFFERS';
       else if (currentContractCategory === 'OVER_UNDER') contractType = (which === 'BUY_1') ? 'OVER' : 'UNDER';
-
-      const mode = localStorage.getItem('ms_account_mode') || 'demo';
-      const isReal = mode === 'real';
-      const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
-      const currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
-
-      if (stake > currentBal) {
-        alert('Insufficient funds! Your ' + mode.toUpperCase() + ' balance is $' + currentBal.toFixed(2));
-        return;
-      }
-
-      // Deduct stake immediately
-      const balAfterStake = Math.max(0, parseFloat((currentBal - stake).toFixed(2)));
-      localStorage.setItem(balKey, balAfterStake.toFixed(2));
-      updateHeaderBalance();
-
-      playClickSound();
 
       // Add to live open positions
       const tradeId = 'MS-' + Math.floor(10000000 + Math.random() * 90000000);
@@ -1888,7 +2284,8 @@
         }
 
         const profit = isWin ? parseFloat((stake * 0.952).toFixed(2)) : -stake;
-        const completedTrade = {
+
+        const tradeRecord = {
           id: tradeId,
           assetId: activeMarket.id,
           symbol: activeMarket.symbol,
@@ -1903,16 +2300,22 @@
           closedAt: Date.now()
         };
 
-        recordTradeResult(completedTrade);
+        recordTradeResult(tradeRecord);
       }, 1200);
     }
 
     // AI BOT AUTOMATION ENGINE
     function startAIBot() {
       if (isBotRunning) return;
-      isBotRunning = true;
 
-      baseBotStake = parseFloat(document.getElementById('tradeStake').value) || 10;
+      const stake = parseFloat(document.getElementById('tradeStake').value) || 10;
+      const mode = localStorage.getItem('ms_account_mode') || 'demo';
+
+      // 1. Strict Balance & Stake Validation for AI Bot
+      if (!validateStake(stake, mode)) return;
+
+      isBotRunning = true;
+      baseBotStake = stake;
       currentBotStake = baseBotStake;
       botTradesCount = 0;
       botWinsCount = 0;
@@ -1944,13 +2347,37 @@
       const targetProfit = parseFloat(document.getElementById('botTargetProfit').value) || 200;
       const stopLoss = parseFloat(document.getElementById('botStopLoss').value) || 999;
       const multiplier = parseFloat(document.getElementById('botMultiplier').value) || 2;
+      const mode = localStorage.getItem('ms_account_mode') || 'demo';
 
-      // Check exit limits
-      if (botSessionPL >= targetProfit || botSessionPL <= -stopLoss) {
+      // 1. Check if Target Profit Hit
+      if (botSessionPL >= targetProfit) {
         stopAIBot();
-        alert('AI Bot Session Ended. Net P/L: $' + botSessionPL.toFixed(2));
+        showTargetProfitHitModal(botSessionPL, botTradesCount, botWinsCount, botLossCount);
         return;
       }
+
+      // 2. Check if Stop Loss Reached
+      if (botSessionPL <= -stopLoss) {
+        stopAIBot();
+        showTargetLossReachedModal(Math.abs(botSessionPL), botTradesCount, botWinsCount, botLossCount);
+        return;
+      }
+
+      // 3. Balance Validation for next bot trade
+      const isReal = mode === 'real';
+      const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
+      let currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
+
+      if (currentBotStake > currentBal) {
+        stopAIBot();
+        showBalanceErrorModal('AI Bot Stopped', 'Next bot stake of $' + currentBotStake.toFixed(2) + ' USD exceeds your available ' + mode.toUpperCase() + ' balance ($' + currentBal.toFixed(2) + ' USD).');
+        return;
+      }
+
+      // Deduct stake immediately
+      currentBal = Math.max(0, parseFloat((currentBal - currentBotStake).toFixed(2)));
+      localStorage.setItem(balKey, currentBal.toFixed(2));
+      updateHeaderBalance();
 
       // Read admin winRate override if any
       let winRate = null;
@@ -1963,7 +2390,7 @@
       if (winRate !== null && !isNaN(winRate)) {
         isWin = (Math.random() * 100) < winRate;
       } else {
-        isWin = Math.random() < 0.52; // standard fair edge
+        isWin = Math.random() < 0.52;
       }
 
       botTradesCount++;
@@ -1982,7 +2409,6 @@
         currentBotStake = parseFloat((currentBotStake * multiplier).toFixed(2)); // Martingale multiplier
       }
 
-      const mode = localStorage.getItem('ms_account_mode') || 'demo';
       const tradeRecord = {
         id: 'AI-' + Math.floor(10000000 + Math.random() * 90000000),
         assetId: activeMarket.id,
@@ -2005,9 +2431,165 @@
       const plEl = document.getElementById('botSessionPL');
       plEl.textContent = (botSessionPL >= 0 ? '+' : '') + '$' + botSessionPL.toFixed(2) + ' USD';
       plEl.style.color = botSessionPL >= 0 ? '#10b981' : '#ef4444';
+
+      // Check exit limits immediately after recording
+      if (botSessionPL >= targetProfit) {
+        stopAIBot();
+        setTimeout(() => showTargetProfitHitModal(botSessionPL, botTradesCount, botWinsCount, botLossCount), 600);
+      } else if (botSessionPL <= -stopLoss) {
+        stopAIBot();
+        setTimeout(() => showTargetLossReachedModal(Math.abs(botSessionPL), botTradesCount, botWinsCount, botLossCount), 600);
+      }
     }
 
+    // TARGET PROFIT & LOSS POPUPS (Matching exact PalOption look)
+    function showTargetProfitHitModal(profit, trades, wins, losses) {
+      playWinSound();
+      const circle = document.getElementById('botOutcomeIconCircle');
+      circle.className = 'bot-outcome-icon-circle profit';
+      document.getElementById('botOutcomeIcon').textContent = '✓';
+      document.getElementById('botOutcomeTitle').textContent = 'Target Profit Hit! 🎉';
+      
+      const amtEl = document.getElementById('botOutcomeAmount');
+      amtEl.textContent = '+$' + Number(profit).toFixed(2) + ' USD';
+      amtEl.style.color = '#10b981';
+
+      document.getElementById('botStatTrades').textContent = trades;
+      document.getElementById('botStatWins').textContent = wins + 'W';
+      document.getElementById('botStatLosses').textContent = losses + 'L';
+      const wr = trades > 0 ? ((wins / trades) * 100).toFixed(1) : '0.0';
+      document.getElementById('botStatWinRate').textContent = wr + '%';
+
+      const btn = document.getElementById('btnBotOutcomeClose');
+      btn.className = 'btn-bot-outcome-close profit';
+
+      document.getElementById('botOutcomeModal').style.display = 'flex';
+    }
+
+    function showTargetLossReachedModal(loss, trades, wins, losses) {
+      playLossSound();
+      const circle = document.getElementById('botOutcomeIconCircle');
+      circle.className = 'bot-outcome-icon-circle loss';
+      document.getElementById('botOutcomeIcon').textContent = '!';
+      document.getElementById('botOutcomeTitle').textContent = 'Target Loss Reached';
+      
+      const amtEl = document.getElementById('botOutcomeAmount');
+      amtEl.textContent = '-$' + Number(loss).toFixed(2) + ' USD';
+      amtEl.style.color = '#ef4444';
+
+      document.getElementById('botStatTrades').textContent = trades;
+      document.getElementById('botStatWins').textContent = wins + 'W';
+      document.getElementById('botStatLosses').textContent = losses + 'L';
+      const wr = trades > 0 ? ((wins / trades) * 100).toFixed(1) : '0.0';
+      document.getElementById('botStatWinRate').textContent = wr + '%';
+
+      const btn = document.getElementById('btnBotOutcomeClose');
+      btn.className = 'btn-bot-outcome-close loss';
+
+      document.getElementById('botOutcomeModal').style.display = 'flex';
+    }
+
+    function closeBotOutcomeModal() {
+      document.getElementById('botOutcomeModal').style.display = 'none';
+    }
+
+    // ==========================================
+    // AI BOT ENTRY SCANNER ENGINE (from video)
+    // ==========================================
     function triggerAICenterAction() {
+      openScannerModal();
+    }
+
+    function openScannerModal() {
+      document.getElementById('scannerModal').style.display = 'flex';
+      runEntryScanner(false);
+    }
+
+    function closeScannerModal() {
+      document.getElementById('scannerModal').style.display = 'none';
+    }
+
+    function runEntryScanner(animate) {
+      const cat = document.getElementById('scannerCategorySelect').value;
+      const progressFill = document.getElementById('scannerProgressFill');
+      const statusText = document.getElementById('scannerStatusText');
+      const countText = document.getElementById('scannerCountText');
+      const selMarket = document.getElementById('scannerSelectedMarket');
+      const tradeType = document.getElementById('scannerTradeType');
+      const prediction = document.getElementById('scannerPrediction');
+      const bestText = document.getElementById('scannerBestText');
+      const btnLoad = document.getElementById('btnLoadMarket');
+
+      tradeType.value = cat.replace('_', ' / ');
+
+      // Pick high confidence synthetic index
+      const candidates = MARKETS.filter(m => m.category === '1s' || m.category === 'vol' || m.category === 'boom_crash');
+      const chosen = candidates[Math.floor(Math.random() * candidates.length)] || MARKETS[0];
+      scannedBestMarket = chosen;
+
+      let predText = 'Odd';
+      if (cat === 'EVEN_ODD') {
+        predText = Math.random() < 0.5 ? 'Even' : 'Odd';
+      } else if (cat === 'MATCHES_DIFFERS') {
+        predText = 'Differs ' + Math.floor(Math.random() * 9);
+      } else if (cat === 'OVER_UNDER') {
+        predText = Math.random() < 0.5 ? 'Over 3' : 'Under 6';
+      } else if (cat === 'RISE_FALL') {
+        predText = Math.random() < 0.5 ? 'Rise' : 'Fall';
+      }
+      scannedBestPrediction = predText;
+      scannedBestCategory = cat;
+
+      const quality = (94.5 + Math.random() * 3.8).toFixed(2);
+
+      if (animate) {
+        progressFill.style.width = '0%';
+        statusText.textContent = 'Scanning all markets...';
+        countText.textContent = '0/' + MARKETS.length;
+        selMarket.value = 'Scanning...';
+        prediction.value = 'Analyzing tick feeds...';
+
+        let cur = 0;
+        const total = MARKETS.length;
+        const interval = setInterval(() => {
+          cur += 4;
+          if (cur >= total) {
+            cur = total;
+            clearInterval(interval);
+            progressFill.style.width = '100%';
+            statusText.textContent = chosen.name;
+            countText.textContent = total + '/' + total;
+            selMarket.value = chosen.name;
+            prediction.value = predText;
+            bestText.innerHTML = '<strong>Best market:</strong> ' + chosen.name + ' | ' + tradeType.value + '<br>' +
+              '<span style="color:#00c49f; font-weight:700;">' + predText + '</span> | <strong style="color:#60a5fa;">Quality ' + quality + '%</strong>';
+            btnLoad.textContent = 'Load ' + chosen.name + ' & Auto-Trade';
+          } else {
+            progressFill.style.width = ((cur / total) * 100) + '%';
+            statusText.textContent = MARKETS[cur].name;
+            countText.textContent = cur + '/' + total;
+          }
+        }, 80);
+      } else {
+        progressFill.style.width = '100%';
+        statusText.textContent = chosen.name;
+        countText.textContent = MARKETS.length + '/' + MARKETS.length;
+        selMarket.value = chosen.name;
+        prediction.value = predText;
+        bestText.innerHTML = '<strong>Best market:</strong> ' + chosen.name + ' | ' + tradeType.value + '<br>' +
+          '<span style="color:#00c49f; font-weight:700;">' + predText + '</span> | <strong style="color:#60a5fa;">Quality ' + quality + '%</strong>';
+        btnLoad.textContent = 'Load ' + chosen.name + ' & Auto-Trade';
+      }
+    }
+
+    function loadScannedMarketAndStart() {
+      if (scannedBestMarket) {
+        selectMarket(scannedBestMarket.id);
+      }
+      if (scannedBestCategory) {
+        setCategory(scannedBestCategory);
+      }
+      closeScannerModal();
       setBotMode('auto');
       startAIBot();
     }

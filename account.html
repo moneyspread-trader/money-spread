@@ -483,6 +483,8 @@
         user.profilePic = base64Data;
         localStorage.setItem('ms_user', JSON.stringify(user));
         localStorage.setItem('ms_profile_pic', base64Data);
+        if (user.email) localStorage.setItem('ms_avatar_for_' + user.email.toLowerCase(), base64Data);
+        if (user.nickname) localStorage.setItem('ms_avatar_for_' + user.nickname.toLowerCase(), base64Data);
 
         // Render immediately to DOM
         applyUserProfileDOM(user);

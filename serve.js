@@ -1,10 +1,128 @@
-﻿const http = require('http');
+const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 5000;
 const DATA_FILE = path.join(__dirname, 'data', 'users.json');
 const AFFILIATES_FILE = path.join(__dirname, 'data', 'affiliates.json');
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const GITHUB_REPO = process.env.GITHUB_REPO || 'moneyspread-trader/money-spread';
+
+// Cloud Persistence Sync to GitHub
+let cloudSyncTimer = null;
+let lastKnownSha = null;
+
+function syncUsersFromCloud() {
+  if (!GITHUB_TOKEN) return;
+  const req = https.request({
+    hostname: 'api.github.com',
+    path: `/repos/${GITHUB_REPO}/contents/data/users.json`,
+    headers: {
+      'User-Agent': 'MoneySpread-Server',
+      'Authorization': `token ${GITHUB_TOKEN}`,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  }, res => {
+    let raw = '';
+    res.on('data', chunk => raw += chunk);
+    res.on('end', () => {
+      if (res.statusCode === 200) {
+        try {
+          const json = JSON.parse(raw);
+          lastKnownSha = json.sha;
+          if (json.content) {
+            const content = Buffer.from(json.content, 'base64').toString('utf-8');
+            const remoteUsers = JSON.parse(content);
+            if (Array.isArray(remoteUsers) && remoteUsers.length > 0) {
+              const localUsers = readUsers();
+              const mergedMap = new Map();
+              localUsers.forEach(u => mergedMap.set((u.email || u.crNumber || '').toLowerCase(), u));
+              remoteUsers.forEach(u => {
+                const key = (u.email || u.crNumber || '').toLowerCase();
+                if (!mergedMap.has(key)) {
+                  mergedMap.set(key, u);
+                } else {
+                  const local = mergedMap.get(key);
+                  if (u.profilePic && !local.profilePic) local.profilePic = u.profilePic;
+                  if (u.winRate !== undefined && u.winRate !== null) local.winRate = u.winRate;
+                  if (u.realBalance !== undefined) local.realBalance = u.realBalance;
+                  if (u.demoBalance !== undefined) local.demoBalance = u.demoBalance;
+                  mergedMap.set(key, local);
+                }
+              });
+              const merged = Array.from(mergedMap.values());
+              const dir = path.dirname(DATA_FILE);
+              if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+              fs.writeFileSync(DATA_FILE, JSON.stringify(merged, null, 2), 'utf-8');
+              console.log(`[CloudSync] Pulled & merged ${merged.length} traders from cloud repository.`);
+            }
+          }
+        } catch (e) {
+          console.error('[CloudSync] Error parsing remote users:', e.message);
+        }
+      }
+    });
+  });
+  req.on('error', err => console.error('[CloudSync] Fetch failed:', err.message));
+  req.end();
+}
+
+function pushUsersToCloud(users) {
+  if (!GITHUB_TOKEN) return;
+  if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(() => {
+    const shaReq = https.request({
+      hostname: 'api.github.com',
+      path: `/repos/${GITHUB_REPO}/contents/data/users.json`,
+      headers: {
+        'User-Agent': 'MoneySpread-Server',
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    }, res => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        let sha = lastKnownSha;
+        if (res.statusCode === 200) {
+          try { sha = JSON.parse(data).sha; } catch(e) {}
+        }
+        const contentBase64 = Buffer.from(JSON.stringify(users, null, 2), 'utf-8').toString('base64');
+        const putBody = JSON.stringify({
+          message: 'Auto-persist traders database [skip ci]',
+          content: contentBase64,
+          sha: sha || undefined
+        });
+        const putReq = https.request({
+          hostname: 'api.github.com',
+          path: `/repos/${GITHUB_REPO}/contents/data/users.json`,
+          method: 'PUT',
+          headers: {
+            'User-Agent': 'MoneySpread-Server',
+            'Authorization': `token ${GITHUB_TOKEN}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          }
+        }, putRes => {
+          let resData = '';
+          putRes.on('data', c => resData += c);
+          putRes.on('end', () => {
+            if (putRes.statusCode === 200 || putRes.statusCode === 201) {
+              try { lastKnownSha = JSON.parse(resData).content.sha; } catch(e) {}
+              console.log('[CloudSync] Users database successfully synced to GitHub.');
+            }
+          });
+        });
+        putReq.on('error', e => console.error('[CloudSync] Push error:', e.message));
+        putReq.write(putBody);
+        putReq.end();
+      });
+    });
+    shaReq.on('error', e => console.error('[CloudSync] SHA check error:', e.message));
+    shaReq.end();
+  }, 2500);
+}
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -130,6 +248,7 @@ function saveUsers(users) {
     const dir = path.dirname(DATA_FILE);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(DATA_FILE, JSON.stringify(users, null, 2), 'utf-8');
+    pushUsersToCloud(users);
   } catch (e) {
     console.error('Error saving users:', e);
   }
@@ -362,6 +481,44 @@ const server = http.createServer((req, res) => {
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Failed to update profile.' }));
+      }
+    });
+    return;
+  }
+
+  // API: Sync Client User (Guarantees accounts registered on mobile/local are never lost)
+  if (req.method === 'POST' && pathname === '/api/sync-client-user') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const clientUser = JSON.parse(body);
+        if (!clientUser || (!clientUser.email && !clientUser.crNumber)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid client user data' }));
+          return;
+        }
+        const users = readUsers();
+        const cleanEmail = (clientUser.email || '').trim().toLowerCase();
+        const cleanCr = (clientUser.crNumber || '').trim().toUpperCase();
+        const idx = users.findIndex(u => (u.email || '').toLowerCase() === cleanEmail || (u.crNumber || '').toUpperCase() === cleanCr);
+        if (idx === -1) {
+          users.push(clientUser);
+          saveUsers(users);
+          console.log('[SyncClient] Added trader account to server:', clientUser.name, clientUser.email);
+        } else {
+          let changed = false;
+          if (clientUser.profilePic && !users[idx].profilePic) {
+            users[idx].profilePic = clientUser.profilePic;
+            changed = true;
+          }
+          if (changed) saveUsers(users);
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, count: users.length }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Sync failed' }));
       }
     });
     return;
@@ -926,4 +1083,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Money Spread server running on port ${PORT}`);
+  syncUsersFromCloud();
 });

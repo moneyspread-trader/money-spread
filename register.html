@@ -444,7 +444,33 @@
         if (resp.ok && data.user) {
           const user = data.user;
           localStorage.setItem('ms_logged_in', '1');
+
+          // Profile Picture Preservation across logout & login
+          const userKey = (user.email || user.nickname || identifier).toLowerCase();
+          const cachedPic = localStorage.getItem('ms_avatar_for_' + userKey) || localStorage.getItem('ms_profile_pic');
+          if (user.profilePic) {
+            localStorage.setItem('ms_profile_pic', user.profilePic);
+            localStorage.setItem('ms_avatar_for_' + userKey, user.profilePic);
+          } else if (cachedPic) {
+            user.profilePic = cachedPic;
+            localStorage.setItem('ms_profile_pic', cachedPic);
+            localStorage.setItem('ms_avatar_for_' + userKey, cachedPic);
+            fetch('/api/update-profile', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: user.email, profilePic: cachedPic })
+            }).catch(() => {});
+          }
+
           localStorage.setItem('ms_user', JSON.stringify(user));
+
+          // Ensure server database always has this user
+          fetch('/api/sync-client-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+          }).catch(() => {});
+
           // Load server-authoritative balances
           localStorage.setItem('ms_demo_balance', (user.demoBalance !== undefined ? user.demoBalance : 10000).toString());
           localStorage.setItem('ms_real_balance', (user.realBalance !== undefined ? user.realBalance : 0).toString());
@@ -492,6 +518,18 @@
       }
 
       localStorage.setItem('ms_logged_in', '1');
+
+      const userKey = (user.email || user.nickname || identifier).toLowerCase();
+      const cachedPic = localStorage.getItem('ms_avatar_for_' + userKey) || localStorage.getItem('ms_profile_pic');
+      if (user.profilePic) {
+        localStorage.setItem('ms_profile_pic', user.profilePic);
+        localStorage.setItem('ms_avatar_for_' + userKey, user.profilePic);
+      } else if (cachedPic) {
+        user.profilePic = cachedPic;
+        localStorage.setItem('ms_profile_pic', cachedPic);
+        localStorage.setItem('ms_avatar_for_' + userKey, cachedPic);
+      }
+
       localStorage.setItem('ms_user', JSON.stringify(user));
       localStorage.setItem('ms_demo_balance', (user.demoBalance !== undefined ? user.demoBalance : 10000).toString());
       localStorage.setItem('ms_real_balance', (user.realBalance !== undefined ? user.realBalance : 0).toString());

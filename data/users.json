@@ -1,201 +1,190 @@
 [
-    {
-        "name":  "Test User",
-        "nickname":  "testuser",
-        "email":  "test@example.com",
-        "pass":  "secret123",
-        "demoBalance":  10000,
-        "realBalance":  99.99,
-        "createdAt":  "2026-10-27T13:51:12.143Z",
-        "crNumber":  "CR4430382",
-        "demoStats":  {
-                          "totalTrades":  0,
-                          "wins":  0,
-                          "losses":  0,
-                          "netProfit":  0
-                      },
-        "realStats":  {
-                          "totalTrades":  0,
-                          "wins":  0,
-                          "losses":  0,
-                          "netProfit":  0
-                      },
-        "demoTradeHistory":  [
-
-                             ],
-        "realTradeHistory":  [
-
-                             ],
-        "transactions":  [
-
-                         ]
+  {
+    "name": "Test User",
+    "nickname": "testuser",
+    "email": "test@example.com",
+    "pass": "secret123",
+    "demoBalance": 10000,
+    "realBalance": 99.99,
+    "createdAt": "2026-10-27T13:51:12.143Z",
+    "crNumber": "CR4430382",
+    "demoStats": {
+      "totalTrades": 0,
+      "wins": 0,
+      "losses": 0,
+      "netProfit": 0
     },
-    {
-        "name":  "COLLO",
-        "nickname":  "collo",
-        "email":  "macollocollins@gmail.com",
-        "pass":  "0797870081eE_",
-        "demoBalance":  10000,
-        "realBalance":  1.5,
-        "createdAt":  "2026-10-28T10:53:26.293Z",
-        "crNumber":  "CR8779020",
-        "demoStats":  {
-                          "totalTrades":  0,
-                          "wins":  0,
-                          "losses":  0,
-                          "netProfit":  0
-                      },
-        "realStats":  {
-                          "totalTrades":  5,
-                          "wins":  5,
-                          "losses":  0,
-                          "netProfit":  47.5
-                      },
-        "demoTradeHistory":  [
-
-                             ],
-        "realTradeHistory":  [
-                                 {
-                                     "id":  "MS-96191865",
-                                     "assetId":  "vol_75",
-                                     "symbol":  "Vol 75",
-                                     "name":  "Volatility 75 Index",
-                                     "type":  "RISE",
-                                     "stake":  10,
-                                     "entrySpot":  74209.84174804097,
-                                     "barrier":  74209.84174804097,
-                                     "predictedDigit":  4,
-                                     "payout":  19.5,
-                                     "startTime":  1793224801748,
-                                     "expiryTime":  1793224803748,
-                                     "durationMs":  2000,
-                                     "touched":  false,
-                                     "status":  "WON",
-                                     "mode":  "real",
-                                     "exitSpot":  74210.038376498,
-                                     "profit":  9.5,
-                                     "closedAt":  1793224804232
-                                 },
-                                 {
-                                     "id":  "MS-32378669",
-                                     "assetId":  "vol_75",
-                                     "symbol":  "Vol 75",
-                                     "name":  "Volatility 75 Index",
-                                     "type":  "RISE",
-                                     "stake":  10,
-                                     "entrySpot":  74209.84174804097,
-                                     "barrier":  74209.84174804097,
-                                     "predictedDigit":  4,
-                                     "payout":  19.5,
-                                     "startTime":  1793224801953,
-                                     "expiryTime":  1793224803953,
-                                     "durationMs":  2000,
-                                     "touched":  false,
-                                     "status":  "WON",
-                                     "mode":  "real",
-                                     "exitSpot":  74210.038376498,
-                                     "profit":  9.5,
-                                     "closedAt":  1793224804232
-                                 },
-                                 {
-                                     "id":  "MS-77627319",
-                                     "assetId":  "vol_75",
-                                     "symbol":  "Vol 75",
-                                     "name":  "Volatility 75 Index",
-                                     "type":  "RISE",
-                                     "stake":  10,
-                                     "entrySpot":  74209.84174804097,
-                                     "barrier":  74209.84174804097,
-                                     "predictedDigit":  4,
-                                     "payout":  19.5,
-                                     "startTime":  1793224801554,
-                                     "expiryTime":  1793224803554,
-                                     "durationMs":  2000,
-                                     "touched":  false,
-                                     "status":  "WON",
-                                     "mode":  "real",
-                                     "exitSpot":  74210.038376498,
-                                     "profit":  9.5,
-                                     "closedAt":  1793224803731
-                                 },
-                                 {
-                                     "id":  "MS-96487806",
-                                     "assetId":  "vol_75",
-                                     "symbol":  "Vol 75",
-                                     "name":  "Volatility 75 Index",
-                                     "type":  "RISE",
-                                     "stake":  10,
-                                     "entrySpot":  74210.24075227756,
-                                     "barrier":  74210.24075227756,
-                                     "predictedDigit":  4,
-                                     "payout":  19.5,
-                                     "startTime":  1793224772190,
-                                     "expiryTime":  1793224787190,
-                                     "durationMs":  15000,
-                                     "touched":  false,
-                                     "status":  "WON",
-                                     "mode":  "real",
-                                     "exitSpot":  74210.4519163524,
-                                     "profit":  9.5,
-                                     "closedAt":  1793224787226
-                                 },
-                                 {
-                                     "mode":  "real",
-                                     "symbol":  "Boom 1000",
-                                     "id":  "MS-REAL001",
-                                     "type":  "FALL",
-                                     "exitSpot":  8110.2,
-                                     "payout":  19.5,
-                                     "profit":  9.5,
-                                     "name":  "Boom 1000 Index",
-                                     "status":  "WON",
-                                     "closedAt":  "2026-10-28T23:40:41.2940300+03:00",
-                                     "stake":  10,
-                                     "entrySpot":  8119.5
-                                 }
-                             ],
-        "transactions":  [
-                             {
-                                 "id":  "WDR-85094360",
-                                 "type":  "withdrawal",
-                                 "amount":  10,
-                                 "method":  "M-Pesa Instant Cashout",
-                                 "status":  "COMPLETED",
-                                 "date":  "2026-10-29T12:07:11.447Z"
-                             }
-                         ],
-        "profilePic":  null
+    "realStats": {
+      "totalTrades": 0,
+      "wins": 0,
+      "losses": 0,
+      "netProfit": 0
     },
-    {
-        "crNumber":  "CR2052475",
-        "name":  "Alice Trader",
-        "nickname":  "alicetrades",
-        "email":  "alice@example.com",
-        "pass":  "AlicePass123",
-        "demoBalance":  10000,
-        "realBalance":  0,
-        "referredBy":  "SPREAD-TMQ2H",
-        "createdAt":  "2026-10-28T13:12:51.422Z",
-        "demoStats":  {
-                          "totalTrades":  0,
-                          "wins":  0,
-                          "losses":  0,
-                          "netProfit":  0
-                      },
-        "realStats":  {
-                          "totalTrades":  0,
-                          "wins":  0,
-                          "losses":  0,
-                          "netProfit":  0
-                      },
-        "demoTradeHistory":  [
-
-                             ],
-        "realTradeHistory":  [
-
-                             ],
-        "transactions":  [
-
-                         ]
-    }
+    "demoTradeHistory": [],
+    "realTradeHistory": [],
+    "transactions": [],
+    "winRate": null
+  },
+  {
+    "name": "COLLO",
+    "nickname": "collo",
+    "email": "macollocollins@gmail.com",
+    "pass": "0797870081eE_",
+    "demoBalance": 10000,
+    "realBalance": 1.5,
+    "createdAt": "2026-10-28T10:53:26.293Z",
+    "crNumber": "CR8779020",
+    "demoStats": {
+      "totalTrades": 0,
+      "wins": 0,
+      "losses": 0,
+      "netProfit": 0
+    },
+    "realStats": {
+      "totalTrades": 5,
+      "wins": 5,
+      "losses": 0,
+      "netProfit": 47.5
+    },
+    "demoTradeHistory": [],
+    "realTradeHistory": [
+      {
+        "id": "MS-96191865",
+        "assetId": "vol_75",
+        "symbol": "Vol 75",
+        "name": "Volatility 75 Index",
+        "type": "RISE",
+        "stake": 10,
+        "entrySpot": 74209.84174804097,
+        "barrier": 74209.84174804097,
+        "predictedDigit": 4,
+        "payout": 19.5,
+        "startTime": 1793224801748,
+        "expiryTime": 1793224803748,
+        "durationMs": 2000,
+        "touched": false,
+        "status": "WON",
+        "mode": "real",
+        "exitSpot": 74210.038376498,
+        "profit": 9.5,
+        "closedAt": 1793224804232
+      },
+      {
+        "id": "MS-32378669",
+        "assetId": "vol_75",
+        "symbol": "Vol 75",
+        "name": "Volatility 75 Index",
+        "type": "RISE",
+        "stake": 10,
+        "entrySpot": 74209.84174804097,
+        "barrier": 74209.84174804097,
+        "predictedDigit": 4,
+        "payout": 19.5,
+        "startTime": 1793224801953,
+        "expiryTime": 1793224803953,
+        "durationMs": 2000,
+        "touched": false,
+        "status": "WON",
+        "mode": "real",
+        "exitSpot": 74210.038376498,
+        "profit": 9.5,
+        "closedAt": 1793224804232
+      },
+      {
+        "id": "MS-77627319",
+        "assetId": "vol_75",
+        "symbol": "Vol 75",
+        "name": "Volatility 75 Index",
+        "type": "RISE",
+        "stake": 10,
+        "entrySpot": 74209.84174804097,
+        "barrier": 74209.84174804097,
+        "predictedDigit": 4,
+        "payout": 19.5,
+        "startTime": 1793224801554,
+        "expiryTime": 1793224803554,
+        "durationMs": 2000,
+        "touched": false,
+        "status": "WON",
+        "mode": "real",
+        "exitSpot": 74210.038376498,
+        "profit": 9.5,
+        "closedAt": 1793224803731
+      },
+      {
+        "id": "MS-96487806",
+        "assetId": "vol_75",
+        "symbol": "Vol 75",
+        "name": "Volatility 75 Index",
+        "type": "RISE",
+        "stake": 10,
+        "entrySpot": 74210.24075227756,
+        "barrier": 74210.24075227756,
+        "predictedDigit": 4,
+        "payout": 19.5,
+        "startTime": 1793224772190,
+        "expiryTime": 1793224787190,
+        "durationMs": 15000,
+        "touched": false,
+        "status": "WON",
+        "mode": "real",
+        "exitSpot": 74210.4519163524,
+        "profit": 9.5,
+        "closedAt": 1793224787226
+      },
+      {
+        "mode": "real",
+        "symbol": "Boom 1000",
+        "id": "MS-REAL001",
+        "type": "FALL",
+        "exitSpot": 8110.2,
+        "payout": 19.5,
+        "profit": 9.5,
+        "name": "Boom 1000 Index",
+        "status": "WON",
+        "closedAt": "2026-10-28T23:40:41.2940300+03:00",
+        "stake": 10,
+        "entrySpot": 8119.5
+      }
+    ],
+    "transactions": [
+      {
+        "id": "WDR-85094360",
+        "type": "withdrawal",
+        "amount": 10,
+        "method": "M-Pesa Instant Cashout",
+        "status": "COMPLETED",
+        "date": "2026-10-29T12:07:11.447Z"
+      }
+    ],
+    "profilePic": null,
+    "winRate": null
+  },
+  {
+    "crNumber": "CR2052475",
+    "name": "Alice Trader",
+    "nickname": "alicetrades",
+    "email": "alice@example.com",
+    "pass": "AlicePass123",
+    "demoBalance": 10000,
+    "realBalance": 0,
+    "referredBy": "SPREAD-TMQ2H",
+    "createdAt": "2026-10-28T13:12:51.422Z",
+    "demoStats": {
+      "totalTrades": 0,
+      "wins": 0,
+      "losses": 0,
+      "netProfit": 0
+    },
+    "realStats": {
+      "totalTrades": 0,
+      "wins": 0,
+      "losses": 0,
+      "netProfit": 0
+    },
+    "demoTradeHistory": [],
+    "realTradeHistory": [],
+    "transactions": [],
+    "winRate": null
+  }
 ]
