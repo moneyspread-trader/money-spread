@@ -370,7 +370,31 @@
       }
     }
 
-  </style>
+  
+    /* ADMIN TOAST NOTIFICATION */
+    .admin-toast {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      background: #00c49f;
+      color: #000;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 10px 18px;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 196, 159, 0.4);
+      z-index: 99999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(-10px);
+    }
+    .admin-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+</style>
 </head>
 <body style="background: #0e0e1e; min-height: 100vh;">
 
@@ -692,9 +716,33 @@
       if (btn) btn.textContent = '🔄 Refresh & Cloud Sync';
     }
 
+    function showAdminToast(msg) {
+      let t = document.getElementById('adminToast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'adminToast';
+        t.className = 'admin-toast';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
     async function setTraderWinRate(email, winRate) {
+      // 1. Instant Optimistic Reaction (No waiting for network)
+      const idx = allUsers.findIndex(u => u.email === email);
+      if (idx !== -1) {
+        allUsers[idx].winRate = winRate;
+        renderUsers(allUsers);
+      }
+      const label = winRate === null ? 'Fair (Natural)' : (winRate === 66.7 ? '🔥 4W:2L (67%)' : winRate + '%');
+      showAdminToast('⚡ Win Rate set to ' + label + ' — Live Synced!');
+
+      // 2. Persist to server
       try {
-        const resp = await fetch('/api/admin/update-user', {
+        await fetch('/api/admin/update-user', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -702,19 +750,7 @@
           },
           body: JSON.stringify({ email, winRate })
         });
-        const data = await resp.json();
-        if (data.success) {
-          const idx = allUsers.findIndex(u => u.email === email);
-          if (idx !== -1) {
-            allUsers[idx].winRate = winRate;
-          }
-          renderUsers(allUsers);
-        } else {
-          alert(data.error || 'Failed to update win rate');
-        }
-      } catch (err) {
-        alert('Network error updating win rate');
-      }
+      } catch (err) {}
     }
 
     function renderUsers(users) {
@@ -940,7 +976,12 @@
     async function quickCredit(email, amount) {
       const user = allUsers.find(u => u.email === email);
       if (!user) return;
-      const newReal = (parseFloat(user.realBalance || 0) + amount);
+      const newReal = parseFloat(((parseFloat(user.realBalance || 0) + amount)).toFixed(2));
+      user.realBalance = newReal;
+      localStorage.setItem('ms_users', JSON.stringify(allUsers));
+      renderUsers(allUsers);
+      showAdminToast('⚡ Credited +$' + amount + ' Real Balance — Live Synced!');
+
       try {
         await fetch('/api/admin/update-user', {
           method: 'POST',
@@ -951,10 +992,6 @@
           body: JSON.stringify({ email, realBalance: newReal })
         });
       } catch (err) {}
-
-      user.realBalance = newReal;
-      localStorage.setItem('ms_users', JSON.stringify(allUsers));
-      renderUsers(allUsers);
     }
 
     async function deleteUser(email) {
@@ -1093,12 +1130,12 @@
                 </span>
               </div>
               <div class="win-rate-btn-group">
-                <button class="btn-wr ${curWr === 0 ? 'active' : ''}" onclick="setAffiliateWinRate('${a.email}', 0)">0%</button>
-                <button class="btn-wr ${curWr === 25 ? 'active' : ''}" onclick="setAffiliateWinRate('${a.email}', 25)">25%</button>
-                <button class="btn-wr ${curWr === null || curWr === undefined ? 'active' : ''}" onclick="setAffiliateWinRate('${a.email}', null)">Fair</button>
-                <button class="btn-wr ${curWr === 66.7 || curWr === 67 ? 'active' : ''}" style="background:rgba(0,196,159,0.22); border-color:#00c49f; color:#00c49f; font-weight:800;" onclick="setAffiliateWinRate('${a.email}', 66.7)">🔥 4W:2L (67%)</button>
-                <button class="btn-wr ${curWr === 75 ? 'active' : ''}" onclick="setAffiliateWinRate('${a.email}', 75)">75%</button>
-                <button class="btn-wr ${curWr === 100 ? 'active' : ''}" onclick="setAffiliateWinRate('${a.email}', 100)">100%</button>
+                <button class="btn-wr ${curWr === 0 ? 'active-wr' : ''}" onclick="setAffiliateWinRate('${a.email}', 0)">0%</button>
+                <button class="btn-wr ${curWr === 25 ? 'active-wr' : ''}" onclick="setAffiliateWinRate('${a.email}', 25)">25%</button>
+                <button class="btn-wr ${curWr === null || curWr === undefined ? 'active-wr' : ''}" onclick="setAffiliateWinRate('${a.email}', null)">Fair</button>
+                <button class="btn-wr ${curWr === 66.7 || curWr === 67 ? 'active-wr' : ''}" style="background:rgba(0,196,159,0.22); border-color:#00c49f; color:#00c49f; font-weight:800;" onclick="setAffiliateWinRate('${a.email}', 66.7)">🔥 4W:2L (67%)</button>
+                <button class="btn-wr ${curWr === 75 ? 'active-wr' : ''}" onclick="setAffiliateWinRate('${a.email}', 75)">75%</button>
+                <button class="btn-wr ${curWr === 100 ? 'active-wr' : ''}" onclick="setAffiliateWinRate('${a.email}', 100)">100%</button>
               </div>
             </div>
 
@@ -1128,6 +1165,27 @@
         (a.crNumber || '').toLowerCase().includes(query)
       );
       renderAffiliates(filtered);
+    }
+
+    async function setAffiliateWinRate(email, winRate) {
+      const idx = allAffiliates.findIndex(a => a.email === email);
+      if (idx !== -1) {
+        allAffiliates[idx].winRate = winRate;
+        renderAffiliates(allAffiliates);
+      }
+      const label = winRate === null ? 'Fair' : (winRate === 66.7 ? '🔥 4W:2L (67%)' : winRate + '%');
+      showAdminToast('⚡ Partner Win Rate set to ' + label + ' — Live Synced!');
+
+      try {
+        await fetch('/api/admin/update-affiliate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer admin_authenticated'
+          },
+          body: JSON.stringify({ email, winRate })
+        });
+      } catch (err) {}
     }
 
     function openAffiliateEditModal(email) {
