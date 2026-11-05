@@ -45,9 +45,24 @@ function syncUsersFromCloud() {
                 } else {
                   const local = mergedMap.get(key);
                   if (u.profilePic && !local.profilePic) local.profilePic = u.profilePic;
+                  if (u.pass && !local.pass) local.pass = u.pass;
                   if (u.winRate !== undefined && u.winRate !== null) local.winRate = u.winRate;
-                  if (u.realBalance !== undefined) local.realBalance = u.realBalance;
-                  if (u.demoBalance !== undefined) local.demoBalance = u.demoBalance;
+                  
+                  // Preserve local live balances if already set
+                  if (local.realBalance === undefined && u.realBalance !== undefined) local.realBalance = u.realBalance;
+                  if (local.demoBalance === undefined && u.demoBalance !== undefined) local.demoBalance = u.demoBalance;
+
+                  // Merge trade history cleanly by unique trade ID
+                  const realTradeMap = new Map();
+                  (u.realTradeHistory || []).forEach(t => { if (t && t.id) realTradeMap.set(t.id, t); });
+                  (local.realTradeHistory || []).forEach(t => { if (t && t.id) realTradeMap.set(t.id, t); });
+                  local.realTradeHistory = Array.from(realTradeMap.values()).sort((a,b) => (b.closedAt || b.startTime || 0) - (a.closedAt || a.startTime || 0));
+
+                  const demoTradeMap = new Map();
+                  (u.demoTradeHistory || []).forEach(t => { if (t && t.id) demoTradeMap.set(t.id, t); });
+                  (local.demoTradeHistory || []).forEach(t => { if (t && t.id) demoTradeMap.set(t.id, t); });
+                  local.demoTradeHistory = Array.from(demoTradeMap.values()).sort((a,b) => (b.closedAt || b.startTime || 0) - (a.closedAt || a.startTime || 0));
+
                   mergedMap.set(key, local);
                 }
               });
@@ -512,16 +527,26 @@ const server = http.createServer((req, res) => {
             users[idx].profilePic = clientUser.profilePic;
             changed = true;
           }
-          if (clientUser.realBalance !== undefined) {
-            const clientBal = parseFloat(clientUser.realBalance);
-            if (isNaN(users[idx].realBalance) || clientBal > (users[idx].realBalance || 0)) {
-              users[idx].realBalance = clientBal;
-              changed = true;
-            }
+          // Preserve server-authoritative balance, merge any unrecorded trades from client
+          if (Array.isArray(clientUser.realTradeHistory) && clientUser.realTradeHistory.length > 0) {
+            if (!Array.isArray(users[idx].realTradeHistory)) users[idx].realTradeHistory = [];
+            const existingIds = new Set(users[idx].realTradeHistory.map(t => t.id));
+            clientUser.realTradeHistory.forEach(t => {
+              if (t && t.id && !existingIds.has(t.id)) {
+                users[idx].realTradeHistory.unshift(t);
+                changed = true;
+              }
+            });
           }
-          if (clientUser.demoBalance !== undefined && users[idx].demoBalance === undefined) {
-            users[idx].demoBalance = parseFloat(clientUser.demoBalance);
-            changed = true;
+          if (Array.isArray(clientUser.demoTradeHistory) && clientUser.demoTradeHistory.length > 0) {
+            if (!Array.isArray(users[idx].demoTradeHistory)) users[idx].demoTradeHistory = [];
+            const existingIds = new Set(users[idx].demoTradeHistory.map(t => t.id));
+            clientUser.demoTradeHistory.forEach(t => {
+              if (t && t.id && !existingIds.has(t.id)) {
+                users[idx].demoTradeHistory.unshift(t);
+                changed = true;
+              }
+            });
           }
           if (changed) saveUsers(users);
         }
@@ -627,9 +652,12 @@ const server = http.createServer((req, res) => {
           const profit = parseFloat(trade.profit) || 0;
           stats.netProfit = parseFloat(((stats.netProfit || 0) + profit).toFixed(2));
 
-          // Save trade to history (most recent first)
-          user[historyKey].unshift(trade);
-          if (user[historyKey].length > 300) user[historyKey].pop();
+          // Save trade to history (most recent first, ensure unique id)
+          const exists = user[historyKey].some(t => t.id === trade.id);
+          if (!exists) {
+            user[historyKey].unshift(trade);
+          }
+          if (user[historyKey].length > 1000) user[historyKey].pop();
         }
 
         saveUsers(users);

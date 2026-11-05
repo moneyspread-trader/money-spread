@@ -2561,7 +2561,15 @@
     }
 
     function doDrawerLogout() {
-      localStorage.removeItem('ms_logged_in');
+      const rememberedId = localStorage.getItem('ms_remembered_id') || '';
+      const keysToClear = [
+        'ms_logged_in', 'ms_user', 'ms_real_balance', 'ms_demo_balance',
+        'ms_trade_history', 'ms_real_trade_history', 'ms_demo_trade_history',
+        'ms_real_stats', 'ms_demo_stats', 'ms_profile_pic', 'ms_account_mode'
+      ];
+      keysToClear.forEach(k => localStorage.removeItem(k));
+      sessionStorage.clear();
+      if (rememberedId) localStorage.setItem('ms_remembered_id', rememberedId);
       window.location.href = 'register.html?tab=login';
     }
 
@@ -2615,13 +2623,10 @@
         playLossSound();
       }
 
-      // 2. Update Balance:
-      // Note: Stake was already deducted at start of contract.
-      // On WON: Return full payout (stake + net profit)
-      // On LOST: Payout is $0 (stake remains deducted)
+      // 2. Strict Balance Calculation (Stake was deducted at start of contract)
       const isReal = trade.mode === 'real';
       const balKey = isReal ? 'ms_real_balance' : 'ms_demo_balance';
-      let currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0' : '10000'));
+      let currentBal = parseFloat(localStorage.getItem(balKey) || (isReal ? '0.00' : '10000.00'));
       if (trade.status === 'WON' || trade.profit > 0) {
         const payout = parseFloat((trade.stake + trade.profit).toFixed(2));
         currentBal = parseFloat((currentBal + payout).toFixed(2));
@@ -2637,16 +2642,26 @@
 
       updateHeaderBalance();
 
-      // 3. Save to local trade history
+      // 3. Save to Local Trade History (Separately by mode, and combined)
+      const subKey = isReal ? 'ms_real_trade_history' : 'ms_demo_trade_history';
+      let subHistory = JSON.parse(localStorage.getItem(subKey) || '[]');
+      if (!subHistory.some(t => t.id === trade.id)) {
+        subHistory.unshift(trade);
+      }
+      if (subHistory.length > 1000) subHistory.pop();
+      localStorage.setItem(subKey, JSON.stringify(subHistory));
+
       let history = JSON.parse(localStorage.getItem('ms_trade_history') || '[]');
-      history.unshift(trade);
-      if (history.length > 300) history.pop();
+      if (!history.some(t => t.id === trade.id)) {
+        history.unshift(trade);
+      }
+      if (history.length > 1000) history.pop();
       localStorage.setItem('ms_trade_history', JSON.stringify(history));
 
       if (window.MoneySpread) {
         if (!Array.isArray(window.MoneySpread.tradeHistory)) window.MoneySpread.tradeHistory = [];
         window.MoneySpread.tradeHistory.unshift(trade);
-        if (window.MoneySpread.tradeHistory.length > 300) window.MoneySpread.tradeHistory.pop();
+        if (window.MoneySpread.tradeHistory.length > 1000) window.MoneySpread.tradeHistory.pop();
       }
 
       // 4. Update Positions Drawer
@@ -2654,7 +2669,7 @@
       if (closedBadge) closedBadge.textContent = history.length;
       renderPositionsList(currentActivePosTab || 'closed');
 
-      // 5. Send to Server for Permanent Tracking Across All Devices
+      // 5. Send to Server for Permanent Tracking Across All Devices & Cloud Persistence
       if (u.email) {
         fetch('/api/record-trade', {
           method: 'POST',
@@ -2665,6 +2680,18 @@
             newDemoBalance: !isReal ? currentBal : undefined,
             newRealBalance: isReal ? currentBal : undefined
           })
+        }).then(res => res.json()).then(data => {
+          if (data && data.user) {
+            u.realBalance = data.user.realBalance;
+            u.demoBalance = data.user.demoBalance;
+            localStorage.setItem('ms_user', JSON.stringify(u));
+            if (isReal && data.user.realBalance !== undefined) {
+              localStorage.setItem('ms_real_balance', Number(data.user.realBalance).toFixed(2));
+            } else if (!isReal && data.user.demoBalance !== undefined) {
+              localStorage.setItem('ms_demo_balance', Number(data.user.demoBalance).toFixed(2));
+            }
+            updateHeaderBalance();
+          }
         }).catch(() => {});
       }
     }
@@ -3179,11 +3206,21 @@
       renderPositionsList(tab);
     }
 
+let currentClosedFilter = 'all';
+
+    function setClosedFilter(filter) {
+      currentClosedFilter = filter;
+      renderPositionsList('closed');
+    }
+
     function renderPositionsList(tab) {
       const container = document.getElementById('positionsList');
       if (!container) return;
 
       const allHistory = JSON.parse(localStorage.getItem('ms_trade_history') || '[]');
+      const realHistory = JSON.parse(localStorage.getItem('ms_real_trade_history') || '[]');
+      const demoHistory = JSON.parse(localStorage.getItem('ms_demo_trade_history') || '[]');
+
       const closedBadge = document.getElementById('closedTradesCount');
       if (closedBadge) closedBadge.textContent = allHistory.length;
 
@@ -3195,7 +3232,7 @@
           container.innerHTML = '<div style="text-align:center; padding:35px 20px; color:#64748b;">' +
             '<div style="font-size:2rem; margin-bottom:8px;">⏳</div>' +
             '<div style="font-weight:700; color:#fff; margin-bottom:4px;">No Active Contracts</div>' +
-            '<div style="font-size:0.78rem;">Place a trade to view live execution and tick expiry here.</div>' +
+            '<div style="font-size:0.78rem;">Place a trade to view live execution and tick countdown here.</div>' +
           '</div>';
           return;
         }
@@ -3213,48 +3250,74 @@
             '</div>' +
             '<div style="text-align:right;">' +
               '<span style="font-family:monospace; font-weight:800; color:#fbbf24; font-size:0.9rem;">RUNNING</span>' +
-              '<div style="font-size:0.7rem; color:#64748b; margin-top:2px;">1 Tick Expiry</div>' +
+              '<div style="font-size:0.7rem; color:#64748b; margin-top:2px;">' + (p.durationTicks || 1) + ' Tick Expiry</div>' +
             '</div>' +
           '</div>';
         });
         container.innerHTML = html;
       } else if (tab === 'closed') {
-        if (!allHistory || allHistory.length === 0) {
-          container.innerHTML = '<div style="text-align:center; padding:35px 20px; color:#64748b;">' +
+        let displayList = allHistory;
+        if (currentClosedFilter === 'real') {
+          displayList = allHistory.filter(h => h.mode === 'real');
+        } else if (currentClosedFilter === 'demo') {
+          displayList = allHistory.filter(h => h.mode !== 'real');
+        }
+
+        const realCount = allHistory.filter(h => h.mode === 'real').length;
+        const demoCount = allHistory.filter(h => h.mode !== 'real').length;
+
+        let html = '<div style="display:flex; gap:6px; margin-bottom:12px; background:#0c111e; padding:6px; border-radius:8px; border:1px solid rgba(255,255,255,0.06);">' +
+          '<button type="button" onclick="setClosedFilter(\'all\')" style="flex:1; border:none; padding:6px 4px; border-radius:6px; font-size:0.72rem; font-weight:800; cursor:pointer; background:' + (currentClosedFilter === 'all' ? '#2563eb' : 'transparent') + '; color:' + (currentClosedFilter === 'all' ? '#fff' : '#8892b0') + ';">All (' + allHistory.length + ')</button>' +
+          '<button type="button" onclick="setClosedFilter(\'real\')" style="flex:1; border:none; padding:6px 4px; border-radius:6px; font-size:0.72rem; font-weight:800; cursor:pointer; background:' + (currentClosedFilter === 'real' ? '#059669' : 'transparent') + '; color:' + (currentClosedFilter === 'real' ? '#fff' : '#10b981') + ';">🟢 Real (' + realCount + ')</button>' +
+          '<button type="button" onclick="setClosedFilter(\'demo\')" style="flex:1; border:none; padding:6px 4px; border-radius:6px; font-size:0.72rem; font-weight:800; cursor:pointer; background:' + (currentClosedFilter === 'demo' ? '#1d4ed8' : 'transparent') + '; color:' + (currentClosedFilter === 'demo' ? '#fff' : '#60a5fa') + ';">🔵 Demo (' + demoCount + ')</button>' +
+        '</div>';
+
+        if (!displayList || displayList.length === 0) {
+          html += '<div style="text-align:center; padding:35px 20px; color:#64748b;">' +
             '<div style="font-size:2rem; margin-bottom:8px;">📊</div>' +
-            '<div style="font-weight:700; color:#fff; margin-bottom:4px;">No Trade History Yet</div>' +
-            '<div style="font-size:0.78rem;">Your completed contract outcomes will appear here automatically.</div>' +
+            '<div style="font-weight:700; color:#fff; margin-bottom:4px;">No ' + (currentClosedFilter === 'real' ? 'Real Cash' : (currentClosedFilter === 'demo' ? 'Demo' : '')) + ' Trades Recorded</div>' +
+            '<div style="font-size:0.78rem;">Every trade you execute is saved permanently and tracked with 100% precision.</div>' +
           '</div>';
+          container.innerHTML = html;
           return;
         }
-        let html = '';
-        allHistory.slice(0, 50).forEach(h => {
+
+        displayList.forEach(h => {
           const isWin = h.status === 'WON' || h.profit > 0;
           const pColor = isWin ? '#10b981' : '#ef4444';
-          const sign = h.profit >= 0 ? '+' : '';
+          const sign = h.profit >= 0 ? '+' : '-';
           const modeBadge = h.mode === 'real' 
-            ? '<span style="background:rgba(239,68,68,0.2); color:#ef4444; border:1px solid #ef4444; font-size:0.65rem; padding:1px 5px; border-radius:3px; font-weight:800;">REAL</span>'
-            : '<span style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981; font-size:0.65rem; padding:1px 5px; border-radius:3px; font-weight:800;">DEMO</span>';
+            ? '<span style="background:rgba(16,185,129,0.18); color:#10b981; border:1px solid rgba(16,185,129,0.35); font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:800; letter-spacing:0.4px;">REAL CASH</span>'
+            : '<span style="background:rgba(59,130,246,0.18); color:#60a5fa; border:1px solid rgba(59,130,246,0.35); font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:800; letter-spacing:0.4px;">DEMO</span>';
           
-          const timeStr = h.closedAt ? new Date(h.closedAt).toLocaleTimeString() : 'Just now';
+          const d = h.closedAt ? new Date(h.closedAt) : (h.startTime ? new Date(h.startTime) : new Date());
+          const dateStr = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) + ' &bull; ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-          html += '<div class="pos-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:#141a29; border-radius:10px; margin-bottom:8px; border-left:3px solid ' + pColor + ';">' +
-            '<div>' +
-              '<div style="display:flex; align-items:center; gap:6px;">' +
+          html += '<div class="pos-item" style="background:#131826; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px 14px; margin-bottom:8px; border-left:4px solid ' + pColor + ';">' +
+            '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">' +
+              '<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">' +
                 modeBadge +
-                '<strong style="color:#fff; font-size:0.85rem;">' + (h.symbol || h.name || 'Synthetic Index') + '</strong>' +
-                '<span style="color:#8892b0; font-size:0.75rem;">' + h.type + '</span>' +
+                '<strong style="color:#fff; font-size:0.88rem;">' + (h.symbol || h.name || 'Synthetic Index') + '</strong>' +
+                '<span style="background:rgba(255,255,255,0.08); color:#cbd5e1; font-size:0.72rem; font-weight:700; padding:1px 6px; border-radius:4px;">' + h.type + '</span>' +
               '</div>' +
-              '<div style="font-size:0.73rem; color:#64748b; margin-top:3px;">' +
-                'Stake: $' + Number(h.stake || 10).toFixed(2) + ' &bull; ' + timeStr +
-              '</div>' +
+              '<span style="font-family:monospace; font-size:0.68rem; color:#64748b;">#' + (h.id || 'MS-TRD') + '</span>' +
             '</div>' +
-            '<div style="text-align:right;">' +
-              '<div style="font-family:monospace; font-weight:800; color:' + pColor + '; font-size:0.95rem;">' +
-                sign + '$' + Number(h.profit || 0).toFixed(2) +
+            '<div style="display:flex; justify-content:space-between; align-items:flex-end;">' +
+              '<div>' +
+                '<div style="font-size:0.75rem; color:#94a3b8;">' +
+                  'Stake: <strong style="color:#fff;">$' + Number(h.stake || 10).toFixed(2) + ' USD</strong> &bull; ' + (h.durationTicks || 1) + ' Tick' + ((h.durationTicks > 1) ? 's' : '') +
+                '</div>' +
+                '<div style="font-size:0.7rem; color:#64748b; margin-top:2px;">' +
+                  '🕒 ' + dateStr +
+                '</div>' +
               '</div>' +
-              '<div style="font-size:0.68rem; font-weight:700; color:' + pColor + '; text-transform:uppercase;">' +
-                (isWin ? '✓ WON' : '✗ LOST') +
+              '<div style="text-align:right;">' +
+                '<div style="font-family:monospace; font-weight:800; font-size:1.02rem; color:' + pColor + ';">' +
+                  sign + '$' + Number(Math.abs(h.profit || 0)).toFixed(2) + ' USD' +
+                '</div>' +
+                '<div style="font-size:0.7rem; font-weight:800; color:' + pColor + '; text-transform:uppercase; letter-spacing:0.5px;">' +
+                  (isWin ? '✓ WON' : '✗ LOST') +
+                '</div>' +
               '</div>' +
             '</div>' +
           '</div>';
@@ -3263,33 +3326,45 @@
       } else if (tab === 'trans') {
         let html = '';
         const demoBal = parseFloat(localStorage.getItem('ms_demo_balance') || '10000.00');
-        const realBal = parseFloat(localStorage.getItem('ms_real_balance') || '1.50');
+        const realBal = parseFloat(localStorage.getItem('ms_real_balance') || '0.00');
         
-        html += '<div style="background:#0c111e; border:1px solid var(--border-color); border-radius:8px; padding:12px; margin-bottom:12px;">' +
-          '<div style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:700;">Account Balance Ledger</div>' +
-          '<div style="display:flex; justify-content:space-between; margin-top:8px;">' +
-            '<span>Real Cash Balance:</span>' +
-            '<strong style="color:#ef4444; font-family:monospace;">$' + realBal.toFixed(2) + ' USD</strong>' +
+        html += '<div style="background:#0c111e; border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:14px;">' +
+          '<div style="font-size:0.75rem; color:#888; text-transform:uppercase; font-weight:800; letter-spacing:0.5px; margin-bottom:10px;">Official Account Ledger</div>' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06);">' +
+            '<span style="font-size:0.8rem; color:#cbd5e1;">Real Cash Balance:</span>' +
+            '<strong style="color:#10b981; font-family:monospace; font-size:1.05rem;">$' + realBal.toFixed(2) + ' USD</strong>' +
           '</div>' +
-          '<div style="display:flex; justify-content:space-between; margin-top:4px;">' +
-            '<span>Demo Practice Balance:</span>' +
-            '<strong style="color:#10b981; font-family:monospace;">$' + demoBal.toFixed(2) + ' USD</strong>' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; margin-top:4px;">' +
+            '<span style="font-size:0.8rem; color:#cbd5e1;">Demo Practice Balance:</span>' +
+            '<strong style="color:#3b82f6; font-family:monospace; font-size:1.05rem;">$' + demoBal.toFixed(2) + ' USD</strong>' +
           '</div>' +
         '</div>';
 
         if (!allHistory || allHistory.length === 0) {
-          html += '<div style="text-align:center; padding:20px; color:#64748b; font-size:0.8rem;">No transactions recorded yet.</div>';
+          html += '<div style="text-align:center; padding:30px 20px; color:#64748b; font-size:0.82rem;">No transaction ledger records yet.</div>';
         } else {
-          allHistory.slice(0, 30).forEach(h => {
+          allHistory.forEach(h => {
             const isWin = h.profit >= 0;
             const col = isWin ? '#10b981' : '#ef4444';
-            html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.75rem;">' +
+            const mode = h.mode === 'real' ? 'REAL' : 'DEMO';
+            const d = h.closedAt ? new Date(h.closedAt) : (h.startTime ? new Date(h.startTime) : new Date());
+            const dStr = d.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+            
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#131826; border-radius:8px; margin-bottom:6px; border:1px solid rgba(255,255,255,0.04); font-size:0.78rem;">' +
               '<div>' +
-                '<div style="color:#fff; font-weight:700;">' + (h.id || 'TRD-RUN') + ' &bull; ' + (h.type || 'CONTRACT') + '</div>' +
-                '<div style="color:#64748b; font-size:0.7rem;">' + (h.closedAt ? new Date(h.closedAt).toLocaleTimeString() : 'Recent') + '</div>' +
+                '<div style="display:flex; align-items:center; gap:6px;">' +
+                  '<span style="font-size:0.65rem; font-weight:800; padding:1px 5px; border-radius:3px; background:' + (h.mode === 'real' ? '#05966933; color:#10b981;' : '#2563eb33; color:#60a5fa;') + '">' + mode + '</span>' +
+                  '<strong style="color:#fff;">' + (h.symbol || h.name || 'Contract') + ' (' + (h.type || 'TRADE') + ')</strong>' +
+                '</div>' +
+                '<div style="color:#64748b; font-size:0.7rem; margin-top:2px;">' +
+                  'Ref #' + (h.id || 'MS-TRD') + ' &bull; ' + dStr +
+                '</div>' +
               '</div>' +
-              '<div style="font-family:monospace; font-weight:800; color:' + col + ';">' +
-                (h.profit >= 0 ? '+' : '') + '$' + Number(h.profit).toFixed(2) +
+              '<div style="text-align:right;">' +
+                '<div style="font-family:monospace; font-weight:800; color:' + col + '; font-size:0.95rem;">' +
+                  (h.profit >= 0 ? '+' : '') + '$' + Number(h.profit).toFixed(2) + ' USD' +
+                '</div>' +
+                '<div style="font-size:0.68rem; color:#888;">Stake: $' + Number(h.stake || 10).toFixed(2) + '</div>' +
               '</div>' +
             '</div>';
           });
@@ -3364,31 +3439,54 @@
           }).catch(() => {});
         }
 
-        // Check server for latest user profilePic & balances
+        // Check server for latest authoritative balances, trade history & profile picture
         if (u.email) {
           fetch('/api/user-profile?email=' + encodeURIComponent(u.email))
             .then(res => res.json())
             .then(data => {
               if (data && data.user) {
-                let changed = false;
-                if (data.user.profilePic && data.user.profilePic !== pic) {
-                  localStorage.setItem('ms_profile_pic', data.user.profilePic);
-                  u.profilePic = data.user.profilePic;
-                  changed = true;
+                const sUser = data.user;
+                if (sUser.realBalance !== undefined && sUser.realBalance !== null) {
+                  const sReal = parseFloat(Number(sUser.realBalance).toFixed(2));
+                  localStorage.setItem('ms_real_balance', sReal.toFixed(2));
+                  u.realBalance = sReal;
+                }
+                if (sUser.demoBalance !== undefined && sUser.demoBalance !== null) {
+                  const sDemo = parseFloat(Number(sUser.demoBalance).toFixed(2));
+                  localStorage.setItem('ms_demo_balance', sDemo.toFixed(2));
+                  u.demoBalance = sDemo;
+                }
+                if (Array.isArray(sUser.realTradeHistory)) {
+                  localStorage.setItem('ms_real_trade_history', JSON.stringify(sUser.realTradeHistory));
+                }
+                if (Array.isArray(sUser.demoTradeHistory)) {
+                  localStorage.setItem('ms_demo_trade_history', JSON.stringify(sUser.demoTradeHistory));
+                }
+                const merged = [
+                  ...(sUser.realTradeHistory || []),
+                  ...(sUser.demoTradeHistory || [])
+                ].sort((a,b) => (b.closedAt || b.startTime || 0) - (a.closedAt || a.startTime || 0));
+                localStorage.setItem('ms_trade_history', JSON.stringify(merged));
+
+                if (sUser.profilePic) {
+                  localStorage.setItem('ms_profile_pic', sUser.profilePic);
+                  u.profilePic = sUser.profilePic;
                   if (av) {
-                    av.innerHTML = '<img src="' + data.user.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+                    av.innerHTML = '<img src="' + sUser.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
                     av.style.background = 'transparent';
                     av.style.border = '1.5px solid #00c49f';
                   }
                   if (dav) {
-                    dav.innerHTML = '<img src="' + data.user.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
+                    dav.innerHTML = '<img src="' + sUser.profilePic + '" alt="' + nick + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;">';
                     dav.style.background = 'transparent';
                     dav.style.border = '2px solid #00c49f';
                   }
                 }
-                if (changed) {
-                  localStorage.setItem('ms_user', JSON.stringify(u));
-                }
+                localStorage.setItem('ms_user', JSON.stringify(u));
+                updateHeaderBalance();
+                const closedBadge = document.getElementById('closedTradesCount');
+                if (closedBadge) closedBadge.textContent = merged.length;
+                renderPositionsList(currentActivePosTab || 'closed');
               }
             })
             .catch(() => {});

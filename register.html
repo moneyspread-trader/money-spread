@@ -506,42 +506,33 @@
             }).catch(() => {});
           }
 
-          // BALANCE PERSISTENCE PROTECTION: Never overwrite earned balance with stale server value
-          const localCachedReal = parseFloat(localStorage.getItem('ms_real_balance_for_' + userKey) || localStorage.getItem('ms_real_balance') || '0');
-          const serverReal = (user.realBalance !== undefined) ? parseFloat(user.realBalance) : 0;
-          const finalReal = Math.max(serverReal, localCachedReal);
+          // 100% STRICT AUTHORITATIVE BALANCE ASSIGNMENT FROM SERVER
+          user.realBalance = (user.realBalance !== undefined && user.realBalance !== null) 
+            ? parseFloat(Number(user.realBalance).toFixed(2)) 
+            : 0.00;
+          user.demoBalance = (user.demoBalance !== undefined && user.demoBalance !== null) 
+            ? parseFloat(Number(user.demoBalance).toFixed(2)) 
+            : 10000.00;
 
-          const localCachedDemo = parseFloat(localStorage.getItem('ms_demo_balance_for_' + userKey) || '10000');
-          const serverDemo = (user.demoBalance !== undefined) ? parseFloat(user.demoBalance) : 10000;
-          const finalDemo = serverDemo || localCachedDemo || 10000;
-
-          user.realBalance = parseFloat(finalReal.toFixed(2));
-          user.demoBalance = parseFloat(finalDemo.toFixed(2));
-
-          localStorage.setItem('ms_real_balance', user.realBalance.toString());
-          localStorage.setItem('ms_demo_balance', user.demoBalance.toString());
-          localStorage.setItem('ms_real_balance_for_' + userKey, user.realBalance.toString());
-          localStorage.setItem('ms_demo_balance_for_' + userKey, user.demoBalance.toString());
+          localStorage.setItem('ms_real_balance', user.realBalance.toFixed(2));
+          localStorage.setItem('ms_demo_balance', user.demoBalance.toFixed(2));
+          localStorage.setItem('ms_real_balance_for_' + userKey, user.realBalance.toFixed(2));
+          localStorage.setItem('ms_demo_balance_for_' + userKey, user.demoBalance.toFixed(2));
 
           localStorage.setItem('ms_user', JSON.stringify(user));
 
-          // Ensure server database always has this user with latest balance
-          fetch('/api/sync-client-user', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(user)
-          }).catch(() => {});
-          // Load server-authoritative stats
-          localStorage.setItem('ms_demo_stats', JSON.stringify(user.demoStats || {totalTrades:0,wins:0,losses:0,netProfit:0}));
-          localStorage.setItem('ms_real_stats', JSON.stringify(user.realStats || {totalTrades:0,wins:0,losses:0,netProfit:0}));
           // Load server-authoritative trade history
-          const combined = [
-            ...(user.demoTradeHistory || []),
-            ...(user.realTradeHistory || [])
-          ].sort((a, b) => (b.closedAt || b.startTime || 0) - (a.closedAt || a.startTime || 0));
-          localStorage.setItem('ms_trade_history', JSON.stringify(combined.slice(0, 200)));
-          if (Array.isArray(user.demoTradeHistory)) localStorage.setItem('ms_demo_trade_history', JSON.stringify(user.demoTradeHistory));
-          if (Array.isArray(user.realTradeHistory)) localStorage.setItem('ms_real_trade_history', JSON.stringify(user.realTradeHistory));
+          const realTrades = Array.isArray(user.realTradeHistory) ? user.realTradeHistory : [];
+          const demoTrades = Array.isArray(user.demoTradeHistory) ? user.demoTradeHistory : [];
+          localStorage.setItem('ms_real_trade_history', JSON.stringify(realTrades));
+          localStorage.setItem('ms_demo_trade_history', JSON.stringify(demoTrades));
+
+          const combined = [...realTrades, ...demoTrades].sort((a, b) => (b.closedAt || b.startTime || 0) - (a.closedAt || a.startTime || 0));
+          localStorage.setItem('ms_trade_history', JSON.stringify(combined));
+
+          // Load server-authoritative stats
+          localStorage.setItem('ms_demo_stats', JSON.stringify(user.demoStats || { totalTrades: demoTrades.length, wins: demoTrades.filter(t => t.status === 'WON').length, losses: demoTrades.filter(t => t.status === 'LOST').length, netProfit: 0 }));
+          localStorage.setItem('ms_real_stats', JSON.stringify(user.realStats || { totalTrades: realTrades.length, wins: realTrades.filter(t => t.status === 'WON').length, losses: realTrades.filter(t => t.status === 'LOST').length, netProfit: 0 }));
 
           const users = JSON.parse(localStorage.getItem('ms_users') || '[]');
           const idx = users.findIndex(u => (u.email || '').toLowerCase() === user.email.toLowerCase());
