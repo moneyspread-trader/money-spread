@@ -762,6 +762,13 @@
       let totalReal = 0;
       let totalDemo = 0;
 
+      if (!users || users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:32px 16px; color:#8888aa;">No traders registered yet. Tap <strong>+ Add New Trader</strong> above to add one.</td></tr>';
+        if (cardsContainer) {
+          cardsContainer.innerHTML = '<div style="text-align:center; padding:28px 16px; color:#8888aa; background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed rgba(255,255,255,0.1);"><strong style="color:#fff;">No Traders Registered Yet</strong></div>';
+        }
+      }
+
       users.forEach((u, idx) => {
         const real = parseFloat(u.realBalance || 0);
         const demo = parseFloat(u.demoBalance || 10000);
@@ -1038,6 +1045,13 @@
 
       let totalCommissions = 0;
       let totalReferrals = 0;
+
+      if (!affiliates || affiliates.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:32px 16px; color:#8888aa;">No affiliate partners registered yet. Tap <strong>+ Register Affiliate Partner</strong> above to add one.</td></tr>';
+        if (cardsContainer) {
+          cardsContainer.innerHTML = '<div style="text-align:center; padding:28px 16px; color:#8888aa; background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed rgba(255,255,255,0.1);"><div style="font-size:2rem; margin-bottom:8px;">🤝</div><strong style="color:#fff; font-size:0.95rem;">No Affiliate Partners Yet</strong><p style="font-size:0.8rem; margin:6px 0 0 0; color:#8888aa;">Tap the green <strong>+ Register Affiliate Partner</strong> button above to register a partner with 4W:2L preset win rate.</p></div>';
+        }
+      }
 
       affiliates.forEach((a, idx) => {
         const com = parseFloat(a.commissionEarned || 0);
