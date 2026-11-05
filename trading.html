@@ -97,7 +97,7 @@
       padding: 4px;
     }
     .logo-badge {
-      background: #ef4444;
+      background: #2563eb;
       color: #fff;
       font-weight: 900;
       font-size: 0.85rem;
@@ -150,14 +150,14 @@
       background: #2563eb;
       color: #fff;
       font-weight: 700;
-      font-size: 0.8rem;
-      padding: 6px 14px;
-      border-radius: 8px;
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: 6px;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
 
     /* CONTRACT TYPE TABS ROW */
@@ -300,14 +300,14 @@
       box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
     }
 
-    /* STATS STRIP: CIRCULAR DIGITS (0 to 9) WITH GOLD CURSOR & GREEN/RED GLOW */
+    /* STATS STRIP: PALOPTION STYLE COMPACT DIGITS */
     .digit-stats-strip {
-      background: #0b0f19;
+      background: #090d16;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 6px 2px 4px;
+      padding: 4px 2px 4px;
     }
     .digit-col {
       display: flex;
@@ -315,7 +315,9 @@
       align-items: center;
       cursor: pointer;
       position: relative;
-      min-width: 28px;
+      flex: 1;
+      max-width: 34px;
+      user-select: none;
     }
     .digit-circle {
       width: 28px;
@@ -325,52 +327,66 @@
       align-items: center;
       justify-content: center;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 800;
-      color: #fff;
+      color: #e2e8f0;
       background: #141a29;
       border: 1.5px solid rgba(255, 255, 255, 0.12);
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
     .digit-circle.most-frequent {
       border: 2px solid #10b981;
       color: #10b981;
-      background: rgba(16, 185, 129, 0.2);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.85);
-      animation: pulseGreen 1.6s infinite ease-in-out;
+      background: rgba(16, 185, 129, 0.18);
     }
     .digit-circle.least-frequent {
       border: 2px solid #ef4444;
       color: #ef4444;
-      background: rgba(239, 68, 68, 0.2);
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.85);
-      animation: pulseRed 1.6s infinite ease-in-out;
+      background: rgba(239, 68, 68, 0.18);
     }
     .digit-circle.is-active {
       border: 2px solid #fbbf24;
       color: #0b0f19;
       background: #fbbf24;
       font-weight: 900;
-      box-shadow: 0 0 14px rgba(251, 191, 36, 0.95);
-      transform: scale(1.08);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.9);
+      transform: scale(1.05);
     }
-    .digit-pct-label {
+    .digit-circle.user-selected {
+      border: 2px solid #38bdf8 !important;
+      background: rgba(56, 189, 248, 0.32) !important;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.95), inset 0 0 6px #38bdf8 !important;
+      color: #fff !important;
+      transform: scale(1.1) !important;
+      font-weight: 900 !important;
+    }
+    .digit-pct {
       font-size: 0.58rem;
-      color: #8892b0;
+      color: #64748b;
       font-weight: 700;
-      margin-top: 3px;
+      margin-top: 2px;
       font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      white-space: nowrap;
+      line-height: 1;
     }
-    .digit-gold-cursor {
+    .digit-pct.pct-most {
+      color: #10b981;
+      font-weight: 800;
+    }
+    .digit-pct.pct-least {
+      color: #ef4444;
+      font-weight: 800;
+    }
+    .digit-arrow {
       color: #fbbf24;
-      font-size: 0.65rem;
+      font-size: 0.55rem;
       line-height: 1;
       margin-top: 1px;
-      filter: drop-shadow(0 0 5px #fbbf24);
-      animation: goldBounce 0.8s infinite alternate ease-in-out;
+      text-align: center;
     }
-    .digit-gold-cursor-placeholder {
-      height: 9px;
+    .digit-arrow-placeholder {
+      height: 7px;
     }
     @keyframes pulseGreen {
       0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
@@ -412,6 +428,74 @@
       flex-direction: column;
       justify-content: space-between;
       overflow-y: auto;
+    }
+
+    /* COMBINED STAKE & TICKS ROW FOR MANUAL MODE */
+    .combined-stake-ticks-row {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+      gap: 10px;
+    }
+    .combined-half {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .combined-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .combined-input-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .combined-btn {
+      width: 28px;
+      height: 28px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .combined-btn:active {
+      transform: scale(0.92);
+      background: rgba(255,255,255,0.1);
+    }
+    .combined-input {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      background: transparent;
+      border: none;
+      text-align: center;
+      width: 60px;
+      outline: none;
+    }
+    .combined-divider {
+      width: 1px;
+      background: var(--border-color);
+      align-self: stretch;
+      margin: 2px 0;
     }
 
     /* AUTO / MANUAL SWITCH */
@@ -1057,17 +1141,17 @@
   
     /* WITHDRAW BUTTON IN HEADER */
     .withdraw-header-btn {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
       color: #ff6b6b;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      padding: 6px 10px;
-      border-radius: 8px;
+      padding: 4px 7px;
+      border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       transition: all 0.2s ease;
       text-decoration: none;
     }
@@ -1227,7 +1311,7 @@
       </div>
     </div>
 
-    <div class="header-right" style="display:flex; align-items:center; gap:6px;">
+    <div class="header-right" style="display:flex; align-items:center; gap:4px;">
       <a href="deposit.html" style="text-decoration:none;">
         <button class="deposit-btn">💰 Deposit</button>
       </a>
@@ -1370,48 +1454,43 @@
       </div>
 
       
-      <!-- DURATION (TICKS) BOX (Manual Mode) -->
-      <div class="stake-box" id="durationTicksBox">
-        <div class="stake-header">
-          <span>DURATION (TICKS)</span>
-          <span style="color:#60a5fa;" id="currentTickLabel">1 Tick Expiry</span>
+      <!-- COMBINED STAKE & TICKS (MANUAL MODE ONLY) -->
+      <div class="combined-stake-ticks-row" id="manualCombinedRow" style="display:none;">
+        <div class="combined-half">
+          <div class="combined-header">
+            <span>STAKE (USD)</span>
+          </div>
+          <div class="combined-input-wrap">
+            <button class="combined-btn" type="button" onclick="adjustStake(-1)">−</button>
+            <input type="number" class="combined-input" id="tradeStakeManual" value="10" min="1" step="1" oninput="syncStakeFromManual(this.value)">
+            <button class="combined-btn" type="button" onclick="adjustStake(1)">+</button>
+          </div>
         </div>
-        <div class="stake-input-row">
-          <button class="qty-btn" type="button" onclick="adjustTicks(-1)">-</button>
-          <input type="number" class="stake-num-input" id="tradeDurationTicks" value="1" min="1" max="10" step="1" oninput="updateTickDurationDisplay()">
-          <button class="qty-btn" type="button" onclick="adjustTicks(1)">+</button>
+        <div class="combined-divider"></div>
+        <div class="combined-half">
+          <div class="combined-header">
+            <span>DURATION</span>
+            <span style="color:#60a5fa; font-size:0.62rem;" id="manualTickLabel">1 Tick</span>
+          </div>
+          <div class="combined-input-wrap">
+            <button class="combined-btn" type="button" onclick="adjustTicks(-1)">−</button>
+            <input type="number" class="combined-input" id="tradeDurationTicks" value="1" min="1" max="10" step="1" oninput="updateTickDurationDisplay()">
+            <button class="combined-btn" type="button" onclick="adjustTicks(1)">+</button>
+          </div>
         </div>
-      </div>
-      <!-- QUICK TICKS PRESETS -->
-      <div class="quick-stakes-row" id="quickTicksRow" style="grid-template-columns: repeat(5, 1fr); margin-bottom:8px;">
-        <div class="quick-stake-chip active" onclick="setQuickTicks(1, this)">1 Tick</div>
-        <div class="quick-stake-chip" onclick="setQuickTicks(2, this)">2 Ticks</div>
-        <div class="quick-stake-chip" onclick="setQuickTicks(3, this)">3 Ticks</div>
-        <div class="quick-stake-chip" onclick="setQuickTicks(5, this)">5 Ticks</div>
-        <div class="quick-stake-chip" onclick="setQuickTicks(10, this)">10 Ticks</div>
       </div>
 
-      <!-- STAKE BOX -->
-      <div class="stake-box">
+      <!-- AUTO MODE STAKE BOX (AUTO MODE ONLY) -->
+      <div class="stake-box" id="autoStakeBox">
         <div class="stake-header">
           <span>STAKE (USD)</span>
           <span id="payoutMultiplier">95.2% Payout</span>
         </div>
         <div class="stake-input-row">
-          <button class="qty-btn" onclick="adjustStake(-1)">−</button>
-          <input type="number" class="stake-num-input" id="tradeStake" value="10" min="1" step="1" oninput="updatePayouts()">
-          <button class="qty-btn" onclick="adjustStake(1)">+</button>
+          <button class="qty-btn" type="button" onclick="adjustStake(-1)">−</button>
+          <input type="number" class="stake-num-input" id="tradeStake" value="10" min="1" step="1" oninput="syncStakeFromAuto(this.value)">
+          <button class="qty-btn" type="button" onclick="adjustStake(1)">+</button>
         </div>
-      </div>
-
-      <!-- QUICK STAKE PRESETS -->
-      <div class="quick-stakes-row">
-        <div class="quick-stake-chip" onclick="setQuickStake(1)">$1</div>
-        <div class="quick-stake-chip" onclick="setQuickStake(5)">$5</div>
-        <div class="quick-stake-chip active" onclick="setQuickStake(10)">$10</div>
-        <div class="quick-stake-chip" onclick="setQuickStake(25)">$25</div>
-        <div class="quick-stake-chip" onclick="setQuickStake(50)">$50</div>
-        <div class="quick-stake-chip" onclick="setQuickStake(100)">$100</div>
       </div>
 
       <!-- AUTO-BOT RISK SETTINGS -->
@@ -1524,6 +1603,9 @@
     <div style="margin-top:auto; padding-top:12px; border-top:1px solid var(--border-color); font-size:0.75rem; color:#666; text-align:center;">
       Money Spread v2.0 &bull; 2026
     </div>
+    <button onclick="doDrawerLogout()" style="width:100%; margin-top:12px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); color:#ff6b6b; padding:10px 14px; border-radius:8px; font-weight:700; font-size:0.88rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+      🚪 Log Out
+    </button>
   </aside>
 
   
@@ -1861,37 +1943,16 @@
     let selectedDurationTicks = 1;
 
     function selectTradeDigit(d) {
+      if (currentContractCategory !== 'MATCHES_DIFFERS' && currentContractCategory !== 'OVER_UNDER') {
+        return;
+      }
       selectedTargetDigit = d;
       playClickSound();
       renderDigitStrip();
       updatePayouts();
     }
 
-    function adjustTicks(delta) {
-      const input = document.getElementById('tradeDurationTicks');
-      if (!input) return;
-      let val = (parseInt(input.value, 10) || 1) + delta;
-      val = Math.max(1, Math.min(10, val));
-      input.value = val;
-      updateTickDurationDisplay();
-    }
 
-    function setQuickTicks(ticks, el) {
-      selectedDurationTicks = ticks;
-      const input = document.getElementById('tradeDurationTicks');
-      if (input) input.value = ticks;
-      document.querySelectorAll('#quickTicksRow .quick-stake-chip').forEach(c => c.classList.remove('active'));
-      if (el) el.classList.add('active');
-      updateTickDurationDisplay();
-    }
-
-    function updateTickDurationDisplay() {
-      const input = document.getElementById('tradeDurationTicks');
-      const val = parseInt(input ? input.value : 1, 10) || 1;
-      selectedDurationTicks = val;
-      const lbl = document.getElementById('currentTickLabel');
-      if (lbl) lbl.textContent = val + (val === 1 ? ' Tick Expiry' : ' Ticks Expiry');
-    }
 
     function renderDigitStrip(activeDigit) {
       const container = document.getElementById('digitStatsStrip');
@@ -1905,10 +1966,13 @@
         if (v < minVal) { minVal = v; minIdx = i; }
       }
 
+      // Blue selected glow ONLY applies to Matches/Differs and Over/Under
+      const canSelectDigit = (currentContractCategory === 'MATCHES_DIFFERS' || currentContractCategory === 'OVER_UNDER');
+
       let html = '';
       for (let i = 0; i <= 9; i++) {
         const isActive = (i === activeDigit);
-        const isSelected = (i === selectedTargetDigit);
+        const isSelected = canSelectDigit && (i === selectedTargetDigit);
         const isMost = (i === maxIdx);
         const isLeast = (i === minIdx);
 
@@ -1918,10 +1982,10 @@
         else if (isMost) circleClass += ' most-frequent';
         else if (isLeast) circleClass += ' least-frequent';
 
-        html += '<div class="digit-col ' + (isActive ? 'active-col' : '') + '" onclick="selectTradeDigit(' + i + ')" style="cursor:pointer;" title="Tap to set Target Digit ' + i + '">' +
+        html += '<div class="digit-col ' + (isActive ? 'active-col' : '') + '" onclick="selectTradeDigit(' + i + ')" title="Digit ' + i + '">' +
           '<div class="' + circleClass + '">' + i + '</div>' +
           '<div class="digit-pct ' + (isMost ? 'pct-most' : (isLeast ? 'pct-least' : '')) + '">' + digitStats[i].toFixed(1) + '%</div>' +
-          (isActive ? '<div class="digit-arrow">▲</div>' : '') +
+          (isActive ? '<div class="digit-arrow">▲</div>' : '<div class="digit-arrow-placeholder"></div>') +
         '</div>';
       }
       container.innerHTML = html;
@@ -2425,12 +2489,13 @@
         b1.textContent = 'Rise';
         b2.textContent = 'Fall';
       } else if (cat === 'MATCHES_DIFFERS') {
-        b1.textContent = 'Matches (4)';
-        b2.textContent = 'Differs (4)';
+        b1.textContent = 'Matches (' + selectedTargetDigit + ')';
+        b2.textContent = 'Differs (' + selectedTargetDigit + ')';
       } else if (cat === 'OVER_UNDER') {
-        b1.textContent = 'Over (4)';
-        b2.textContent = 'Under (4)';
+        b1.textContent = 'Over (' + selectedTargetDigit + ')';
+        b2.textContent = 'Under (' + selectedTargetDigit + ')';
       }
+      renderDigitStrip();
       updatePayouts();
     }
 
@@ -2438,30 +2503,69 @@
       currentBotMode = mode;
       document.getElementById('btnAutoMode').classList.toggle('active', mode === 'auto');
       document.getElementById('btnManualMode').classList.toggle('active', mode === 'manual');
-      document.getElementById('autoParamsRow').style.display = (mode === 'auto') ? 'grid' : 'none';
+      
+      const autoStake = document.getElementById('autoStakeBox');
+      const manualCombined = document.getElementById('manualCombinedRow');
+      const autoParams = document.getElementById('autoParamsRow');
+
+      if (mode === 'auto') {
+        if (autoStake) autoStake.style.display = 'block';
+        if (manualCombined) manualCombined.style.display = 'none';
+        if (autoParams) autoParams.style.display = 'grid';
+      } else {
+        if (autoStake) autoStake.style.display = 'none';
+        if (manualCombined) manualCombined.style.display = 'flex';
+        if (autoParams) autoParams.style.display = 'none';
+      }
+    }
+
+    function syncStakeFromManual(val) {
+      const auto = document.getElementById('tradeStake');
+      if (auto) auto.value = val;
+      updatePayouts();
+    }
+
+    function syncStakeFromAuto(val) {
+      const manual = document.getElementById('tradeStakeManual');
+      if (manual) manual.value = val;
+      updatePayouts();
     }
 
     function adjustStake(delta) {
-      const el = document.getElementById('tradeStake');
-      let val = Math.max(1, (parseFloat(el.value) || 10) + delta);
-      el.value = val;
+      const autoEl = document.getElementById('tradeStake');
+      const manualEl = document.getElementById('tradeStakeManual');
+      const currentVal = parseFloat(autoEl ? autoEl.value : (manualEl ? manualEl.value : 10)) || 10;
+      const newVal = Math.max(1, currentVal + delta);
+      if (autoEl) autoEl.value = newVal;
+      if (manualEl) manualEl.value = newVal;
       updatePayouts();
     }
 
-    function setQuickStake(val) {
-      document.getElementById('tradeStake').value = val;
-      document.querySelectorAll('.quick-stake-chip').forEach(c => {
-        c.classList.toggle('active', c.textContent === '$' + val);
-      });
-      updatePayouts();
+    function adjustTicks(delta) {
+      const input = document.getElementById('tradeDurationTicks');
+      if (!input) return;
+      let val = (parseInt(input.value, 10) || 1) + delta;
+      val = Math.max(1, Math.min(10, val));
+      input.value = val;
+      updateTickDurationDisplay();
     }
 
-    function updatePayouts() {
-      const stake = parseFloat(document.getElementById('tradeStake').value) || 10;
-      const payout = (stake * 1.952).toFixed(2);
-      document.getElementById('btn1Payout').textContent = '$' + payout + ' Payout';
-      document.getElementById('btn2Payout').textContent = '$' + payout + ' Payout';
+    function updateTickDurationDisplay() {
+      const input = document.getElementById('tradeDurationTicks');
+      const val = parseInt(input ? input.value : 1, 10) || 1;
+      selectedDurationTicks = val;
+      const lbl = document.getElementById('currentTickLabel');
+      if (lbl) lbl.textContent = val + (val === 1 ? ' Tick Expiry' : ' Ticks Expiry');
+      const mlbl = document.getElementById('manualTickLabel');
+      if (mlbl) mlbl.textContent = val + (val === 1 ? ' Tick' : ' Ticks');
     }
+
+    function doDrawerLogout() {
+      localStorage.removeItem('ms_logged_in');
+      window.location.href = 'register.html?tab=login';
+    }
+
+
 
     // ==========================================
     // UNIFIED TRADE EXECUTION & RECORDING
@@ -2528,6 +2632,8 @@
       if (isReal) u.realBalance = currentBal;
       else u.demoBalance = currentBal;
       localStorage.setItem('ms_user', JSON.stringify(u));
+      const uKey = (u.email || u.nickname || 'current').toLowerCase();
+      localStorage.setItem((isReal ? 'ms_real_balance_for_' : 'ms_demo_balance_for_') + uKey, currentBal.toFixed(2));
 
       updateHeaderBalance();
 
@@ -2578,6 +2684,12 @@
       // 2. Deduct stake immediately
       currentBal = Math.max(0, parseFloat((currentBal - stake).toFixed(2)));
       localStorage.setItem(balKey, currentBal.toFixed(2));
+      const uStake = JSON.parse(localStorage.getItem('ms_user') || '{}');
+      if (isReal) uStake.realBalance = currentBal;
+      else uStake.demoBalance = currentBal;
+      localStorage.setItem('ms_user', JSON.stringify(uStake));
+      const uStakeKey = (uStake.email || uStake.nickname || 'current').toLowerCase();
+      localStorage.setItem((isReal ? 'ms_real_balance_for_' : 'ms_demo_balance_for_') + uStakeKey, currentBal.toFixed(2));
       updateHeaderBalance();
 
       playClickSound();
@@ -3271,6 +3383,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       initLiveCanvasChart();
+      setBotMode('auto');
       renderDigitStrip(6);
       updatePayouts();
       syncUser();

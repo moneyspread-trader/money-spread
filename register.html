@@ -506,18 +506,31 @@
             }).catch(() => {});
           }
 
+          // BALANCE PERSISTENCE PROTECTION: Never overwrite earned balance with stale server value
+          const localCachedReal = parseFloat(localStorage.getItem('ms_real_balance_for_' + userKey) || localStorage.getItem('ms_real_balance') || '0');
+          const serverReal = (user.realBalance !== undefined) ? parseFloat(user.realBalance) : 0;
+          const finalReal = Math.max(serverReal, localCachedReal);
+
+          const localCachedDemo = parseFloat(localStorage.getItem('ms_demo_balance_for_' + userKey) || '10000');
+          const serverDemo = (user.demoBalance !== undefined) ? parseFloat(user.demoBalance) : 10000;
+          const finalDemo = serverDemo || localCachedDemo || 10000;
+
+          user.realBalance = parseFloat(finalReal.toFixed(2));
+          user.demoBalance = parseFloat(finalDemo.toFixed(2));
+
+          localStorage.setItem('ms_real_balance', user.realBalance.toString());
+          localStorage.setItem('ms_demo_balance', user.demoBalance.toString());
+          localStorage.setItem('ms_real_balance_for_' + userKey, user.realBalance.toString());
+          localStorage.setItem('ms_demo_balance_for_' + userKey, user.demoBalance.toString());
+
           localStorage.setItem('ms_user', JSON.stringify(user));
 
-          // Ensure server database always has this user
+          // Ensure server database always has this user with latest balance
           fetch('/api/sync-client-user', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(user)
           }).catch(() => {});
-
-          // Load server-authoritative balances
-          localStorage.setItem('ms_demo_balance', (user.demoBalance !== undefined ? user.demoBalance : 10000).toString());
-          localStorage.setItem('ms_real_balance', (user.realBalance !== undefined ? user.realBalance : 0).toString());
           // Load server-authoritative stats
           localStorage.setItem('ms_demo_stats', JSON.stringify(user.demoStats || {totalTrades:0,wins:0,losses:0,netProfit:0}));
           localStorage.setItem('ms_real_stats', JSON.stringify(user.realStats || {totalTrades:0,wins:0,losses:0,netProfit:0}));

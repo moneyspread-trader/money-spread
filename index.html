@@ -232,6 +232,45 @@
         box-sizing: border-box !important;
       }
     }
+  
+    /* ELECTRIC BLUE THEME (Matching Trading Page) */
+    .brand-accent {
+      color: #60a5fa !important;
+    }
+    .btn-start-trading-compact {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%) !important;
+      box-shadow: 0 6px 25px rgba(37, 99, 235, 0.5) !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    }
+    .btn-start-trading-compact:hover {
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.7) !important;
+      transform: translateY(-2px) scale(1.02);
+    }
+    .btn-login-compact:hover {
+      border-color: #3b82f6 !important;
+      color: #60a5fa !important;
+    }
+    .hero-pill {
+      border-color: rgba(59, 130, 246, 0.4) !important;
+      background: rgba(59, 130, 246, 0.08) !important;
+    }
+    .pulse-dot {
+      background: #3b82f6 !important;
+    }
+    .nav-mobile-cta .btn-primary {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4) !important;
+    }
+    #navGuestActions .btn-primary {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4) !important;
+    }
+    .admin-dots-btn:hover, .admin-dots-btn:active {
+      background: rgba(59, 130, 246, 0.3) !important;
+      border-color: #3b82f6 !important;
+      color: #60a5fa !important;
+    }
+
   </style>
 </head>
 <body>
@@ -264,7 +303,7 @@
   <nav class="navbar" style="background: rgba(8, 8, 18, 0.88); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding: 8px 1.5rem;">
     <a href="index.html" class="nav-brand" style="text-decoration: none;">
       <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
-        <circle cx="18" cy="18" r="18" fill="#ff444f"/>
+        <circle cx="18" cy="18" r="18" fill="#2563eb"/>
         <text x="18" y="24" text-anchor="middle" font-size="18" font-weight="bold" fill="white" font-family="Inter">$</text>
       </svg>
       <span class="brand-name" style="font-size: 1.15rem;">Money<span class="brand-accent">Spread</span></span>
@@ -281,7 +320,7 @@
       <!-- Guest Action Buttons in Navbar -->
       <div id="navGuestActions" style="display: flex; gap: 8px; align-items: center; margin-left: 10px;">
         <a href="register.html?tab=login" class="btn btn-outline btn-sm" style="padding: 5px 12px; font-weight: 700; font-size: 0.82rem;">Log In</a>
-        <a href="register.html?tab=signup" class="btn btn-primary btn-sm" style="padding: 5px 14px; font-weight: 800; background: #ff444f; font-size: 0.82rem;">Start Free Trading</a>
+        <a href="register.html?tab=signup" class="btn btn-primary btn-sm" style="padding: 5px 14px; font-weight: 800; background: #2563eb; font-size: 0.82rem;">Start Free Trading</a>
       </div>
 
       <!-- User Logged In Actions -->
@@ -294,7 +333,7 @@
     <!-- Mobile-only compact CTA (never wraps or overlaps) -->
     <div class="nav-mobile-cta" style="display: none;">
       <a href="register.html?tab=login" class="btn btn-outline btn-sm" style="padding: 5px 10px; font-size: 0.75rem; border-color: rgba(255,255,255,0.25);">Log In</a>
-      <a href="register.html?tab=signup" class="btn btn-primary btn-sm" style="padding: 5px 12px; font-size: 0.75rem; background: #ff444f; font-weight: 800;">Trade</a>
+      <a href="register.html?tab=signup" class="btn btn-primary btn-sm" style="padding: 5px 12px; font-size: 0.75rem; background: #2563eb; font-weight: 800;">Trade</a>
     </div>
   </nav>
 

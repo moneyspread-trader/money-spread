@@ -512,6 +512,17 @@ const server = http.createServer((req, res) => {
             users[idx].profilePic = clientUser.profilePic;
             changed = true;
           }
+          if (clientUser.realBalance !== undefined) {
+            const clientBal = parseFloat(clientUser.realBalance);
+            if (isNaN(users[idx].realBalance) || clientBal > (users[idx].realBalance || 0)) {
+              users[idx].realBalance = clientBal;
+              changed = true;
+            }
+          }
+          if (clientUser.demoBalance !== undefined && users[idx].demoBalance === undefined) {
+            users[idx].demoBalance = parseFloat(clientUser.demoBalance);
+            changed = true;
+          }
           if (changed) saveUsers(users);
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
